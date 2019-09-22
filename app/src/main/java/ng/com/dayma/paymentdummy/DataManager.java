@@ -1,7 +1,13 @@
 package ng.com.dayma.paymentdummy;
 
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+
 import java.util.ArrayList;
 import java.util.List;
+
+import ng.com.dayma.paymentdummy.data.PaymentDatabaseContract.MonthInfoEntry;
+import ng.com.dayma.paymentdummy.data.PaymentOpenHelper;
 
 /**
  * Created by Ahmad on 7/12/2019.
@@ -16,10 +22,46 @@ public class DataManager {
     public static DataManager getInstance() {
         if(ourInstance == null){
             ourInstance = new DataManager();
-            ourInstance.initializeMonths();
-            ourInstance.initializeExamplePayments();
+//            ourInstance.initializeMonths();
+//            ourInstance.initializeExamplePayments();
         }
         return ourInstance;
+    }
+
+    public static void loadFromDatabase(PaymentOpenHelper dbHelper){
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+
+        // get the columns for the month_info table
+        final String[] monthColumnsProjection = {
+                MonthInfoEntry.COLUMN_MONTH_ID
+        };
+        // query the month_info table with the specified columns
+        Cursor monthCursor = db.query(MonthInfoEntry.TABLE_NAME, monthColumnsProjection, null,
+                null, null, null, null);// query returns a cursor
+
+        // extract the months from the returned cursor
+        loadMonthsFromDatabase(monthCursor);
+
+    }
+
+    private static void loadMonthsFromDatabase(Cursor cursor) {
+        // get the columns position
+        int monthIdPos = cursor.getColumnIndex(MonthInfoEntry.COLUMN_MONTH_ID);
+
+        // get reference to datamanager singleton and clear any previous month
+        DataManager dm = getInstance();
+        dm.mMonths.clear();
+
+        // extract data from each row
+        while (cursor.moveToNext()) {
+            String monthId = cursor.getString(monthIdPos);
+            // create new Month and add to mMonths field
+            MonthInfo month = new MonthInfo(monthId);
+            dm.mMonths.add(month);
+        }
+        // close cursor after retreiving the rows
+        cursor.close();
+
     }
 
     public String getCurrentUserName() {
@@ -177,7 +219,7 @@ public class DataManager {
     }
 
     private MonthInfo initializeMonth3() {
-        MonthInfo month = new MonthInfo("April 2019", "Chanda Payment for April");
+        MonthInfo month = new MonthInfo("April 2019");
         List<ScheduleInfo> schedules = new ArrayList<>();
         schedules.add(new ScheduleInfo("Schedule1 for kewulere", month));
         schedules.add(new ScheduleInfo("Schedule1 for felele", month));
@@ -191,7 +233,7 @@ public class DataManager {
     }
 
     private MonthInfo initializeMonth2() {
-        MonthInfo month = new MonthInfo("May 2019", "Chanda Payment for May");
+        MonthInfo month = new MonthInfo("May 2019");
         List<ScheduleInfo> schedules = new ArrayList<>();
         schedules.add(new ScheduleInfo("Schedule2 for kewulere", month));
         schedules.add(new ScheduleInfo("Schedule2 for felele", month));
@@ -205,7 +247,7 @@ public class DataManager {
     }
 
     private MonthInfo initializeMonth1() {
-        MonthInfo month = new MonthInfo("June 2019", "Chanda Payment for June");
+        MonthInfo month = new MonthInfo("June 2019");
         List<ScheduleInfo> schedules = new ArrayList<>();
         schedules.add(new ScheduleInfo("Schedule3 for kewulere",month));
         schedules.add(new ScheduleInfo("Schedule3 for felele", month));

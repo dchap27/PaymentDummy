@@ -100,6 +100,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void initialDisplayContent() {
+        DataManager.loadFromDatabase(mDbOpenHelper);
         mRecyclerItems = (RecyclerView) findViewById(R.id.list_schedules);
         mGridLayoutManager = new GridLayoutManager(this,
                 getResources().getInteger(R.integer.schedule_grid_span));
@@ -118,8 +119,6 @@ public class MainActivity extends AppCompatActivity
     private void displaySchedules() {
         mRecyclerItems.setLayoutManager(mGridLayoutManager);
         mRecyclerItems.setAdapter(mScheduleRecyclerAdapter);
-
-        SQLiteDatabase db = mDbOpenHelper.getReadableDatabase();
 
         selectNavigationMenuItem(R.id.nav_schedules);
 

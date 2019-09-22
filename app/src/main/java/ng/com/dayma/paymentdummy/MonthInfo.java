@@ -12,22 +12,19 @@ import java.util.List;
 
 public final class MonthInfo implements Parcelable {
     private final String mMonthId;
-    private final String mTitle;
     private List<ScheduleInfo> mSchedules;
 
-    public MonthInfo(String monthId, String title) {
-        this(monthId,title, null);
+    public MonthInfo(String monthId) {
+        this(monthId, null);
     }
 
-    public MonthInfo(String monthId, String title, List<ScheduleInfo> schedules) {
+    public MonthInfo(String monthId, List<ScheduleInfo> schedules) {
         mMonthId = monthId;
-        mTitle = title;
         mSchedules = schedules;
     }
 
     public MonthInfo (Parcel source) {
         mMonthId = source.readString();
-        mTitle = source.readString();
         mSchedules = new ArrayList<>();
         source.readTypedList(mSchedules, ScheduleInfo.CREATOR);
     }
@@ -36,9 +33,6 @@ public final class MonthInfo implements Parcelable {
         return mMonthId;
     }
 
-    String getTitle() {
-        return mTitle;
-    }
 
     public void addSchedule(ScheduleInfo schedule) {
         if(mSchedules == null){
@@ -75,7 +69,7 @@ public final class MonthInfo implements Parcelable {
 
     @Override
     public String toString() {
-        return mTitle;
+        return mMonthId;
     }
 
     @Override
@@ -103,7 +97,6 @@ public final class MonthInfo implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(mMonthId);
-        dest.writeString(mTitle);
         dest.writeTypedList(mSchedules);
 
     }
