@@ -36,7 +36,7 @@ public class PaymentRecyclerAdapter extends RecyclerView.Adapter<PaymentRecycler
     public void onBindViewHolder(PaymentRecyclerAdapter.ViewHolder holder, int position) {
 
         PaymentInfo payment = mPayments.get(position);
-        holder.mTextPaymentId.setText(payment.getPaymentId());
+        holder.mTextPaymentId.setText(payment.getChandaNo());
         holder.mTextMonthPaid.setText(payment.getMonthPaid());
         holder.mTextReceiptNo.setText(String.format(mContext.getString(R.string.text_receipt_number), String.valueOf(payment.getReceiptNo())));
         holder.mTextAmountPaid.setText(String.format(mContext.getString(R.string.text_amount_paid), String.valueOf(payment.getTotalAmountPaid())));

@@ -8,50 +8,99 @@ import android.os.Parcelable;
  */
 
 public final class PaymentInfo implements Parcelable {
-    private String mPaymentId;
+    private String mFullname;
+    private String mLocalReceipt;
+    private float mJalsaSalana;
+    private float mWelfare;
+    private float mScholarship;
+    private float mSubtotal;
+    private float mMiscellaneous;
+    private float mWasiyyatHissan;
+    private float mCentinary;
+    private float mMaryam;
+    private float mTabligh;
+    private float mZakat;
+    private float mSadakat;
+    private float mFitrana;
+    private float mMosqueDonation;
+    private float mMta;
+    private int mChandaNo;
     private ScheduleInfo mSchedule;
     private String mMonthPaid;
-    private int mReceiptNo;
     private float mChandaAm;
     private float mWasiyyat;
     private float mTahrikJadid;
     private float mWaqfJadid;
 
-    public PaymentInfo(String paymentId, String monthPaid, int receiptNo, float chandaAm, float wasiyyat,
-                       float tahrikJadid, float waqfJadid) {
-        this(paymentId,monthPaid,receiptNo,chandaAm,wasiyyat,tahrikJadid,waqfJadid,null);
+    public PaymentInfo(ScheduleInfo schedule, int chandaNo, String fullname, String localReceipt, String monthPaid) {
+        this(null,chandaNo,null,localReceipt,monthPaid, 0.0f, 0.0f, 0.0f,0.0f,
+                0.0f,0.0f,0.0f,0.0f,0.0f,0.0f,0.0f,0.0f,0.0f,0.0f,0.0f,
+                0.0f,0.0f,0.0f);
     }
 
-    public PaymentInfo(String paymentId, String monthPaid, int receiptNo, float chandaAm, float wasiyyat,
-                       float tahrikJadid, float waqfJadid, ScheduleInfo schedule) {
-        mPaymentId = paymentId;
+    public PaymentInfo(ScheduleInfo schedule, int chandaNo, String fullname, String localReceipt, String monthPaid,
+                       float chandaAm, float wasiyyat, float jalsaSalana, float tarikiJadid,
+                       float waqfJadid, float welfare, float scholarship, float maryam,
+                       float tabligh, float zakat, float sadakat, float fitrana,
+                       float mosqueDonation, float mta, float centinary, float wasiyyatHissan,
+                       float miscellaneous, float subtotal) {
+        mChandaNo = chandaNo;
+        mFullname = fullname;
         mMonthPaid = monthPaid;
-        mReceiptNo = receiptNo;
+        mLocalReceipt = localReceipt;
         mChandaAm = chandaAm;
         mWasiyyat = wasiyyat;
-        mTahrikJadid = tahrikJadid;
+        mJalsaSalana = jalsaSalana;
+        mTahrikJadid = tarikiJadid;
         mWaqfJadid = waqfJadid;
+        mWelfare = welfare;
+        mScholarship = scholarship;
+        mMaryam = maryam;
+        mTabligh = tabligh;
+        mZakat = zakat;
+        mSadakat = sadakat;
+        mFitrana = fitrana;
+        mMosqueDonation = mosqueDonation;
+        mMta = mta;
+        mCentinary = centinary;
+        mWasiyyatHissan = wasiyyatHissan;
+        mMiscellaneous = miscellaneous;
+        mSubtotal = subtotal;
         mSchedule = schedule;
 
     }
 
     private PaymentInfo(Parcel source) {
-        mPaymentId = source.readString();
+        mChandaNo = source.readInt();
         mMonthPaid = source.readString();
-        mReceiptNo = source.readInt();
+        mLocalReceipt = source.readString();
         mChandaAm = source.readFloat();
         mWasiyyat = source.readFloat();
+        mJalsaSalana = source.readFloat();
         mTahrikJadid = source.readFloat();
         mWaqfJadid = source.readFloat();
+        mWelfare = source.readFloat();
+        mScholarship = source.readFloat();
+        mMaryam = source.readFloat();
+        mTabligh = source.readFloat();
+        mZakat = source.readFloat();
+        mSadakat = source.readFloat();
+        mFitrana = source.readFloat();
+        mMosqueDonation = source.readFloat();
+        mMta = source.readFloat();
+        mCentinary = source.readFloat();
+        mWasiyyatHissan = source.readFloat();
+        mMiscellaneous = source.readFloat();
+        mSubtotal = source.readFloat();
         mSchedule = source.readParcelable(ScheduleInfo.class.getClassLoader());
     }
 
-    public String getPaymentId() {
-        return mPaymentId;
+    public int getChandaNo() {
+        return mChandaNo;
     }
 
-    public void setPaymentId(String paymentId) {
-        mPaymentId = paymentId;
+    public void setChandaNo(int chandaNo) {
+        mChandaNo = chandaNo;
     }
 
     public ScheduleInfo getSchedule() {
@@ -62,12 +111,12 @@ public final class PaymentInfo implements Parcelable {
         mSchedule = schedule;
     }
 
-    public int getReceiptNo() {
-        return mReceiptNo;
+    public String getReceiptNo() {
+        return mLocalReceipt;
     }
 
-    public void setReceiptNo(int receiptNo) {
-        mReceiptNo = receiptNo;
+    public void setReceiptNo(String receiptNo) {
+        mLocalReceipt = receiptNo;
     }
 
     public String getMonthPaid() {
@@ -114,7 +163,7 @@ public final class PaymentInfo implements Parcelable {
         return getChandaAm() + getWasiyyat() + getTahrikJadid() + getWaqfJadid();
     }
     private String getCompareKey() {
-        return mPaymentId + "|" + mMonthPaid;
+        return mChandaNo + "|" + mMonthPaid;
     }
 
     @Override
@@ -144,14 +193,28 @@ public final class PaymentInfo implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(mPaymentId);
+        dest.writeInt(mChandaNo);
         dest.writeParcelable(mSchedule, 0);
         dest.writeString(mMonthPaid);
-        dest.writeInt(mReceiptNo);
+        dest.writeString(mLocalReceipt);
         dest.writeFloat(mChandaAm);
         dest.writeFloat(mWasiyyat);
+        dest.writeFloat(mJalsaSalana);
         dest.writeFloat(mTahrikJadid);
         dest.writeFloat(mWaqfJadid);
+        dest.writeFloat(mWelfare);
+        dest.writeFloat(mScholarship);
+        dest.writeFloat(mMaryam);
+        dest.writeFloat(mTabligh);
+        dest.writeFloat(mZakat);
+        dest.writeFloat(mSadakat);
+        dest.writeFloat(mFitrana);
+        dest.writeFloat(mMosqueDonation);
+        dest.writeFloat(mMta);
+        dest.writeFloat(mCentinary);
+        dest.writeFloat(mWasiyyatHissan);
+        dest.writeFloat(mMiscellaneous);
+        dest.writeFloat(mSubtotal);
 
     }
 

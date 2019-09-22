@@ -12,22 +12,28 @@ import java.util.List;
 
 public final class ScheduleInfo implements Parcelable {
     private final String mScheduleId;
+    private final String mJamaat;
+    private final String mTitle;
     private MonthInfo mMonth;
     private boolean mIsComplete = false;
 
-    public ScheduleInfo(String scheduleId, MonthInfo month) {
-        this(scheduleId, month, false);
+    public ScheduleInfo(String scheduleId, MonthInfo month, String jamaat, String title) {
+        this(scheduleId, month, jamaat, title, false);
     }
 
-    public ScheduleInfo (String scheduleId, MonthInfo month, boolean isComplete) {
+    public ScheduleInfo (String scheduleId, MonthInfo month, String jamaat, String title, boolean isComplete) {
         mScheduleId = scheduleId;
         mMonth = month;
+        mJamaat = jamaat;
+        mTitle = title;
         mIsComplete = isComplete;
     }
 
     public ScheduleInfo(Parcel source) {
         mScheduleId = source.readString();
         mMonth = source.readParcelable(MonthInfo.class.getClassLoader());
+        mJamaat = source.readString();
+        mTitle = source.readString();
         mIsComplete = source.readByte() == 1;
     }
 
@@ -38,6 +44,10 @@ public final class ScheduleInfo implements Parcelable {
     public MonthInfo getMonth() {
         return mMonth;
     }
+
+    public String getTitle() { return mTitle; }
+
+    public String getJamaat() { return mJamaat; }
 
     public boolean isComplete() {
         return mIsComplete;
@@ -80,6 +90,8 @@ public final class ScheduleInfo implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(mScheduleId);
         dest.writeParcelable(mMonth, 0);
+        dest.writeString(mJamaat);
+        dest.writeString(mTitle);
         dest.writeByte((byte) (mIsComplete ? 1 : 0));
 
     }

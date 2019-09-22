@@ -42,9 +42,9 @@ public class PaymentActivity extends AppCompatActivity {
     private MonthInfo mMonth;
     private ScheduleInfo mSchedule;
     private Spinner mSpinnerPaymentId;
-    private String mOriginalPaymentId;
+    private int mOriginalChandaNo;
     private String mOriginalMonthPaid;
-    private int mOriginalPaymentReceiptNo;
+    private String mOriginalPaymentReceiptNo;
     private float mOriginalPaymentChandaAm;
     private float mOriginalPaymentWasiyyat;
     private float mOriginalPaymentTahrikJadid;
@@ -99,10 +99,10 @@ public class PaymentActivity extends AppCompatActivity {
     }
 
     private void restoreOriginalPaymentValues(Bundle savedInstanceState) {
-        mOriginalPaymentId = savedInstanceState.getString(ORIGINAL_PAYMENT_ID);
+        mOriginalChandaNo = Integer.parseInt(savedInstanceState.getString(ORIGINAL_PAYMENT_ID));
         mOriginalScheduleId = savedInstanceState.getString(ORIGINAL_SCHEDULE_ID);
         mOriginalMonthPaid = savedInstanceState.getString(ORIGINAL_MONTH_PAID);
-        mOriginalPaymentReceiptNo = Integer.parseInt(savedInstanceState.getString(ORIGINAL_PAYMENT_RECEIPT_NO));
+        mOriginalPaymentReceiptNo = savedInstanceState.getString(ORIGINAL_PAYMENT_RECEIPT_NO);
         mOriginalPaymentChandaAm = Float.parseFloat(savedInstanceState.getString(ORIGINAL_PAYMENT_CHANDAAM));
         mOriginalPaymentWasiyyat = Float.parseFloat(savedInstanceState.getString(ORIGINAL_PAYMENT_WASIYYAT));
         mOriginalPaymentTahrikJadid = Float.parseFloat(savedInstanceState.getString(ORIGINAL_PAYMENT_TAHRIKJADID));
@@ -113,7 +113,7 @@ public class PaymentActivity extends AppCompatActivity {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putString(ORIGINAL_PAYMENT_ID, mOriginalPaymentId);
+        outState.putString(ORIGINAL_PAYMENT_ID, String.valueOf(mOriginalChandaNo));
         outState.putString(ORIGINAL_SCHEDULE_ID, mOriginalScheduleId);
         outState.putString(ORIGINAL_MONTH_PAID, mOriginalMonthPaid);
         outState.putString(ORIGINAL_PAYMENT_RECEIPT_NO, String.valueOf(mOriginalPaymentReceiptNo));
@@ -126,7 +126,7 @@ public class PaymentActivity extends AppCompatActivity {
     private void saveOriginalPaymentValues() {
         if(mIsNewPayment)
             return;
-        mOriginalPaymentId = mPayment.getPaymentId();
+        mOriginalChandaNo = mPayment.getChandaNo();
         mOriginalMonthPaid = mPayment.getMonthPaid();
         mOriginalPaymentReceiptNo = mPayment.getReceiptNo();
         mOriginalPaymentChandaAm = mPayment.getChandaAm();
@@ -141,7 +141,7 @@ public class PaymentActivity extends AppCompatActivity {
                                  EditText textTahrik, EditText textWaqf) {
         List<String> monthsYear = DataManager.getInstance().getMonthsOfTheYear();
         List<String> paymentIds = DataManager.getInstance().getPaymentIds();
-        int paymentIdIndex = paymentIds.indexOf(mPayment.getPaymentId());
+        int paymentIdIndex = paymentIds.indexOf(mPayment.getChandaNo());
         spinnerPaymentId.setSelection(paymentIdIndex);
         if(!mIsNewPayment){
             mTextPaymentId.setVisibility(View.VISIBLE); // show textview if not a new payment
@@ -153,7 +153,7 @@ public class PaymentActivity extends AppCompatActivity {
         int monthIndex = monthsYear.indexOf(mPayment.getMonthPaid());
         spinnerMonthPaid.setSelection(monthIndex);
 
-        mTextPaymentId.setText(mPayment.getPaymentId());
+        mTextPaymentId.setText(mPayment.getChandaNo());
 
         textReceipt.setText(String.valueOf(mPayment.getReceiptNo()));
         textChanda.setText(String.valueOf(mPayment.getChandaAm()));
@@ -285,7 +285,7 @@ public class PaymentActivity extends AppCompatActivity {
     private void storePreviousPaymentValues() {
         ScheduleInfo schedule = DataManager.getInstance().getSchedule(mOriginalScheduleId);
         mPayment.setSchedule(schedule);
-        mPayment.setPaymentId(mOriginalPaymentId);
+        mPayment.setChandaNo(mOriginalChandaNo);
         mPayment.setMonthPaid(mOriginalMonthPaid);
         mPayment.setReceiptNo(mOriginalPaymentReceiptNo);
         mPayment.setChandaAm(mOriginalPaymentChandaAm);
@@ -301,10 +301,10 @@ public class PaymentActivity extends AppCompatActivity {
         mTextReceiptNo.getText().toString();
         Integer.parseInt(mTextReceiptNo.getText().toString());
         mPayment.setSchedule(mSchedule);
-        mPayment.setPaymentId((String) mSpinnerPaymentId.getSelectedItem());
+        mPayment.setChandaNo(Integer.parseInt((String) mSpinnerPaymentId.getSelectedItem()));
         mPayment.setMonthPaid((String) mSpinnerMonthPaid.getSelectedItem());
-        // parse the editText to integer
-        mPayment.setReceiptNo( Integer.parseInt(mTextReceiptNo.getText().toString()));
+        // parse the editText to String
+        mPayment.setReceiptNo(mTextReceiptNo.getText().toString());
         // convert the String to float
         mPayment.setChandaAm(Float.valueOf(mTextChandaAm.getText().toString()));
         mPayment.setWasiyyat(Float.valueOf(mTextWasiyyat.getText().toString()));

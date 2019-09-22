@@ -53,7 +53,7 @@ public class NextThroughPaymentTest {
             PaymentInfo payment = payments.get(i);
 
             onView(withId(R.id.text_payer_title)).check(
-                    matches(withText(payment.getPaymentId()))
+                    matches(withText(payment.getChandaNo()))
             );
             onView(withId(R.id.spinner_monthpaid)).check(matches(withSpinnerText(payment.getMonthPaid())));
             onView(withId(R.id.text_receiptno)).check(matches(withText(containsString(String.valueOf(payment.getReceiptNo())))));
