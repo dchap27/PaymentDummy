@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context="ng.com.dayma.paymentdummy.PaymentActivity"
+    tools:showIn="@layout/activity_payment">
+
+
+    <TextView
+        android:id="@+id/text_payer_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginTop="8dp"
+        android:text="@string/payer_title_hint"
+        android:textAppearance="@android:style/TextAppearance.Material.Large"
+        android:visibility="invisible"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <Spinner
+        android:id="@+id/spinner_payment_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="0dp"
+        android:layout_marginTop="0dp"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/text_payer_title"
+        app:layout_constraintRight_toLeftOf="parent"
+        tools:ignore="RtlHardcoded"/>
+
+    <Spinner
+        android:id="@+id/spinner_monthpaid"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="0dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/spinner_payment_text"
+        tools:ignore="RtlHardcoded"/>
+
+    <EditText
+        android:id="@+id/text_receiptno"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="0dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:ems="10"
+        android:hint="@string/receipt_number_hint"
+        android:inputType="number"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/spinner_monthpaid"
+        tools:ignore="RtlHardcoded"/>
+
+    <EditText
+        android:id="@+id/text_chandaam"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:ems="10"
+        android:hint="@string/chanda_am_hint"
+        android:inputType="number"
+        app:layout_constraintLeft_toLeftOf="@+id/text_receiptno"
+        app:layout_constraintTop_toBottomOf="@+id/text_receiptno" />
+
+    <EditText
+        android:id="@+id/text_wasiyyat"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
+        android:layout_marginTop="8dp"
+        android:ems="10"
+        android:hint="@string/wasiyyat_hint"
+        android:inputType="number"
+        app:layout_constraintTop_toBottomOf="@+id/text_chandaam"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:layout_marginStart="8dp"
+        tools:ignore="RtlHardcoded"/>
+
+    <EditText
+        android:id="@+id/text_tahrik"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:ems="10"
+        android:hint="@string/tahrik_jadid_hint"
+        android:inputType="number"
+        app:layout_constraintLeft_toLeftOf="@+id/text_chandaam"
+        app:layout_constraintTop_toBottomOf="@+id/text_wasiyyat" />
+
+    <EditText
+        android:id="@+id/text_waqf"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="6dp"
+        android:ems="10"
+        android:hint="@string/waqf_jadid_hint"
+        android:inputType="number"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/text_tahrik"/>
+
+</android.support.constraint.ConstraintLayout>

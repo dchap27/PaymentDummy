@@ -1,0 +1,34 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="ng.com.dayma.paymentdummy.PaymentActivity">
+    <item
+        android:id="@+id/action_save"
+        android:icon="@android:drawable/ic_menu_save"
+        android:orderInCategory="101"
+        android:title="Save"
+        app:showAsAction="always"/>
+    <item
+        android:id="@+id/action_previous"
+        android:icon="@android:drawable/ic_media_previous"
+        android:orderInCategory="102"
+        android:title="previous"
+        app:showAsAction="ifRoom"/>
+    <item
+        android:id="@+id/action_next"
+        android:icon="@android:drawable/ic_media_next"
+        android:orderInCategory="103"
+        android:title="next"
+        app:showAsAction="ifRoom"/>
+    <item
+        android:id="@+id/action_cancel"
+        android:icon="@android:drawable/ic_menu_revert"
+        android:orderInCategory="104"
+        android:title="cancel"
+        app:showAsAction="ifRoom|withText"/>
+    <item
+        android:id="@+id/action_send_email"
+        android:orderInCategory="105"
+        android:title="send as mail"
+        app:showAsAction="never"/>
+</menu>
