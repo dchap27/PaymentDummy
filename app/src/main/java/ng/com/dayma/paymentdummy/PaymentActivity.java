@@ -11,11 +11,14 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import ng.com.dayma.paymentdummy.data.PaymentDatabaseContract.MemberInfoEntry;
 import ng.com.dayma.paymentdummy.data.PaymentDatabaseContract.PaymentInfoEntry;
 import ng.com.dayma.paymentdummy.data.PaymentOpenHelper;
 
@@ -82,6 +85,8 @@ public class PaymentActivity extends AppCompatActivity {
     private int mWasiyyatHissanPos;
     private int mMiscellaneousPos;
     private int mSubtotalPos;
+    private SimpleCursorAdapter mAdapterMemberIds;
+    private int mMemberIdPos;
 
 
     @Override
@@ -102,18 +107,18 @@ public class PaymentActivity extends AppCompatActivity {
         mSpinnerMonthPaid = (Spinner) findViewById(R.id.spinner_monthpaid);
         mSpinnerChandaNo = (Spinner) findViewById(R.id.spinner_payment_text);
 
-        List<String> monthsYear = DataManager.getInstance().getMonthsOfTheYear();
-        List<String> paymentIds = DataManager.getInstance().getPaymentIds();
+        mAdapterMemberIds = new SimpleCursorAdapter(this, android.R.layout.simple_spinner_item, null,
+                new String[] {MemberInfoEntry.COLUMN_MEMBER_ID},
+                new int[] {android.R.id.text1}, 0);
+
+        mAdapterMemberIds.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        mSpinnerChandaNo.setAdapter(mAdapterMemberIds);
+
+        ArrayList<String> monthsYear = DataManager.getInstance().getMonthsOfTheYear();
         ArrayAdapter<String> adapterMonths =
                 new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, monthsYear);
         adapterMonths.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-
-        ArrayAdapter<String> adapterPaymentIds =
-                new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, paymentIds);
-        adapterPaymentIds.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-
         mSpinnerMonthPaid.setAdapter(adapterMonths);
-        mSpinnerChandaNo.setAdapter(adapterPaymentIds);
 
 
         readDisplayStateValue();
@@ -136,6 +141,21 @@ public class PaymentActivity extends AppCompatActivity {
             loadPaymentData();
     }
 
+    private void loadMemberData() {
+        SQLiteDatabase db = mDbOpenHelper.getReadableDatabase();
+
+        String[] selectionColumns = {
+                MemberInfoEntry.COLUMN_MEMBER_ID,
+                MemberInfoEntry.COLUMN_MEMBER_CHANDANO,
+                MemberInfoEntry.COLUMN_MEMBER_FULLNAME,
+                MemberInfoEntry.COLUMN_MEMBER_JAMAATNAME
+        };
+        Cursor cursor = db.query(MemberInfoEntry.TABLE_NAME,selectionColumns, null,
+                null,null, null, MemberInfoEntry.COLUMN_MEMBER_FULLNAME);
+        mAdapterMemberIds.changeCursor(cursor);
+
+    }
+
     private void loadPaymentData() {
         SQLiteDatabase db = mDbOpenHelper.getReadableDatabase();
 
@@ -146,8 +166,8 @@ public class PaymentActivity extends AppCompatActivity {
         };
 
         String[] paymentColumns = {
-                PaymentInfoEntry.COLUMN_PAYMENT_CHANDANO,
-                PaymentInfoEntry.COLUMN_PAYMENT_FULLNAME,
+                PaymentInfoEntry.COLUMN_MEMBER_CHANDANO,
+                PaymentInfoEntry.COLUMN_MEMBER_FULLNAME,
                 PaymentInfoEntry.COLUMN_PAYMENT_LOCALRECEIPT,
                 PaymentInfoEntry.COLUMN_PAYMENT_MONTHPAID,
                 PaymentInfoEntry.COLUMN_PAYMENT_CHANDAAM,
@@ -172,8 +192,8 @@ public class PaymentActivity extends AppCompatActivity {
         mPaymentCursor = db.query(PaymentInfoEntry.TABLE_NAME, paymentColumns, selection,
                 selectionArgs, null, null, null);
         // get the positions of the columns
-        mChandaNoPos = mPaymentCursor.getColumnIndex(PaymentInfoEntry.COLUMN_PAYMENT_CHANDANO);
-        mFullnamePos = mPaymentCursor.getColumnIndex(PaymentInfoEntry.COLUMN_PAYMENT_FULLNAME);
+        mChandaNoPos = mPaymentCursor.getColumnIndex(PaymentInfoEntry.COLUMN_MEMBER_CHANDANO);
+        mFullnamePos = mPaymentCursor.getColumnIndex(PaymentInfoEntry.COLUMN_MEMBER_FULLNAME);
         mLocalReceiptPos = mPaymentCursor.getColumnIndex(PaymentInfoEntry.COLUMN_PAYMENT_LOCALRECEIPT);
         mMonthPaidPos = mPaymentCursor.getColumnIndex(PaymentInfoEntry.COLUMN_PAYMENT_MONTHPAID);
         mChandaPos = mPaymentCursor.getColumnIndex(PaymentInfoEntry.COLUMN_PAYMENT_CHANDAAM);
@@ -263,9 +283,9 @@ public class PaymentActivity extends AppCompatActivity {
         float subtotal = mPaymentCursor.getFloat(mSubtotalPos);
 
         List<String> monthsYear = DataManager.getInstance().getMonthsOfTheYear();
-        List<String> paymentIds = DataManager.getInstance().getPaymentIds();
-        int paymentIdIndex = paymentIds.indexOf(mPayment.getChandaNo());
-        mSpinnerChandaNo.setSelection(paymentIdIndex);
+
+        int memberIndex = getIndexOfMemberId(chandaNo);
+        mSpinnerChandaNo.setSelection(memberIndex);
         if(!mIsNewPayment){
             mTextChandaNo.setVisibility(View.VISIBLE); // show textview if not a new payment
             mSpinnerChandaNo.setVisibility(View.INVISIBLE); // hide spinner
@@ -285,6 +305,24 @@ public class PaymentActivity extends AppCompatActivity {
         mTextTahrikJadid.setText(String.valueOf(tarikiJadid));
         mTextWaqfJadid.setText(String.valueOf(waqfJadid));
 //        mTextWelfare.setText(String.valueOf(welfare));
+    }
+
+    private int getIndexOfMemberId(int chandaNo) {
+        // get cursor from the adapter
+        Cursor cursor = mAdapterMemberIds.getCursor();
+        int memberChandaNoPos = cursor.getColumnIndex(MemberInfoEntry.COLUMN_MEMBER_CHANDANO);
+        int courseRowIndex = 0;
+
+        boolean more = cursor.moveToFirst();
+        while (more) {
+            int memberCursorId = cursor.getInt(memberChandaNoPos);
+            if(chandaNo ==(memberCursorId)){
+                break;
+            }
+            courseRowIndex++;
+            more = cursor.moveToNext();
+        }
+        return courseRowIndex;
     }
 
     private void readDisplayStateValue() {

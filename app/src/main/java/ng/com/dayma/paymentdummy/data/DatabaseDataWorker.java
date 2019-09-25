@@ -24,6 +24,11 @@ public class DatabaseDataWorker {
         insertMember("Oke-Ado", 9320, "Adepoju Suraj");
         insertMember("Felele", 38299, "Haruna Mujidat");
         insertMember("Felele", 38272, "Garba Idiat");
+        insertMember("Kewulere", 2345, "Mahmud kaka");
+        insertMember("Kewulere", 2365, "Muhammad Tolu");
+        insertMember("Oke-Ado", 2115, "Adeleke Haruna");
+        insertMember("Oke-Ado", 2005, "Modupe Adeoye");
+        insertMember("Oke-Ado", 29222, "Kunle Yusuf");
     }
 
     public void insertMonths() {
@@ -38,7 +43,7 @@ public class DatabaseDataWorker {
         insertSchedule("January 2019", "January_2019_Kewulere_2", "Kewulere", "Schedule for chanda payment January 2019");
         insertSchedule("June 2019", "June_2019_Felele_3", "Felele", "Schedule for chanda payment June");
         insertSchedule("May 2019", "May_2019_Felele_4", "Felele", "Schedule for chanda payment May 2019");
-        insertSchedule("August 2019", "August_2019_Oke-Ado_5", "OkeAdo", "Schedule for chanda payment August 2019");
+        insertSchedule("August 2019", "August_2019_Oke-Ado_5", "Oke-Ado", "Schedule for chanda payment August 2019");
         insertSchedule("June 2019", "June_2019_Kewulere_6", "Kewulere", "Schedule for chanda payment 2019");
         insertSchedule("August 2019", "May_2019_Felele_7", "Felele", "Schedule for chanda payment Felele August 2019");
 
@@ -49,21 +54,21 @@ public class DatabaseDataWorker {
                 70, 0, 10);
         insertPayment("May_2019_Kewulere_1", 2365, "00031", "May", 290,
                 709, 700, 10);
-        insertPayment("May_2019_Kewulere_1", 2335, "000231", "May", 7000,
+        insertPayment("May_2019_Kewulere_1", 3450, "000231", "May", 7000,
                 0, 50, 0);
-        insertPayment("May_2019_Kewulere_1", 23775, "00022", "May", 4000,
+        insertPayment("May_2019_Kewulere_1", 930293, "00022", "May", 4000,
                 60, 200, 30);
 
-        insertPayment("January_2019_Kewulere_2", 2221, "0067701", "January", 0,
+        insertPayment("January_2019_Kewulere_2", 83929, "0067701", "January", 0,
                 1000, 0, 70);
-        insertPayment("January_2019_Kewulere_2", 20045, "0005", "January", 800,
+        insertPayment("January_2019_Kewulere_2", 3450, "0005", "January", 800,
                 0, 560, 300);
         insertPayment("January_2019_Kewulere_2", 2345, "00087", "January", 1200,
                 210, 30, 0);
 
-        insertPayment("May_2019_Felele_4", 2325, "0009551", "May", 2500,
+        insertPayment("May_2019_Felele_4", 38299, "0009551", "May", 2500,
                 700, 030, 10);
-        insertPayment("May_2019_Felele_4", 8945, "00081", "May", 2900,
+        insertPayment("May_2019_Felele_4", 38272, "00081", "May", 2900,
                 7050, 20, 100);
 
         insertPayment("August_2019_OkeAdo_5", 2115, "032001", "August", 4500,
@@ -95,7 +100,7 @@ public class DatabaseDataWorker {
                                float chandaAm, float jalsaSalana, float tarikiJadid, float welfareFund){
         ContentValues values = new ContentValues();
         values.put(PaymentDatabaseContract.PaymentInfoEntry.COLUMN_SCHEDULE_ID, scheduleId);
-        values.put(PaymentDatabaseContract.PaymentInfoEntry.COLUMN_PAYMENT_CHANDANO, chandaNo);
+        values.put(PaymentDatabaseContract.PaymentInfoEntry.COLUMN_MEMBER_CHANDANO, chandaNo);
         values.put(PaymentDatabaseContract.PaymentInfoEntry.COLUMN_PAYMENT_LOCALRECEIPT, localReceipt);
         values.put(PaymentDatabaseContract.PaymentInfoEntry.COLUMN_PAYMENT_MONTHPAID, monthPaid);
         values.put(PaymentDatabaseContract.PaymentInfoEntry.COLUMN_PAYMENT_CHANDAAM, chandaAm);
@@ -109,9 +114,10 @@ public class DatabaseDataWorker {
 
     private void insertMember(String jamaatName, int chandaNo, String fullname){
         ContentValues values = new ContentValues();
-        values.put(PaymentDatabaseContract.MemberInfoEntry.COLUMN_JAMAAT_NAME, jamaatName);
-        values.put(PaymentDatabaseContract.MemberInfoEntry.COLUMN_CHANDA_NO, chandaNo);
-        values.put(PaymentDatabaseContract.MemberInfoEntry.COLUMN_FULLNAME, chandaNo);
+        values.put(PaymentDatabaseContract.MemberInfoEntry.COLUMN_MEMBER_JAMAATNAME, jamaatName);
+        values.put(PaymentDatabaseContract.MemberInfoEntry.COLUMN_MEMBER_ID, (chandaNo) + fullname);
+        values.put(PaymentDatabaseContract.MemberInfoEntry.COLUMN_MEMBER_CHANDANO, chandaNo);
+        values.put(PaymentDatabaseContract.MemberInfoEntry.COLUMN_MEMBER_FULLNAME, fullname);
 
         long newRowId = mDb.insert(PaymentDatabaseContract.MemberInfoEntry.TABLE_NAME, null, values);
 

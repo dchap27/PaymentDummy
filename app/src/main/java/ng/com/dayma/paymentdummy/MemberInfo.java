@@ -7,29 +7,41 @@ public final class MemberInfo implements Parcelable {
     private String mJamaatname;
     private int mChandaNo;
     private String mFullname;
+    private String mMemberId;
     private int mId;
 
     public MemberInfo(String jamaatName, int chandaNo, String fullname){
         mJamaatname = jamaatName;
         mChandaNo = chandaNo;
         mFullname = fullname;
+        mMemberId = chandaNo + "- " + fullname;
     }
 
     public MemberInfo(int id, String jamaatname, int chandaNo, String fullname){
         mJamaatname= jamaatname;
         mChandaNo = chandaNo;
         mFullname = fullname;
+        mMemberId = chandaNo + "- " + fullname;
         mId = id;
     }
 
     protected MemberInfo(Parcel source) {
         mJamaatname = source.readString();
+        mMemberId = source.readString();
         mChandaNo = source.readInt();
         mFullname = source.readString();
     }
 
     public int getId(){
         return mId;
+    }
+
+    public String getMemberId() {
+        return mMemberId;
+    }
+
+    public void setMemberId(){
+        mMemberId = mChandaNo + "- " + mFullname;
     }
 
     public String getJamaatname(){

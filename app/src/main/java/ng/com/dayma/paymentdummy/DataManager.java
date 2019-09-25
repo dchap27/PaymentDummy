@@ -4,6 +4,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import ng.com.dayma.paymentdummy.data.PaymentDatabaseContract.MonthInfoEntry;
@@ -64,8 +65,8 @@ public class DataManager {
         final String[] paymentColumnsProjection = new String[]{
                 PaymentInfoEntry.COLUMN_SCHEDULE_ID,
                 PaymentInfoEntry._ID,
-                PaymentInfoEntry.COLUMN_PAYMENT_CHANDANO,
-                PaymentInfoEntry.COLUMN_PAYMENT_FULLNAME,
+                PaymentInfoEntry.COLUMN_MEMBER_CHANDANO,
+                PaymentInfoEntry.COLUMN_MEMBER_FULLNAME,
                 PaymentInfoEntry.COLUMN_PAYMENT_LOCALRECEIPT,
                 PaymentInfoEntry.COLUMN_PAYMENT_MONTHPAID,
                 PaymentInfoEntry.COLUMN_PAYMENT_CHANDAAM,
@@ -90,7 +91,7 @@ public class DataManager {
         };
 
         Cursor cursor = db.query(PaymentInfoEntry.TABLE_NAME, paymentColumnsProjection, null, null,
-                null, null, PaymentInfoEntry.COLUMN_PAYMENT_FULLNAME);
+                null, null, PaymentInfoEntry.COLUMN_MEMBER_FULLNAME);
         loadPaymentsFromDatabase(cursor);
 
 
@@ -99,8 +100,8 @@ public class DataManager {
     private static void loadPaymentsFromDatabase(Cursor cursor) {
         // get the positions of the columns
         int scheduleIdPos = cursor.getColumnIndex(PaymentInfoEntry.COLUMN_SCHEDULE_ID);
-        int chandaNoPos = cursor.getColumnIndex(PaymentInfoEntry.COLUMN_PAYMENT_CHANDANO);
-        int fullnamePos = cursor.getColumnIndex(PaymentInfoEntry.COLUMN_PAYMENT_FULLNAME);
+        int chandaNoPos = cursor.getColumnIndex(PaymentInfoEntry.COLUMN_MEMBER_CHANDANO);
+        int fullnamePos = cursor.getColumnIndex(PaymentInfoEntry.COLUMN_MEMBER_FULLNAME);
         int localReceiptPos = cursor.getColumnIndex(PaymentInfoEntry.COLUMN_PAYMENT_LOCALRECEIPT);
         int monthPaidPos = cursor.getColumnIndex(PaymentInfoEntry.COLUMN_PAYMENT_MONTHPAID);
         int chandaPos = cursor.getColumnIndex(PaymentInfoEntry.COLUMN_PAYMENT_CHANDAAM);
@@ -438,31 +439,32 @@ public class DataManager {
 //        return month;
 //    }
 
-    public List<String> getMonthsOfTheYear() {
-        List<String> mMonthsYear = new ArrayList<>();
-        mMonthsYear.add(0,"January");
-        mMonthsYear.add(1, "February");
-        mMonthsYear.add(2, "March");
-        mMonthsYear.add(3, "April");
-        mMonthsYear.add(4, "May");
-        mMonthsYear.add(5, "June");
-        mMonthsYear.add(6, "July");
-        mMonthsYear.add(7, "August");
-        mMonthsYear.add(8, "September");
-        mMonthsYear.add(9, "October");
-        mMonthsYear.add(10, "November");
-        mMonthsYear.add(11, "December");
-        return mMonthsYear;
-    }
+    public ArrayList<String> getMonthsOfTheYear() {
+        ArrayList months = new ArrayList<>();
+        List<String> monthsYear = new ArrayList<>();
+        monthsYear.add(0,"JAN");
+        monthsYear.add(1, "FEB");
+        monthsYear.add(2, "MAR");
+        monthsYear.add(3, "APR");
+        monthsYear.add(4, "MAY");
+        monthsYear.add(5, "JUN");
+        monthsYear.add(6, "JUL");
+        monthsYear.add(7, "AUG");
+        monthsYear.add(8, "SEP");
+        monthsYear.add(9, "OCT");
+        monthsYear.add(10, "NOV");
+        monthsYear.add(11, "DEC");
+        Calendar dateTime = Calendar.getInstance();
+        int presentYear = Integer.parseInt(String.format("%1$TY", dateTime));
+        int year = presentYear - 3;
+        while(year < presentYear + 3){
+            for(int i = 0; i < monthsYear.size(); i++){
+                String mon = monthsYear.get(i) + year;
+                months.add(mon);
+            }
+            year++;
+        }
 
-    public List<String> getPaymentIds() {
-        List<String> paymentIds = new ArrayList<>();
-        paymentIds.add(0, "Modupe Ade");
-        paymentIds.add(1, "Adeola");
-        paymentIds.add(2, "Ope");
-        paymentIds.add(3, "Kunle");
-        paymentIds.add(4, "Adelaja");
-        paymentIds.add(5, "Faiza");
-        return paymentIds;
+        return months;
     }
 }

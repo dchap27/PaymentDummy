@@ -8,16 +8,18 @@ public final class PaymentDatabaseContract {
     public static final class MemberInfoEntry implements BaseColumns {
         public static final String TABLE_NAME = "jamaat_info";
 
-        public static final String COLUMN_JAMAAT_NAME = "jamaat_name";
-        public static final String COLUMN_CHANDA_NO = "chanda_no";
-        public static final String COLUMN_FULLNAME = "fullname";
+        public static final String COLUMN_MEMBER_JAMAATNAME = "jamaat_name";
+        public static final String COLUMN_MEMBER_ID = "member_id";
+        public static final String COLUMN_MEMBER_CHANDANO = "chanda_no";
+        public static final String COLUMN_MEMBER_FULLNAME = "fullname";
 
         public static final String SQL_CREATE_TABLE =
                 "CREATE TABLE " + TABLE_NAME + "(" +
                         _ID + " INTEGER PRIMARY KEY, " +
-                        COLUMN_JAMAAT_NAME + " TEXT NOT NULL, " +
-                        COLUMN_CHANDA_NO + " INTEGER UNIQUE NOT NULL " +
-                        COLUMN_FULLNAME + " TEXT NOT NULL)";
+                        COLUMN_MEMBER_JAMAATNAME + " TEXT NOT NULL, " +
+                        COLUMN_MEMBER_ID + " TEXT " +
+                        COLUMN_MEMBER_CHANDANO + " INTEGER UNIQUE NOT NULL " +
+                        COLUMN_MEMBER_FULLNAME + " TEXT NOT NULL)";
     }
 
     public static final class MonthInfoEntry implements BaseColumns {
@@ -61,8 +63,8 @@ public final class PaymentDatabaseContract {
         public static final String TABLE_NAME = "payment_info";
 
         public static final String COLUMN_SCHEDULE_ID = "schedule_id";
-        public static final String COLUMN_PAYMENT_CHANDANO = "ChandaNo";
-        public static final String COLUMN_PAYMENT_FULLNAME = "Fullname";
+        public static final String COLUMN_MEMBER_CHANDANO = "ChandaNo";
+        public static final String COLUMN_MEMBER_FULLNAME = "Fullname";
         public static final String COLUMN_PAYMENT_LOCALRECEIPT = "LocalReceipt";
         public static final String COLUMN_PAYMENT_MONTHPAID = "MonthPaidFor";
         public static final String COLUMN_PAYMENT_CHANDAAM = "ChandaAam";
@@ -89,8 +91,8 @@ public final class PaymentDatabaseContract {
                 "CREATE TABLE " + TABLE_NAME + "(" +
                         _ID + " INTEGER PRIMARY KEY, " +
                         COLUMN_SCHEDULE_ID + " TEXT NOT NULL, " +
-                        COLUMN_PAYMENT_CHANDANO + " INTEGER NOT NULL, " +
-                        COLUMN_PAYMENT_FULLNAME + " TEXT, " +
+                        COLUMN_MEMBER_CHANDANO + " INTEGER NOT NULL, " +
+                        COLUMN_MEMBER_FULLNAME + " TEXT, " +
                         COLUMN_PAYMENT_LOCALRECEIPT + " TEXT NOT NULL, " +
                         COLUMN_PAYMENT_MONTHPAID + " TEXT, " +
                         COLUMN_PAYMENT_CHANDAAM + " REAL DEFAULT 0.0, " +
