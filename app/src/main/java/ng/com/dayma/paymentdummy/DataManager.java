@@ -20,6 +20,7 @@ public class DataManager {
     private List<MonthInfo> mMonths = new ArrayList<>();
     private List<PaymentInfo> mPayments = new ArrayList<>();
     private List<ScheduleInfo> mSchedules = new ArrayList<>();
+    private List<MemberInfo> mMembers = new ArrayList<>();
 
     public static DataManager getInstance() {
         if(ourInstance == null){
@@ -238,6 +239,12 @@ public class DataManager {
                 null, null);
         mPayments.add(payment);
         return mPayments.size() - 1;
+    }
+
+    public int addNewMember(){
+        MemberInfo member = new MemberInfo(null, -1, null);
+        mMembers.add(member);
+        return mMembers.size() - 1;
     }
 
     public int findPayment(PaymentInfo payment) {
