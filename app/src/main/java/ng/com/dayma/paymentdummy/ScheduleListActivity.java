@@ -6,28 +6,23 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.ListView;
 
-import java.util.ArrayList;
 import java.util.List;
-
-import static ng.com.dayma.paymentdummy.PaymentListActivity.POSITION_NOT_SET;
 
 public class ScheduleListActivity extends AppCompatActivity {
 
-    public static final String SCHEDULE_POSITION = "ng.com.dayma.paymentdummy.SCHEDULE_POSITION";
-    public static final int POSITION_NOT_SET = -1;
+    public static final String MONTH_ID = "ng.com.dayma.paymentdummy.MONTH_ID";
+    public static final int ID_NOT_SET = -1;
     private List<MonthInfo> mMonths;
     private List<ScheduleInfo> mSchedules;
     private ArrayAdapter<ScheduleInfo> mAdaptermonths;
     private RecyclerView mRecyclerItems;
     private ScheduleRecyclerAdapter mMonthSchedulesAdapter;
+    private int mMonID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +50,7 @@ public class ScheduleListActivity extends AppCompatActivity {
     }
 
     private void initializeDisplayContent() {
+
 //        ListView listMonths = (ListView) findViewById(R.id.list_monthschedules);
 //        DataManager dm = DataManager.getInstance();
 //        mMonths = dm.getMonths();
@@ -73,8 +69,8 @@ public class ScheduleListActivity extends AppCompatActivity {
 //            }
 //        });
         Intent intent = getIntent();
-        int position = intent.getIntExtra(SCHEDULE_POSITION, POSITION_NOT_SET);
-        MonthInfo month = DataManager.getInstance().getMonths().get(position);
+        mMonID = intent.getIntExtra(MONTH_ID, ID_NOT_SET);
+        MonthInfo month = DataManager.getInstance().getMonth(mMonID);
 
         mRecyclerItems = (RecyclerView) findViewById(R.id.list_monthschedules);
         List<ScheduleInfo> schedules = DataManager.getInstance().getSchedules(month);

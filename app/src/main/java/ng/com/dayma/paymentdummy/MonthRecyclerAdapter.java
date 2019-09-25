@@ -2,7 +2,6 @@ package ng.com.dayma.paymentdummy;
 
 import android.content.Context;
 import android.content.Intent;
-import android.support.design.widget.Snackbar;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -41,7 +40,7 @@ public class MonthRecyclerAdapter extends RecyclerView.Adapter<MonthRecyclerAdap
         int totalSchedules = dm.getScheduleCount(month.getMonthId());
         holder.mTextMonth.setText(month.getMonthId());
         holder.mTextScheduleTotal.setText(mContext.getString(R.string.text_total_schedules_for_month) + String.valueOf(totalSchedules));
-        holder.mCurrentPosition = position;
+        holder.mId = month.getId();
         holder.mMonth = month;
 
     }
@@ -55,7 +54,7 @@ public class MonthRecyclerAdapter extends RecyclerView.Adapter<MonthRecyclerAdap
 
         public final TextView mTextMonth;
         public final TextView mTextScheduleTotal;
-        private int mCurrentPosition;
+        private int mId;
         private MonthInfo mMonth;
 
         public ViewHolder(View itemView) {
@@ -69,7 +68,7 @@ public class MonthRecyclerAdapter extends RecyclerView.Adapter<MonthRecyclerAdap
                 public void onClick(View v) {
 
                     Intent intent = new Intent(mContext, ScheduleListActivity.class);
-                    intent.putExtra(ScheduleListActivity.SCHEDULE_POSITION, mCurrentPosition);
+                    intent.putExtra(ScheduleListActivity.MONTH_ID, mId);
                     mContext.startActivity(intent);
 //                    Snackbar.make(v, mTextMonth.getText(), Snackbar.LENGTH_LONG).show();
                 }

@@ -6,7 +6,6 @@ import android.database.sqlite.SQLiteDatabase;
 import java.util.ArrayList;
 import java.util.List;
 
-import ng.com.dayma.paymentdummy.data.PaymentDatabaseContract;
 import ng.com.dayma.paymentdummy.data.PaymentDatabaseContract.MonthInfoEntry;
 import ng.com.dayma.paymentdummy.data.PaymentDatabaseContract.PaymentInfoEntry;
 import ng.com.dayma.paymentdummy.data.PaymentDatabaseContract.ScheduleInfoEntry;
@@ -40,7 +39,7 @@ public class DataManager {
         };
         // query the month_info table with the specified columns
         Cursor monthCursor = db.query(MonthInfoEntry.TABLE_NAME, monthColumnsProjection, null,
-                null, null, null, null);// query returns a cursor
+                null, null, null, MonthInfoEntry.COLUMN_MONTH_ID + " DESC");// query returns a cursor
 
         // extract the months from the returned cursor
         loadMonthsFromDatabase(monthCursor);
@@ -54,13 +53,14 @@ public class DataManager {
                 ScheduleInfoEntry.COLUMN_SCHEDULE_IS_COMPLETE,
                 ScheduleInfoEntry._ID
         };
+        String scheduleOrderby = ScheduleInfoEntry.COLUMN_MONTH_ID + "," + ScheduleInfoEntry.COLUMN_SCHEDULE_JAMAAT;
         // query the schedule_info table
         Cursor scheduleCursor = db.query(ScheduleInfoEntry.TABLE_NAME, scheduleColumnsProjection, null,
-                null, null, null, null);
+                null, null, null, scheduleOrderby);
         loadSchedulesFromDatabase(scheduleCursor);
 
         //get columns for payment_info table
-        final String[] paymentColumnsProjection = {
+        final String[] paymentColumnsProjection = new String[]{
                 PaymentInfoEntry.COLUMN_SCHEDULE_ID,
                 PaymentInfoEntry._ID,
                 PaymentInfoEntry.COLUMN_PAYMENT_CHANDANO,
@@ -89,7 +89,7 @@ public class DataManager {
         };
 
         Cursor cursor = db.query(PaymentInfoEntry.TABLE_NAME, paymentColumnsProjection, null, null,
-                null, null, null, null);
+                null, null, PaymentInfoEntry.COLUMN_PAYMENT_FULLNAME);
         loadPaymentsFromDatabase(cursor);
 
 
@@ -155,7 +155,7 @@ public class DataManager {
             PaymentInfo payment = new PaymentInfo(schedule,chandaNo,fullname,localReceipt,monthPaid,chandaAm,
                     wasiyyat,jalsaSalana,tarikiJadid,waqfJadid,welfare,scholarship,maryam,
                     tabligh,zakat,sadakat,fitrana,mosqueDonation,mta,centinary,wasiyyatHissan,
-                    miscellaneous,subtotal);
+                    miscellaneous,subtotal,id);
 
             dm.mPayments.add(payment);
         }
@@ -191,7 +191,7 @@ public class DataManager {
             MonthInfo month = dm.getMonth(monthId);
 
             // create new schedule
-            ScheduleInfo schedule = new ScheduleInfo(scheduleId, month, jamaat, title, status);
+            ScheduleInfo schedule = new ScheduleInfo(scheduleId, month, jamaat, title, status, id);
             dm.mSchedules.add(schedule);
         }
         // close cursor
@@ -265,9 +265,25 @@ public class DataManager {
         return null;
     }
 
+    public MonthInfo getMonth(int id){
+        for(MonthInfo month : mMonths){
+            if(id == (month.getId()))
+                return month;
+        }
+        return null;
+    }
+
     public ScheduleInfo getSchedule(String id){
         for(ScheduleInfo schedule : mSchedules){
             if(id.equals(schedule.getScheduleId()))
+                return schedule;
+        }
+        return null;
+    }
+
+    public ScheduleInfo getSchedule(int id){
+        for(ScheduleInfo schedule : mSchedules){
+            if(id ==(schedule.getId()))
                 return schedule;
         }
         return null;

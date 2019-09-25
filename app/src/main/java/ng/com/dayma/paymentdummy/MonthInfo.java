@@ -13,12 +13,14 @@ import java.util.List;
 public final class MonthInfo implements Parcelable {
     private final String mMonthId;
     private List<ScheduleInfo> mSchedules;
+    private int mId;
 
     public MonthInfo(String monthId) {
-        this(monthId, null);
+        mMonthId = monthId;
     }
 
-    public MonthInfo(String monthId, List<ScheduleInfo> schedules) {
+    public MonthInfo(int id, String monthId, List<ScheduleInfo> schedules) {
+        mId = id;
         mMonthId = monthId;
         mSchedules = schedules;
     }
@@ -32,6 +34,8 @@ public final class MonthInfo implements Parcelable {
     public String getMonthId() {
         return mMonthId;
     }
+
+    public int getId() { return mId; }
 
 
     public void addSchedule(ScheduleInfo schedule) {

@@ -46,12 +46,12 @@ public class ScheduleRecyclerAdapter extends RecyclerView.Adapter<ScheduleRecycl
             status = "draft";
         }
         holder.mScheduleTitle.setText(schedule.getScheduleId());
-        holder.mTextMonth.setText(schedule.getMonth().getTitle());
+        holder.mTextMonth.setText(schedule.getMonth().getMonthId());
         holder.mTextTotalPayers.setText(mContext.getString(R.string.text_no_of_payers) + String.valueOf(payers));
         holder.mTextScheduleTotalAmount.setText(String.format(
                 mContext.getString(R.string.text_total_amount_for_schedule), String.valueOf(totalAmount)));
         holder.mTextCompletionStatus.setText(String.format("Status: %s", status));
-        holder.mCurrentPosition = position;
+        holder.mId = schedule.getId();
 
     }
 
@@ -65,7 +65,7 @@ public class ScheduleRecyclerAdapter extends RecyclerView.Adapter<ScheduleRecycl
         public final TextView mTextMonth;
         public final TextView mTextTotalPayers;
         public final TextView mTextScheduleTotalAmount;
-        private int mCurrentPosition;
+        private int mId;
         private final TextView mTextCompletionStatus;
 
         public ViewHolder(View itemView) {
@@ -81,7 +81,7 @@ public class ScheduleRecyclerAdapter extends RecyclerView.Adapter<ScheduleRecycl
                 @Override
                 public void onClick(View v) {
                     Intent intent = new Intent(mContext, PaymentListActivity.class);
-                    intent.putExtra(PaymentListActivity.SCHEDULE_POSITION, mCurrentPosition);
+                    intent.putExtra(PaymentListActivity.SCHEDULE_ID, mId);
                     mContext.startActivity(intent);
 //                    Snackbar.make(v, mScheduleTitle.getText(), Snackbar.LENGTH_LONG).show();
                 }

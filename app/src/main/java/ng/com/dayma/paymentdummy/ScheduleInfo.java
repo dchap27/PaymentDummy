@@ -3,9 +3,6 @@ package ng.com.dayma.paymentdummy;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Created by Ahmad on 7/12/2019.
  */
@@ -15,18 +12,20 @@ public final class ScheduleInfo implements Parcelable {
     private final String mJamaat;
     private final String mTitle;
     private MonthInfo mMonth;
+    private int mId;
     private boolean mIsComplete = false;
 
     public ScheduleInfo(String scheduleId, MonthInfo month, String jamaat, String title) {
-        this(scheduleId, month, jamaat, title, false);
+        this(scheduleId, month, jamaat, title, false, -1);
     }
 
-    public ScheduleInfo (String scheduleId, MonthInfo month, String jamaat, String title, boolean isComplete) {
+    public ScheduleInfo (String scheduleId, MonthInfo month, String jamaat, String title, boolean isComplete,int id) {
         mScheduleId = scheduleId;
         mMonth = month;
         mJamaat = jamaat;
         mTitle = title;
         mIsComplete = isComplete;
+        mId = id;
     }
 
     public ScheduleInfo(Parcel source) {
@@ -108,4 +107,6 @@ public final class ScheduleInfo implements Parcelable {
                     return new ScheduleInfo[0];
                 }
             };
+
+    public int getId() { return mId; }
 }

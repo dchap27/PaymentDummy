@@ -26,9 +26,9 @@
                 android:layout_marginTop="8dp"
                 android:tint="@android:color/holo_green_dark"
                 app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:srcCompat="@drawable/ic_payment_black_24dp"
-                tools:layout_editor_absoluteX="0dp"/>
+                app:srcCompat="@drawable/ic_payment_black_24dp" />
 
             <TextView
                 android:id="@+id/text_payment_id"

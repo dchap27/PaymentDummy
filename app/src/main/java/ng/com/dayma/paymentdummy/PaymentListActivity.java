@@ -2,30 +2,26 @@ package ng.com.dayma.paymentdummy;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
-import android.widget.Spinner;
 
 import java.util.List;
 
 public class PaymentListActivity extends AppCompatActivity {
 
-    public static final int POSITION_NOT_SET = -1;
-    public static final String SCHEDULE_POSITION = "ng.com.dayma.paymentdummy.SCHEDULE_POSITION";
+    public static final int ID_NOT_SET = -1;
+    public static final String SCHEDULE_ID = "ng.com.dayma.paymentdummy.SCHEDULE_ID";
 
 //    private ArrayAdapter<PaymentInfo> mAdapterPayments;
     private List<PaymentInfo> mPayments;
     private boolean mIsNewSchedule;
     private ScheduleInfo mSchedule;
     private PaymentRecyclerAdapter mPaymentRecyclerAdapter;
+    private int mScheID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,9 +49,9 @@ public class PaymentListActivity extends AppCompatActivity {
     private void readDisplayStateValues() {
         Intent intent = getIntent();
         //get value that was put into the intent
-        int position = intent.getIntExtra(SCHEDULE_POSITION, POSITION_NOT_SET);
-        mSchedule = DataManager.getInstance().getSchedules().get(position);
-        mIsNewSchedule = position == POSITION_NOT_SET;
+        mScheID = intent.getIntExtra(SCHEDULE_ID, ID_NOT_SET);
+        mSchedule = DataManager.getInstance().getSchedule(mScheID);
+        mIsNewSchedule = mScheID == ID_NOT_SET;
         if(mIsNewSchedule){
             createNewSchedule();
         }else {
@@ -65,9 +61,9 @@ public class PaymentListActivity extends AppCompatActivity {
 
     @Override
     protected void onResume() {
+        mPaymentRecyclerAdapter.notifyDataSetChanged();
         super.onResume();
 //        mAdapterPayments.notifyDataSetChanged();
-        mPaymentRecyclerAdapter.notifyDataSetChanged();
     }
 
     private void initializeDisplayContent() {
@@ -85,7 +81,7 @@ public class PaymentListActivity extends AppCompatActivity {
 //                Intent intent = new Intent(PaymentListActivity.this, PaymentActivity.class);
 ////                PaymentInfo payment = (PaymentInfo) listPayments.getItemAtPosition(position);
 //                intent.putExtra(PaymentActivity.SCHEDULE_INFO, mSchedule.getScheduleId());
-//                intent.putExtra(PaymentActivity.PAYMENT_POSITION, position);
+//                intent.putExtra(PaymentActivity.PAYMENT_ID, position);
 //                startActivity(intent);
 //            }
 //        });

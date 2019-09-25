@@ -36,14 +36,13 @@ public class PaymentRecyclerAdapter extends RecyclerView.Adapter<PaymentRecycler
     public void onBindViewHolder(PaymentRecyclerAdapter.ViewHolder holder, int position) {
 
         PaymentInfo payment = mPayments.get(position);
-        holder.mTextPaymentId.setText(payment.getChandaNo());
+        holder.mTextPaymentId.setText(String.format("%s: %s", String.valueOf(payment.getChandaNo()), payment.getFullname()));
         holder.mTextMonthPaid.setText(payment.getMonthPaid());
-        holder.mTextReceiptNo.setText(String.format(mContext.getString(R.string.text_receipt_number), String.valueOf(payment.getReceiptNo())));
+        holder.mTextReceiptNo.setText(String.format(mContext.getString(R.string.text_receipt_number), payment.getReceiptNo()));
         holder.mTextAmountPaid.setText(String.format(mContext.getString(R.string.text_amount_paid), String.valueOf(payment.getTotalAmountPaid())));
-        holder.mCurrentPosition = position;
+        holder.mId = payment.getId();
         ScheduleInfo schedule = payment.getSchedule();
         mScheduleId = schedule.getScheduleId();
-
     }
 
     @Override
@@ -56,7 +55,7 @@ public class PaymentRecyclerAdapter extends RecyclerView.Adapter<PaymentRecycler
         public final TextView mTextMonthPaid;
         public final TextView mTextReceiptNo;
         public final TextView mTextAmountPaid;
-        private int mCurrentPosition;
+        private int mId;
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -70,7 +69,7 @@ public class PaymentRecyclerAdapter extends RecyclerView.Adapter<PaymentRecycler
                 @Override
                 public void onClick(View v) {
                     Intent intent = new Intent(mContext, PaymentActivity.class);
-                    intent.putExtra(PaymentActivity.PAYMENT_POSITION, mCurrentPosition);
+                    intent.putExtra(PaymentActivity.PAYMENT_ID, mId);
                     intent.putExtra(PaymentActivity.SCHEDULE_INFO, mScheduleId);
                     mContext.startActivity(intent);
                 }

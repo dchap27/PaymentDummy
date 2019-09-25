@@ -31,19 +31,15 @@ public final class PaymentInfo implements Parcelable {
     private float mWasiyyat;
     private float mTahrikJadid;
     private float mWaqfJadid;
-
-    public PaymentInfo(ScheduleInfo schedule, int chandaNo, String fullname, String localReceipt, String monthPaid) {
-        this(null,chandaNo,null,localReceipt,monthPaid, 0.0f, 0.0f, 0.0f,0.0f,
-                0.0f,0.0f,0.0f,0.0f,0.0f,0.0f,0.0f,0.0f,0.0f,0.0f,0.0f,
-                0.0f,0.0f,0.0f);
-    }
+    private int mId;
 
     public PaymentInfo(ScheduleInfo schedule, int chandaNo, String fullname, String localReceipt, String monthPaid,
                        float chandaAm, float wasiyyat, float jalsaSalana, float tarikiJadid,
                        float waqfJadid, float welfare, float scholarship, float maryam,
                        float tabligh, float zakat, float sadakat, float fitrana,
                        float mosqueDonation, float mta, float centinary, float wasiyyatHissan,
-                       float miscellaneous, float subtotal) {
+                       float miscellaneous, float subtotal, int id) {
+        mId = id;
         mChandaNo = chandaNo;
         mFullname = fullname;
         mMonthPaid = monthPaid;
@@ -68,6 +64,12 @@ public final class PaymentInfo implements Parcelable {
         mSubtotal = subtotal;
         mSchedule = schedule;
 
+    }
+
+    public PaymentInfo(ScheduleInfo schedule, int chandaNo, String fullname, String localReceipt, String monthPaid) {
+        this(null,chandaNo,null,localReceipt,monthPaid, 0.0f, 0.0f, 0.0f,0.0f,
+                0.0f,0.0f,0.0f,0.0f,0.0f,0.0f,0.0f,0.0f,0.0f,0.0f,0.0f,
+                0.0f,0.0f,0.0f,-1);
     }
 
     private PaymentInfo(Parcel source) {
@@ -95,8 +97,14 @@ public final class PaymentInfo implements Parcelable {
         mSchedule = source.readParcelable(ScheduleInfo.class.getClassLoader());
     }
 
+    public int getId() { return mId; }
+
     public int getChandaNo() {
         return mChandaNo;
+    }
+
+    public String getFullname() {
+        return mFullname;
     }
 
     public void setChandaNo(int chandaNo) {
@@ -160,7 +168,9 @@ public final class PaymentInfo implements Parcelable {
     }
 
     public float getTotalAmountPaid() {
-        return getChandaAm() + getWasiyyat() + getTahrikJadid() + getWaqfJadid();
+        return mChandaAm + mWasiyyat + mJalsaSalana + mTahrikJadid + mWaqfJadid + mWelfare +
+                mScholarship + mTabligh + mMaryam + mCentinary + mMta + mWasiyyatHissan +
+                mMosqueDonation + mFitrana + mSadakat + mZakat + mMiscellaneous;
     }
     private String getCompareKey() {
         return mChandaNo + "|" + mMonthPaid;
@@ -231,4 +241,4 @@ public final class PaymentInfo implements Parcelable {
                 }
             };
 
-}
+    }
