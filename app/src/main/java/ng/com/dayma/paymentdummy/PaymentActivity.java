@@ -35,6 +35,7 @@ public class PaymentActivity extends AppCompatActivity {
     public static final String ORIGINAL_PAYMENT_TAHRIKJADID = "ng.com.dayma.paymentdummy.ORIGINAL_PAYMENT_TAHRIKJADID";
     public static final String ORIGINAL_PAYMENT_WAQFJADID = "ng.com.dayma.paymentdummy.ORIGINAL_PAYMENT_WAQFJADID";
     public static final String ORIGINAL_SCHEDULE_ID = "ng.com.dayma.paymentdummy.ORIGINAL_SCHEDULE_ID";
+    public static final int LOADER_PAYMENTS = 0;
     private PaymentInfo mPayment = new PaymentInfo(DataManager.getInstance().getSchedules().get(0),-1,null,null,null);
 
     private Spinner mSpinnerMonthPaid;
@@ -86,7 +87,6 @@ public class PaymentActivity extends AppCompatActivity {
     private int mMiscellaneousPos;
     private int mSubtotalPos;
     private SimpleCursorAdapter mAdapterMemberIds;
-    private int mMemberIdPos;
 
 
     @Override
@@ -120,6 +120,8 @@ public class PaymentActivity extends AppCompatActivity {
         adapterMonths.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         mSpinnerMonthPaid.setAdapter(adapterMonths);
 
+        loadMemberData();
+
 
         readDisplayStateValue();
         if(savedInstanceState == null) {
@@ -138,6 +140,7 @@ public class PaymentActivity extends AppCompatActivity {
 
         if(!mIsNewPayment)
             // populate the views with values if not a new payment
+//            getLoaderManager().initLoader(LOADER_PAYMENTS, null, this);
             loadPaymentData();
     }
 
@@ -145,6 +148,7 @@ public class PaymentActivity extends AppCompatActivity {
         SQLiteDatabase db = mDbOpenHelper.getReadableDatabase();
 
         String[] selectionColumns = {
+                MemberInfoEntry._ID,
                 MemberInfoEntry.COLUMN_MEMBER_ID,
                 MemberInfoEntry.COLUMN_MEMBER_CHANDANO,
                 MemberInfoEntry.COLUMN_MEMBER_FULLNAME,
@@ -221,7 +225,7 @@ public class PaymentActivity extends AppCompatActivity {
 
     private void restoreOriginalPaymentValues(Bundle savedInstanceState) {
         mOriginalChandaNo = Integer.parseInt(savedInstanceState.getString(ORIGINAL_PAYMENT_ID));
-//        mOriginalScheduleId = savedInstanceState.getString(ORIGINAL_SCHEDULE_ID);
+        mOriginalScheduleId = savedInstanceState.getString(ORIGINAL_SCHEDULE_ID);
         mOriginalMonthPaid = savedInstanceState.getString(ORIGINAL_MONTH_PAID);
         mOriginalPaymentReceiptNo = savedInstanceState.getString(ORIGINAL_PAYMENT_RECEIPT_NO);
         mOriginalPaymentChandaAm = Float.parseFloat(savedInstanceState.getString(ORIGINAL_PAYMENT_CHANDAAM));
@@ -235,7 +239,7 @@ public class PaymentActivity extends AppCompatActivity {
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putString(ORIGINAL_PAYMENT_ID, String.valueOf(mOriginalChandaNo));
-//        outState.putString(ORIGINAL_SCHEDULE_ID, mOriginalScheduleId);
+        outState.putString(ORIGINAL_SCHEDULE_ID, mOriginalScheduleId);
         outState.putString(ORIGINAL_MONTH_PAID, mOriginalMonthPaid);
         outState.putString(ORIGINAL_PAYMENT_RECEIPT_NO, String.valueOf(mOriginalPaymentReceiptNo));
         outState.putString(ORIGINAL_PAYMENT_CHANDAAM, String.valueOf(mOriginalPaymentChandaAm));
@@ -254,7 +258,7 @@ public class PaymentActivity extends AppCompatActivity {
         mOriginalPaymentWasiyyat = mPayment.getWasiyyat();
         mOriginalPaymentTahrikJadid = mPayment.getTahrikJadid();
         mOriginalPaymentWaqfJadid = mPayment.getWaqfJadid();
-//        mOriginalScheduleId = mPayment.getSchedule().getScheduleId();
+        mOriginalScheduleId = mPayment.getSchedule().getScheduleId();
     }
 
     private void displayPayments() {
@@ -328,16 +332,16 @@ public class PaymentActivity extends AppCompatActivity {
     private void readDisplayStateValue() {
         Intent intent = getIntent();
         //get value that was put into the intent
-        String scheduleId = intent.getStringExtra(SCHEDULE_INFO);
-        mSchedule = DataManager.getInstance().getSchedule(scheduleId);
+//        String scheduleId = intent.getStringExtra(SCHEDULE_INFO);
+//        mSchedule = DataManager.getInstance().getSchedule(scheduleId);
         mPaymentId = intent.getIntExtra(PAYMENT_ID, ID_NOT_SET);
         mIsNewPayment = mPaymentId == ID_NOT_SET;
         if(mIsNewPayment){
             createNewPayment();
         }
-//        else {
-//            mPayment = DataManager.getInstance().getPayments(mSchedule).get(mPaymentId);
-//        }
+        else {
+            mPayment = DataManager.getInstance().getPayment(mPaymentId);
+        }
 
     }
 
@@ -359,12 +363,12 @@ public class PaymentActivity extends AppCompatActivity {
         MenuItem item1 = menu.findItem(R.id.action_next);
         MenuItem item2 = menu.findItem(R.id.action_previous);
         MenuItem item3 = menu.findItem(R.id.action_save);
-        int lastPaymentIndex = DataManager.getInstance().getPayments(mSchedule).size() - 1;
-        item1.setEnabled(mPaymentId < lastPaymentIndex);
-        item2.setEnabled(mPaymentId > 0); // if position is on index greater than startindex 0
-        if(mIsNewPayment){
-            item1.setEnabled(false); // disable next menu
-        }
+//        int lastPaymentIndex = DataManager.getInstance().getPayments(mSchedule).size() - 1;
+//        item1.setEnabled(mPaymentId < lastPaymentIndex);
+//        item2.setEnabled(mPaymentId > 0); // if position is on index greater than startindex 0
+//        if(mIsNewPayment){
+//            item1.setEnabled(false); // disable next menu
+//        }
         item3.setEnabled(mIsNewPayment); // enable the button if NewPayment
         return super.onPrepareOptionsMenu(menu);
     }
@@ -447,8 +451,8 @@ public class PaymentActivity extends AppCompatActivity {
     }
 
     private void storePreviousPaymentValues() {
-        ScheduleInfo schedule = DataManager.getInstance().getSchedule(mOriginalScheduleId);
-        mPayment.setSchedule(schedule);
+//        ScheduleInfo schedule = DataManager.getInstance().getSchedule(mOriginalScheduleId);
+//        mPayment.setSchedule(schedule);
         mPayment.setChandaNo(mOriginalChandaNo);
         mPayment.setMonthPaid(mOriginalMonthPaid);
         mPayment.setReceiptNo(mOriginalPaymentReceiptNo);
@@ -486,4 +490,31 @@ public class PaymentActivity extends AppCompatActivity {
         intent.putExtra(Intent.EXTRA_TEXT, text);
         startActivity(intent);
     }
+
+//    @Override
+//    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+//        CursorLoader loader = null;
+//        if(id == LOADER_PAYMENTS)
+//            loader = createLoaderPayments();
+//        return loader;
+//    }
+//
+//    private CursorLoader createLoaderPayments() {
+//        return new CursorLoader(this){
+//            @Override
+//            public Cursor loadInBackground() {
+//                return super.loadInBackground();
+//            }
+//        };
+//    }
+//
+//    @Override
+//    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+//
+//    }
+//
+//    @Override
+//    public void onLoaderReset(Loader<Cursor> loader) {
+//
+//    }
 }

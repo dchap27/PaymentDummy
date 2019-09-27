@@ -297,6 +297,14 @@ public class DataManager {
         return null;
     }
 
+    public PaymentInfo getPayment(int id){
+        for(PaymentInfo payment : mPayments){
+            if(id ==(payment.getId()))
+                return payment;
+        }
+        return null;
+    }
+
     public List<PaymentInfo> getPayments(ScheduleInfo schedule) {
         ArrayList<PaymentInfo> payments = new ArrayList<>();
         for(PaymentInfo payment:mPayments) {

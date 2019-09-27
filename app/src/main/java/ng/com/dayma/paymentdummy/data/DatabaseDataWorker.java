@@ -50,32 +50,32 @@ public class DatabaseDataWorker {
     }
 
     public void insertSamplePayments(){
-        insertPayment("May_2019_Kewulere_1", 2345, "0001", "May", 200,
+        insertPayment("May_2019_Kewulere_1", 2345, "0001", "MAY2019", 200,
                 70, 0, 10);
-        insertPayment("May_2019_Kewulere_1", 2365, "00031", "May", 290,
+        insertPayment("May_2019_Kewulere_1", 2365, "00031", "MAY2019", 290,
                 709, 700, 10);
-        insertPayment("May_2019_Kewulere_1", 3450, "000231", "May", 7000,
+        insertPayment("May_2019_Kewulere_1", 3450, "000231", "MAY2019", 7000,
                 0, 50, 0);
-        insertPayment("May_2019_Kewulere_1", 930293, "00022", "May", 4000,
+        insertPayment("May_2019_Kewulere_1", 930293, "00022", "MAY2019", 4000,
                 60, 200, 30);
 
-        insertPayment("January_2019_Kewulere_2", 83929, "0067701", "January", 0,
+        insertPayment("January_2019_Kewulere_2", 83929, "0067701", "JAN2019", 0,
                 1000, 0, 70);
-        insertPayment("January_2019_Kewulere_2", 3450, "0005", "January", 800,
+        insertPayment("January_2019_Kewulere_2", 3450, "0005", "JAN2019", 800,
                 0, 560, 300);
-        insertPayment("January_2019_Kewulere_2", 2345, "00087", "January", 1200,
+        insertPayment("January_2019_Kewulere_2", 2345, "00087", "JAN2019", 1200,
                 210, 30, 0);
 
-        insertPayment("May_2019_Felele_4", 38299, "0009551", "May", 2500,
+        insertPayment("May_2019_Felele_4", 38299, "0009551", "MAY2019", 2500,
                 700, 030, 10);
-        insertPayment("May_2019_Felele_4", 38272, "00081", "May", 2900,
+        insertPayment("May_2019_Felele_4", 38272, "00081", "MAY2019", 2900,
                 7050, 20, 100);
 
-        insertPayment("August_2019_OkeAdo_5", 2115, "032001", "August", 4500,
+        insertPayment("August_2019_OkeAdo_5", 2115, "032001", "AUG2019", 4500,
                 0, 200, 0);
-        insertPayment("August_2019_OkeAdo_5", 2005, "0001093", "August", 34200,
+        insertPayment("August_2019_OkeAdo_5", 2005, "0001093", "AUG2018", 34200,
                 700, 340, 90);
-        insertPayment("August_2019_OkeAdo_5", 29222, "9004001", "July", 2900,
+        insertPayment("August_2019_OkeAdo_5", 29222, "9004001", "JUL2019", 2900,
                 0, 0230, 100);
     }
 

@@ -17,8 +17,8 @@ public final class PaymentDatabaseContract {
                 "CREATE TABLE " + TABLE_NAME + "(" +
                         _ID + " INTEGER PRIMARY KEY, " +
                         COLUMN_MEMBER_JAMAATNAME + " TEXT NOT NULL, " +
-                        COLUMN_MEMBER_ID + " TEXT " +
-                        COLUMN_MEMBER_CHANDANO + " INTEGER UNIQUE NOT NULL " +
+                        COLUMN_MEMBER_ID + " TEXT, " +
+                        COLUMN_MEMBER_CHANDANO + " INTEGER UNIQUE NOT NULL, " +
                         COLUMN_MEMBER_FULLNAME + " TEXT NOT NULL)";
     }
 

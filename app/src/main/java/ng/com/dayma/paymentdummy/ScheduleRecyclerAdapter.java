@@ -2,6 +2,7 @@ package ng.com.dayma.paymentdummy;
 
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,19 +11,47 @@ import android.widget.TextView;
 
 import java.util.List;
 
+import ng.com.dayma.paymentdummy.data.PaymentDatabaseContract.ScheduleInfoEntry;
+
 /**
  * Created by Ahmad on 7/31/2019.
  */
 
 public class ScheduleRecyclerAdapter extends RecyclerView.Adapter<ScheduleRecyclerAdapter.ViewHolder> {
     private final Context mContext;
-    private final List<ScheduleInfo> mSchedules;
+    private Cursor mCursor;
     private final LayoutInflater mLayoutInflater;
+    private int mScheduleIdPos;
+    private int mMonthIdPos;
+    private int mJamaatPos;
+    private int mTitlePos;
+    private int mStatusPos;
+    private int mIdPos;
 
-    public ScheduleRecyclerAdapter(Context context, List<ScheduleInfo> schedules) {
+    public ScheduleRecyclerAdapter(Context context, Cursor cursor) {
         mContext = context;
-        mSchedules = schedules;
+        mCursor = cursor;
         mLayoutInflater = LayoutInflater.from(mContext);
+        populateColumnPostions();
+    }
+
+    private void populateColumnPostions() {
+        if(mCursor == null)
+            return;
+        mScheduleIdPos = mCursor.getColumnIndex(ScheduleInfoEntry.COLUMN_SCHEDULE_ID);
+        mMonthIdPos = mCursor.getColumnIndex(ScheduleInfoEntry.COLUMN_MONTH_ID);
+        mJamaatPos = mCursor.getColumnIndex(ScheduleInfoEntry.COLUMN_SCHEDULE_JAMAAT);
+        mTitlePos = mCursor.getColumnIndex(ScheduleInfoEntry.COLUMN_SCHEDULE_TITLE);
+        mStatusPos = mCursor.getColumnIndex(ScheduleInfoEntry.COLUMN_SCHEDULE_IS_COMPLETE);
+        mIdPos = mCursor.getColumnIndex(ScheduleInfoEntry._ID);
+    }
+
+    public void changeCursor(Cursor cursor){
+        if(mCursor != null)
+            mCursor.close();
+        mCursor = cursor;
+        populateColumnPostions();
+        notifyDataSetChanged();
     }
 
     @Override
@@ -33,31 +62,39 @@ public class ScheduleRecyclerAdapter extends RecyclerView.Adapter<ScheduleRecycl
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
+        mCursor.moveToPosition(position);
+        String scheduleId = mCursor.getString(mScheduleIdPos);
+        String monthId = mCursor.getString(mMonthIdPos);
+        String jamaat = mCursor.getString(mJamaatPos);
+        String title = mCursor.getString(mTitlePos);
+        int status = mCursor.getInt(mStatusPos);
+        int id = mCursor.getInt(mIdPos);
 
-        ScheduleInfo schedule = mSchedules.get(position);
         DataManager dm = DataManager.getInstance();
+        ScheduleInfo schedule = dm.getSchedule(scheduleId);
         int payers = dm.getPaymentCount(schedule);
         List<PaymentInfo> payments = dm.getPayments(schedule);
         float totalAmount = dm.getScheduleAmount(payments);
-        String status;
-        if(schedule.isComplete()){
-            status = "complete";
+        String completion;
+        if(status == 0){
+            completion = "Draft";
         } else {
-            status = "draft";
+            completion = "completed";
         }
-        holder.mScheduleTitle.setText(schedule.getScheduleId());
-        holder.mTextMonth.setText(schedule.getMonth().getMonthId());
+        holder.mScheduleTitle.setText(title);
+        holder.mTextMonth.setText(monthId);
         holder.mTextTotalPayers.setText(mContext.getString(R.string.text_no_of_payers) + String.valueOf(payers));
         holder.mTextScheduleTotalAmount.setText(String.format(
                 mContext.getString(R.string.text_total_amount_for_schedule), String.valueOf(totalAmount)));
-        holder.mTextCompletionStatus.setText(String.format("Status: %s", status));
-        holder.mId = schedule.getId();
+        holder.mTextCompletionStatus.setText(String.format("Status: %s", completion));
+        holder.mId = id;
+        holder.mScheduleId = scheduleId;
 
     }
 
     @Override
     public int getItemCount() {
-        return mSchedules.size();
+        return mCursor == null ? 0 : mCursor.getCount();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder{
@@ -65,6 +102,7 @@ public class ScheduleRecyclerAdapter extends RecyclerView.Adapter<ScheduleRecycl
         public final TextView mTextMonth;
         public final TextView mTextTotalPayers;
         public final TextView mTextScheduleTotalAmount;
+        public String mScheduleId;
         private int mId;
         private final TextView mTextCompletionStatus;
 
@@ -81,7 +119,7 @@ public class ScheduleRecyclerAdapter extends RecyclerView.Adapter<ScheduleRecycl
                 @Override
                 public void onClick(View v) {
                     Intent intent = new Intent(mContext, PaymentListActivity.class);
-                    intent.putExtra(PaymentListActivity.SCHEDULE_ID, mId);
+                    intent.putExtra(PaymentListActivity.SCHEDULE_ID, mScheduleId);
                     mContext.startActivity(intent);
 //                    Snackbar.make(v, mScheduleTitle.getText(), Snackbar.LENGTH_LONG).show();
                 }

@@ -5,6 +5,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.support.annotation.Nullable;
 
+import ng.com.dayma.paymentdummy.data.PaymentDatabaseContract.MemberInfoEntry;
 import ng.com.dayma.paymentdummy.data.PaymentDatabaseContract.MonthInfoEntry;
 import ng.com.dayma.paymentdummy.data.PaymentDatabaseContract.PaymentInfoEntry;
 import ng.com.dayma.paymentdummy.data.PaymentDatabaseContract.ScheduleInfoEntry;
@@ -20,12 +21,14 @@ public class PaymentOpenHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         // create the database table if it doesn't exist
+        db.execSQL(MemberInfoEntry.SQL_CREATE_TABLE);
         db.execSQL(MonthInfoEntry.SQL_CREATE_TABLE);
         db.execSQL(ScheduleInfoEntry.SQL_CREATE_TABLE);
         db.execSQL(PaymentInfoEntry.SQL_CREATE_TABLE);
 
         // create a dummy data
         DatabaseDataWorker worker = new DatabaseDataWorker(db);
+        worker.insertMembers();
         worker.insertMonths();
         worker.insertSampleSchedules();
         worker.insertSamplePayments();

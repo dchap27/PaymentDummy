@@ -1,6 +1,8 @@
 package ng.com.dayma.paymentdummy;
 
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -13,6 +15,9 @@ import android.widget.ArrayAdapter;
 
 import java.util.List;
 
+import ng.com.dayma.paymentdummy.data.PaymentDatabaseContract.ScheduleInfoEntry;
+import ng.com.dayma.paymentdummy.data.PaymentOpenHelper;
+
 public class ScheduleListActivity extends AppCompatActivity {
 
     public static final String MONTH_ID = "ng.com.dayma.paymentdummy.MONTH_ID";
@@ -22,7 +27,8 @@ public class ScheduleListActivity extends AppCompatActivity {
     private ArrayAdapter<ScheduleInfo> mAdaptermonths;
     private RecyclerView mRecyclerItems;
     private ScheduleRecyclerAdapter mMonthSchedulesAdapter;
-    private int mMonID;
+    private String mMonID;
+    private PaymentOpenHelper mDbOpenHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,6 +36,8 @@ public class ScheduleListActivity extends AppCompatActivity {
         setContentView(R.layout.activity_schedule_list);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        mDbOpenHelper = new PaymentOpenHelper(this);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -44,37 +52,48 @@ public class ScheduleListActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onDestroy() {
+        mDbOpenHelper.close();
+        super.onDestroy();
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
-        mMonthSchedulesAdapter.notifyDataSetChanged();
+        loadScheduleData();
+//        mMonthSchedulesAdapter.notifyDataSetChanged();
+    }
+
+    private void loadScheduleData() {
+        SQLiteDatabase db = mDbOpenHelper.getReadableDatabase();
+
+        final String[] scheduleColumns = {
+                ScheduleInfoEntry.COLUMN_MONTH_ID,
+                ScheduleInfoEntry._ID,
+                ScheduleInfoEntry.COLUMN_SCHEDULE_JAMAAT,
+                ScheduleInfoEntry.COLUMN_SCHEDULE_IS_COMPLETE,
+                ScheduleInfoEntry.COLUMN_SCHEDULE_TITLE,
+                ScheduleInfoEntry.COLUMN_SCHEDULE_ID
+
+        };
+        String selection = ScheduleInfoEntry.COLUMN_MONTH_ID + "=?";
+        String[] selectionArgs = { mMonID };
+        String scheduleOrder = ScheduleInfoEntry.COLUMN_MONTH_ID + "," + ScheduleInfoEntry.COLUMN_SCHEDULE_JAMAAT;
+        Cursor cursor = db.query(ScheduleInfoEntry.TABLE_NAME, scheduleColumns,
+                selection, selectionArgs, null, null, scheduleOrder);
+        mMonthSchedulesAdapter.changeCursor(cursor);
+
     }
 
     private void initializeDisplayContent() {
 
-//        ListView listMonths = (ListView) findViewById(R.id.list_monthschedules);
-//        DataManager dm = DataManager.getInstance();
-//        mMonths = dm.getMonths();
-//        mSchedules = dm.getSchedules();
-//
-//        mAdaptermonths = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, mSchedules);
-//
-//        listMonths.setAdapter(mAdaptermonths);
-//        listMonths.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//            @Override
-//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//                Intent intent = new Intent(ScheduleListActivity.this, PaymentListActivity.class);
-////                PaymentInfo payment = (PaymentInfo) listPayments.getItemAtPosition(position);
-//                intent.putExtra(PaymentListActivity.SCHEDULE_POSITION, position);
-//                startActivity(intent);
-//            }
-//        });
         Intent intent = getIntent();
-        mMonID = intent.getIntExtra(MONTH_ID, ID_NOT_SET);
+        mMonID = intent.getStringExtra(MONTH_ID);
         MonthInfo month = DataManager.getInstance().getMonth(mMonID);
 
         mRecyclerItems = (RecyclerView) findViewById(R.id.list_monthschedules);
-        List<ScheduleInfo> schedules = DataManager.getInstance().getSchedules(month);
-        mMonthSchedulesAdapter = new ScheduleRecyclerAdapter(this, schedules);
+//        List<ScheduleInfo> schedules = DataManager.getInstance().getSchedules(month);
+        mMonthSchedulesAdapter = new ScheduleRecyclerAdapter(this, null);
 
         GridLayoutManager mMonthSchedulesLayoutManager = new GridLayoutManager(this, 2);
         mRecyclerItems.setLayoutManager(mMonthSchedulesLayoutManager);

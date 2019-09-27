@@ -1,6 +1,9 @@
 package ng.com.dayma.paymentdummy;
 
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
@@ -11,9 +14,12 @@ import android.view.View;
 
 import java.util.List;
 
+import ng.com.dayma.paymentdummy.data.PaymentDatabaseContract.PaymentInfoEntry;
+import ng.com.dayma.paymentdummy.data.PaymentOpenHelper;
+
 public class PaymentListActivity extends AppCompatActivity {
 
-    public static final int ID_NOT_SET = -1;
+    public static final String ID_NOT_SET = null;
     public static final String SCHEDULE_ID = "ng.com.dayma.paymentdummy.SCHEDULE_ID";
 
 //    private ArrayAdapter<PaymentInfo> mAdapterPayments;
@@ -21,7 +27,8 @@ public class PaymentListActivity extends AppCompatActivity {
     private boolean mIsNewSchedule;
     private ScheduleInfo mSchedule;
     private PaymentRecyclerAdapter mPaymentRecyclerAdapter;
-    private int mScheID;
+    private String mScheID;
+    private SQLiteOpenHelper mDbOpenHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,6 +36,8 @@ public class PaymentListActivity extends AppCompatActivity {
         setContentView(R.layout.activity_payment_list);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        mDbOpenHelper = new PaymentOpenHelper(this);
 
         readDisplayStateValues();
         initializeDisplayContent();
@@ -49,7 +58,7 @@ public class PaymentListActivity extends AppCompatActivity {
     private void readDisplayStateValues() {
         Intent intent = getIntent();
         //get value that was put into the intent
-        mScheID = intent.getIntExtra(SCHEDULE_ID, ID_NOT_SET);
+        mScheID = intent.getStringExtra(SCHEDULE_ID);
         mSchedule = DataManager.getInstance().getSchedule(mScheID);
         mIsNewSchedule = mScheID == ID_NOT_SET;
         if(mIsNewSchedule){
@@ -61,9 +70,36 @@ public class PaymentListActivity extends AppCompatActivity {
 
     @Override
     protected void onResume() {
-        mPaymentRecyclerAdapter.notifyDataSetChanged();
         super.onResume();
+        loadPaymentsData();
 //        mAdapterPayments.notifyDataSetChanged();
+    }
+
+    private void loadPaymentsData() {
+        SQLiteDatabase db = mDbOpenHelper.getReadableDatabase();
+
+        String[] paymentColumns = {
+                PaymentInfoEntry._ID,
+                PaymentInfoEntry.COLUMN_MEMBER_CHANDANO,
+                PaymentInfoEntry.COLUMN_MEMBER_FULLNAME,
+                PaymentInfoEntry.COLUMN_PAYMENT_LOCALRECEIPT,
+                PaymentInfoEntry.COLUMN_PAYMENT_MONTHPAID,
+                PaymentInfoEntry.COLUMN_PAYMENT_CHANDAAM,
+                PaymentInfoEntry.COLUMN_PAYMENT_CHANDAWASIYYAT,
+                PaymentInfoEntry.COLUMN_PAYMENT_JALSASALANA,
+                PaymentInfoEntry.COLUMN_PAYMENT_TARIKIJADID,
+                PaymentInfoEntry.COLUMN_PAYMENT_WAQFIJADID,
+                PaymentInfoEntry.COLUMN_PAYMENT_WELFAREFUND,
+                PaymentInfoEntry.COLUMN_PAYMENT_SCHOLARSHIP,
+                PaymentInfoEntry.COLUMN_PAYMENT_SUBTOTAL,
+                PaymentInfoEntry.COLUMN_SCHEDULE_ID
+        };
+        String selection = PaymentInfoEntry.COLUMN_SCHEDULE_ID + "=?";
+        String[] selectionArgs = { mScheID };
+        String paymentOrderby = PaymentInfoEntry.COLUMN_MEMBER_FULLNAME + "," + PaymentInfoEntry.COLUMN_PAYMENT_SUBTOTAL;
+        Cursor cursor = db.query(PaymentInfoEntry.TABLE_NAME, paymentColumns, selection, selectionArgs,
+                null, null, paymentOrderby);
+        mPaymentRecyclerAdapter.changeCursor(cursor);
     }
 
     private void initializeDisplayContent() {
@@ -90,7 +126,7 @@ public class PaymentListActivity extends AppCompatActivity {
         recyclerPayments.setLayoutManager(paymentsLayoutManager);
 
         List<PaymentInfo> payments = DataManager.getInstance().getPayments();
-        mPaymentRecyclerAdapter = new PaymentRecyclerAdapter(this, mPayments);
+        mPaymentRecyclerAdapter = new PaymentRecyclerAdapter(this, null);
         recyclerPayments.setAdapter(mPaymentRecyclerAdapter);
 
     }

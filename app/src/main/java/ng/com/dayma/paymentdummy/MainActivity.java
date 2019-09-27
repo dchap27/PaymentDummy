@@ -2,25 +2,27 @@ package ng.com.dayma.paymentdummy;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.view.View;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.TextView;
 
-import java.util.List;
-
+import ng.com.dayma.paymentdummy.data.PaymentDatabaseContract;
+import ng.com.dayma.paymentdummy.data.PaymentDatabaseContract.ScheduleInfoEntry;
 import ng.com.dayma.paymentdummy.data.PaymentOpenHelper;
 
 public class MainActivity extends AppCompatActivity
@@ -71,8 +73,27 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onResume() {
         super.onResume();
-        mScheduleRecyclerAdapter.notifyDataSetChanged();
+        loadSchedulesData();
+//        mScheduleRecyclerAdapter.notifyDataSetChanged();
         updateNavHeader();
+    }
+
+    private void loadSchedulesData() {
+        SQLiteDatabase db = mDbOpenHelper.getReadableDatabase();
+
+        final String[] scheduleColumns = {
+                ScheduleInfoEntry.COLUMN_MONTH_ID,
+                ScheduleInfoEntry._ID,
+                ScheduleInfoEntry.COLUMN_SCHEDULE_JAMAAT,
+                ScheduleInfoEntry.COLUMN_SCHEDULE_IS_COMPLETE,
+                ScheduleInfoEntry.COLUMN_SCHEDULE_TITLE,
+                ScheduleInfoEntry.COLUMN_SCHEDULE_ID
+
+        };
+        String scheduleOrder = ScheduleInfoEntry.COLUMN_MONTH_ID + "," + ScheduleInfoEntry.COLUMN_SCHEDULE_JAMAAT;
+        Cursor cursor = db.query(PaymentDatabaseContract.ScheduleInfoEntry.TABLE_NAME, scheduleColumns,
+                null, null, null, null, scheduleOrder);
+        mScheduleRecyclerAdapter.changeCursor(cursor);
     }
 
     @Override
@@ -101,13 +122,11 @@ public class MainActivity extends AppCompatActivity
         mGridLayoutManager = new GridLayoutManager(this,
                 getResources().getInteger(R.integer.schedule_grid_span));
 
-        List<ScheduleInfo> schedules = DataManager.getInstance().getSchedules();
-        mScheduleRecyclerAdapter = new ScheduleRecyclerAdapter(this, schedules);
+//        List<ScheduleInfo> schedules = DataManager.getInstance().getSchedules();
+        mScheduleRecyclerAdapter = new ScheduleRecyclerAdapter(this, null);
 
-        List<MonthInfo> months = DataManager.getInstance().getMonths();
-        mMonthRecyclerAdapter = new MonthRecyclerAdapter(this, months);
-
-
+//        List<MonthInfo> months = DataManager.getInstance().getMonths();
+        mMonthRecyclerAdapter = new MonthRecyclerAdapter(this, null);
         displaySchedules();
 
     }
@@ -121,11 +140,25 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void displayMonths() {
+        loadMonthsData();
         mRecyclerItems.setLayoutManager(mGridLayoutManager);
         mRecyclerItems.setAdapter(mMonthRecyclerAdapter);
 
         selectNavigationMenuItem(R.id.nav_months);
 
+    }
+
+    private void loadMonthsData() {
+        SQLiteDatabase db = mDbOpenHelper.getReadableDatabase();
+
+        final String[] monthColumns = {
+                PaymentDatabaseContract.MonthInfoEntry._ID,
+                PaymentDatabaseContract.MonthInfoEntry.COLUMN_MONTH_ID
+        };
+
+        Cursor cursor = db.query(PaymentDatabaseContract.MonthInfoEntry.TABLE_NAME, monthColumns, null,
+                null, null, null, PaymentDatabaseContract.MonthInfoEntry.COLUMN_MONTH_ID);
+        mMonthRecyclerAdapter.changeCursor(cursor);
     }
 
     private void selectNavigationMenuItem(int id) {
