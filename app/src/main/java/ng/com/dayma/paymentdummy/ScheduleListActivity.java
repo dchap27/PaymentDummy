@@ -1,6 +1,9 @@
 package ng.com.dayma.paymentdummy;
 
+import android.app.LoaderManager;
+import android.content.CursorLoader;
 import android.content.Intent;
+import android.content.Loader;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
@@ -18,10 +21,11 @@ import java.util.List;
 import ng.com.dayma.paymentdummy.data.PaymentDatabaseContract.ScheduleInfoEntry;
 import ng.com.dayma.paymentdummy.data.PaymentOpenHelper;
 
-public class ScheduleListActivity extends AppCompatActivity {
+public class ScheduleListActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
     public static final String MONTH_ID = "ng.com.dayma.paymentdummy.MONTH_ID";
     public static final int ID_NOT_SET = -1;
+    public static final int LOADER_SCHEDULES = 0;
     private List<MonthInfo> mMonths;
     private List<ScheduleInfo> mSchedules;
     private ArrayAdapter<ScheduleInfo> mAdaptermonths;
@@ -60,8 +64,8 @@ public class ScheduleListActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        loadScheduleData();
-//        mMonthSchedulesAdapter.notifyDataSetChanged();
+//        loadScheduleData();
+        getLoaderManager().restartLoader(LOADER_SCHEDULES, null, this);
     }
 
     private void loadScheduleData() {
@@ -101,4 +105,45 @@ public class ScheduleListActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        CursorLoader loader = null;
+        if(id == LOADER_SCHEDULES){
+            loader = new CursorLoader(this){
+                @Override
+                public Cursor loadInBackground() {
+                    SQLiteDatabase db = mDbOpenHelper.getReadableDatabase();
+
+                    final String[] scheduleColumns = {
+                            ScheduleInfoEntry.COLUMN_MONTH_ID,
+                            ScheduleInfoEntry._ID,
+                            ScheduleInfoEntry.COLUMN_SCHEDULE_JAMAAT,
+                            ScheduleInfoEntry.COLUMN_SCHEDULE_IS_COMPLETE,
+                            ScheduleInfoEntry.COLUMN_SCHEDULE_TITLE,
+                            ScheduleInfoEntry.COLUMN_SCHEDULE_ID
+
+                    };
+                    String selection = ScheduleInfoEntry.COLUMN_MONTH_ID + "=?";
+                    String[] selectionArgs = { mMonID };
+                    String scheduleOrder = ScheduleInfoEntry.COLUMN_MONTH_ID + "," + ScheduleInfoEntry.COLUMN_SCHEDULE_JAMAAT;
+                    return db.query(ScheduleInfoEntry.TABLE_NAME, scheduleColumns,
+                            selection, selectionArgs, null, null, scheduleOrder);
+                }
+            };
+        }
+        return loader;
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        if(loader.getId() == LOADER_SCHEDULES){
+            mMonthSchedulesAdapter.changeCursor(data);
+        }
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        if(loader.getId() == LOADER_SCHEDULES)
+            mMonthSchedulesAdapter.changeCursor(null);
+    }
 }
