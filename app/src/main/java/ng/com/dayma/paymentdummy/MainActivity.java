@@ -1,6 +1,9 @@
 package ng.com.dayma.paymentdummy;
 
+import android.app.LoaderManager;
+import android.content.CursorLoader;
 import android.content.Intent;
+import android.content.Loader;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -26,8 +29,10 @@ import ng.com.dayma.paymentdummy.data.PaymentDatabaseContract.ScheduleInfoEntry;
 import ng.com.dayma.paymentdummy.data.PaymentOpenHelper;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener, LoaderManager.LoaderCallbacks<Cursor> {
     public static final String MONTH_POSITION = "ng.com.dayma.paymentdummy.MONTH_POSITION";
+    public static final int LOADER_SCHEDULES = 0;
+    private static final int LOADER_MONTHS = 1;
     private ScheduleRecyclerAdapter mScheduleRecyclerAdapter;
     private RecyclerView mRecyclerItems;
     private GridLayoutManager mGridLayoutManager;
@@ -73,8 +78,8 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onResume() {
         super.onResume();
-        loadSchedulesData();
-//        mScheduleRecyclerAdapter.notifyDataSetChanged();
+        getLoaderManager().restartLoader(LOADER_SCHEDULES, null, this);
+//        loadSchedulesData();
         updateNavHeader();
     }
 
@@ -140,7 +145,8 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void displayMonths() {
-        loadMonthsData();
+//        loadMonthsData();
+        getLoaderManager().restartLoader(LOADER_MONTHS, null, this);
         mRecyclerItems.setLayoutManager(mGridLayoutManager);
         mRecyclerItems.setAdapter(mMonthRecyclerAdapter);
 
@@ -229,4 +235,69 @@ public class MainActivity extends AppCompatActivity
 
     }
 
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        CursorLoader loader = null;
+        if(id == LOADER_SCHEDULES) {
+            loader = new CursorLoader(this) {
+                @Override
+                public Cursor loadInBackground() {
+                    SQLiteDatabase db = mDbOpenHelper.getReadableDatabase();
+
+                    final String[] scheduleColumns = {
+                            ScheduleInfoEntry.COLUMN_MONTH_ID,
+                            ScheduleInfoEntry._ID,
+                            ScheduleInfoEntry.COLUMN_SCHEDULE_JAMAAT,
+                            ScheduleInfoEntry.COLUMN_SCHEDULE_IS_COMPLETE,
+                            ScheduleInfoEntry.COLUMN_SCHEDULE_TITLE,
+                            ScheduleInfoEntry.COLUMN_SCHEDULE_ID
+
+                    };
+                    String scheduleOrder = ScheduleInfoEntry.COLUMN_MONTH_ID + "," + ScheduleInfoEntry.COLUMN_SCHEDULE_JAMAAT;
+                    return db.query(PaymentDatabaseContract.ScheduleInfoEntry.TABLE_NAME, scheduleColumns,
+                            null, null, null, null, scheduleOrder);
+                }
+            };
+        }
+        else if(id == LOADER_MONTHS){
+            loader = cursorLoaderMonths();
+        }
+        return loader;
+    }
+
+    private CursorLoader cursorLoaderMonths() {
+        return new CursorLoader(this){
+            @Override
+            public Cursor loadInBackground() {
+                SQLiteDatabase db = mDbOpenHelper.getReadableDatabase();
+
+                final String[] monthColumns = {
+                        PaymentDatabaseContract.MonthInfoEntry._ID,
+                        PaymentDatabaseContract.MonthInfoEntry.COLUMN_MONTH_ID
+                };
+
+                return db.query(PaymentDatabaseContract.MonthInfoEntry.TABLE_NAME, monthColumns, null,
+                        null, null, null, PaymentDatabaseContract.MonthInfoEntry.COLUMN_MONTH_ID);
+            }
+        };
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        if(loader.getId() == LOADER_SCHEDULES)
+            mScheduleRecyclerAdapter.changeCursor(data);
+        else if(loader.getId() == LOADER_MONTHS){
+            mMonthRecyclerAdapter.changeCursor(data);
+        }
+
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        if(loader.getId() == LOADER_SCHEDULES)
+            mScheduleRecyclerAdapter.changeCursor(null);
+        if(loader.getId() == LOADER_MONTHS){
+            mMonthRecyclerAdapter.changeCursor(null);
+        }
+    }
 }
