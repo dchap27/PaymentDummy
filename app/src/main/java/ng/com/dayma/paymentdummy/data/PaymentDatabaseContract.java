@@ -6,7 +6,7 @@ public final class PaymentDatabaseContract {
     private PaymentDatabaseContract () {} // make non-creatable
 
     public static final class MemberInfoEntry implements BaseColumns {
-        public static final String TABLE_NAME = "jamaat_info";
+        public static final String TABLE_NAME = "member_info";
 
         public static final String COLUMN_MEMBER_JAMAATNAME = "jamaat_name";
         public static final String COLUMN_MEMBER_ID = "member_id";
@@ -20,6 +20,14 @@ public final class PaymentDatabaseContract {
                         COLUMN_MEMBER_ID + " TEXT, " +
                         COLUMN_MEMBER_CHANDANO + " INTEGER UNIQUE NOT NULL, " +
                         COLUMN_MEMBER_FULLNAME + " TEXT NOT NULL)";
+
+        // CREATE INDEX member_info_index1 ON member_info (columns)
+        public static final String INDEX1 = TABLE_NAME + "_index1";
+        public static final String SQL_CREATE_INDEX1 =
+                "CREATE INDEX " + INDEX1 + " ON " + TABLE_NAME +
+                        "(" + COLUMN_MEMBER_JAMAATNAME + "," +
+                        COLUMN_MEMBER_ID + "," +
+                        COLUMN_MEMBER_CHANDANO + ")";
     }
 
     public static final class MonthInfoEntry implements BaseColumns {
@@ -34,6 +42,12 @@ public final class PaymentDatabaseContract {
                 "CREATE TABLE " + TABLE_NAME + "(" +
                         _ID + " INTEGER PRIMARY KEY, " +
                         COLUMN_MONTH_ID + " TEXT NOT NULL)";
+
+        // CREATE INDEX member_info_index1 ON member_info (columns)
+        public static final String INDEX1 = TABLE_NAME + "_index1";
+        public static final String SQL_CREATE_INDEX1 =
+                "CREATE INDEX " + INDEX1 + " ON " + TABLE_NAME +
+                        "(" + COLUMN_MONTH_ID + ")";
 
     }
 
@@ -56,6 +70,13 @@ public final class PaymentDatabaseContract {
                         COLUMN_SCHEDULE_JAMAAT + " TEXT NOT NULL, " +
                         COLUMN_SCHEDULE_IS_COMPLETE + " INTEGER DEFAULT 0, " +
                         COLUMN_MONTH_ID + " TEXT NOT NULL)";
+
+        // CREATE INDEX member_info_index1 ON member_info (columns)
+        public static final String INDEX1 = TABLE_NAME + "_index1";
+        public static final String SQL_CREATE_INDEX1 =
+                "CREATE INDEX " + INDEX1 + " ON " + TABLE_NAME +
+                        "(" + COLUMN_SCHEDULE_ID + "," +
+                        COLUMN_MONTH_ID + ")";
 
     }
 
@@ -113,6 +134,13 @@ public final class PaymentDatabaseContract {
                         COLUMN_PAYMENT_WASIYYATHISSANJAIDAD + " REAL DEFAULT 0.0, " +
                         COLUMN_PAYMENT_MISCELLANEOUS + " REAL DEFAULT 0.0, " +
                         COLUMN_PAYMENT_SUBTOTAL + " REAL DEFAULT 0.0)";
+
+        // CREATE INDEX member_info_index1 ON member_info (columns)
+        public static final String INDEX1 = TABLE_NAME + "_index1";
+        public static final String SQL_CREATE_INDEX1 =
+                "CREATE INDEX " + INDEX1 + " ON " + TABLE_NAME +
+                        "(" + COLUMN_SCHEDULE_ID + "," +
+                        COLUMN_MEMBER_CHANDANO + ")";
 
     }
 

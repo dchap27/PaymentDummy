@@ -24,6 +24,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import java.util.List;
+
 import ng.com.dayma.paymentdummy.data.PaymentDatabaseContract;
 import ng.com.dayma.paymentdummy.data.PaymentDatabaseContract.ScheduleInfoEntry;
 import ng.com.dayma.paymentdummy.data.PaymentOpenHelper;
@@ -127,7 +129,7 @@ public class MainActivity extends AppCompatActivity
         mGridLayoutManager = new GridLayoutManager(this,
                 getResources().getInteger(R.integer.schedule_grid_span));
 
-//        List<ScheduleInfo> schedules = DataManager.getInstance().getSchedules();
+        List<ScheduleInfo> schedules = DataManager.getInstance().getSchedules();
         mScheduleRecyclerAdapter = new ScheduleRecyclerAdapter(this, null);
 
 //        List<MonthInfo> months = DataManager.getInstance().getMonths();

@@ -9,8 +9,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import java.util.List;
-
 import ng.com.dayma.paymentdummy.data.PaymentDatabaseContract.ScheduleInfoEntry;
 
 /**
@@ -73,8 +71,8 @@ public class ScheduleRecyclerAdapter extends RecyclerView.Adapter<ScheduleRecycl
         DataManager dm = DataManager.getInstance();
         ScheduleInfo schedule = dm.getSchedule(scheduleId);
         int payers = dm.getPaymentCount(schedule);
-        List<PaymentInfo> payments = dm.getPayments(schedule);
-        float totalAmount = dm.getScheduleAmount(payments);
+//        List<PaymentInfo> payments = dm.getPayments(scheduleId);
+        float totalAmount = dm.getScheduleAmount(schedule);
         String completion;
         if(status == 0){
             completion = "Draft";

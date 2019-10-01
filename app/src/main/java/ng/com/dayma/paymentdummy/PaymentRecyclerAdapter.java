@@ -19,13 +19,13 @@ public class PaymentRecyclerAdapter extends RecyclerView.Adapter<PaymentRecycler
     private final Context mContext;
     private Cursor mCursor;
     private final LayoutInflater mLayoutInflater;
-    private String mScheduleId;
     private int mChandaNoPos;
     private int mMemberNamePos;
     private int mLocalReceiptPos;
     private int mMonthPaidPos;
     private int mAmountPaidPos;
     private int mIdPos;
+    private int mScheduleIdPos;
 
     public PaymentRecyclerAdapter(Context context, Cursor cursor) {
         mContext = context;
@@ -38,6 +38,7 @@ public class PaymentRecyclerAdapter extends RecyclerView.Adapter<PaymentRecycler
         if(mCursor == null)
             return;
         mChandaNoPos = mCursor.getColumnIndex(PaymentInfoEntry.COLUMN_MEMBER_CHANDANO);
+        mScheduleIdPos = mCursor.getColumnIndex(PaymentInfoEntry.COLUMN_SCHEDULE_ID);
         mMemberNamePos = mCursor.getColumnIndex(PaymentInfoEntry.COLUMN_MEMBER_FULLNAME);
         mLocalReceiptPos = mCursor.getColumnIndex(PaymentInfoEntry.COLUMN_PAYMENT_LOCALRECEIPT);
         mMonthPaidPos = mCursor.getColumnIndex(PaymentInfoEntry.COLUMN_PAYMENT_MONTHPAID);
@@ -68,12 +69,14 @@ public class PaymentRecyclerAdapter extends RecyclerView.Adapter<PaymentRecycler
         String receiptNo = mCursor.getString(mLocalReceiptPos);
         Float amountPaid = mCursor.getFloat(mAmountPaidPos);
         String fullname = mCursor.getString(mMemberNamePos);
+        String scheduleId = mCursor.getString(mScheduleIdPos);
         int id = mCursor.getInt(mIdPos);
 
         holder.mTextChandaNo.setText(String.format("%s: %s", String.valueOf(chandaNo), fullname));
         holder.mTextMonthPaid.setText(monthPaid);
         holder.mTextReceiptNo.setText(String.format(mContext.getString(R.string.text_receipt_number), receiptNo));
         holder.mTextAmountPaid.setText(String.format(mContext.getString(R.string.text_amount_paid), String.valueOf(amountPaid)));
+        holder.mScheduleId = scheduleId;
         holder.mId = id;
 
     }
@@ -89,6 +92,7 @@ public class PaymentRecyclerAdapter extends RecyclerView.Adapter<PaymentRecycler
         public final TextView mTextReceiptNo;
         public final TextView mTextAmountPaid;
         private int mId;
+        private String mScheduleId;
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -102,7 +106,7 @@ public class PaymentRecyclerAdapter extends RecyclerView.Adapter<PaymentRecycler
                 public void onClick(View v) {
                     Intent intent = new Intent(mContext, PaymentActivity.class);
                     intent.putExtra(PaymentActivity.PAYMENT_ID, mId);
-//                    intent.putExtra(PaymentActivity.SCHEDULE_INFO, mScheduleId);
+                    intent.putExtra(PaymentActivity.SCHEDULE_INFO, mScheduleId);
                     mContext.startActivity(intent);
                 }
             });

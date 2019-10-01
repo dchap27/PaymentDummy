@@ -1,11 +1,13 @@
 package ng.com.dayma.paymentdummy;
 
 import android.app.LoaderManager;
+import android.content.ContentValues;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -93,6 +95,7 @@ public class PaymentActivity extends AppCompatActivity implements LoaderManager.
     private SimpleCursorAdapter mAdapterMemberIds;
     private boolean mMembersQueriesFinished;
     private boolean mPaymentQueriesFinished;
+    private String mScheduleId;
 
 
     @Override
@@ -339,8 +342,8 @@ public class PaymentActivity extends AppCompatActivity implements LoaderManager.
     private void readDisplayStateValue() {
         Intent intent = getIntent();
         //get value that was put into the intent
-//        String scheduleId = intent.getStringExtra(SCHEDULE_INFO);
-//        mSchedule = DataManager.getInstance().getSchedule(scheduleId);
+        mScheduleId = intent.getStringExtra(SCHEDULE_INFO);
+        mSchedule = DataManager.getInstance().getSchedule(mScheduleId);
         mPaymentId = intent.getIntExtra(PAYMENT_ID, ID_NOT_SET);
         mIsNewPayment = mPaymentId == ID_NOT_SET;
         if(mIsNewPayment){
@@ -353,9 +356,27 @@ public class PaymentActivity extends AppCompatActivity implements LoaderManager.
     }
 
     private void createNewPayment() {
-        DataManager dm = DataManager.getInstance();
-        mPaymentId = dm.createNewPayment(); // create a new payment and return its position
-        mPayment = DataManager.getInstance().getPayments().get(mPaymentId);
+        AsyncTask task = new AsyncTask() {
+            @Override
+            protected Object doInBackground(Object[] objects) {
+                ContentValues values = new ContentValues();
+                values.put(PaymentInfoEntry.COLUMN_MEMBER_CHANDANO, 0);
+                values.put(PaymentInfoEntry.COLUMN_SCHEDULE_ID, mScheduleId);
+                values.put(PaymentInfoEntry.COLUMN_PAYMENT_MONTHPAID, "");
+                values.put(PaymentInfoEntry.COLUMN_PAYMENT_LOCALRECEIPT, "");
+                values.put(PaymentInfoEntry.COLUMN_PAYMENT_CHANDAAM, 0);
+                // get connection to the database
+                SQLiteDatabase db = mDbOpenHelper.getWritableDatabase();
+                // insert new row
+                mPaymentId = (int) db.insert(PaymentInfoEntry.TABLE_NAME, null, values);
+                return null;
+            }
+        };
+        task.execute();
+
+//        DataManager dm = DataManager.getInstance();
+//        mPaymentId = dm.createNewPayment(); // create a new payment and return its position
+//        mPayment = DataManager.getInstance().getPayments().get(mPaymentId);
     }
 
     @Override
@@ -376,7 +397,7 @@ public class PaymentActivity extends AppCompatActivity implements LoaderManager.
 //        if(mIsNewPayment){
 //            item1.setEnabled(false); // disable next menu
 //        }
-        item3.setEnabled(mIsNewPayment); // enable the button if NewPayment
+        item3.setEnabled(true); // enable the button always
         return super.onPrepareOptionsMenu(menu);
     }
 
@@ -388,9 +409,10 @@ public class PaymentActivity extends AppCompatActivity implements LoaderManager.
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_send_email) {
-            sendEmail();
-            return true;
+        if (id == R.id.action_delete_payment) {
+//            sendEmail();
+            deletePaymentFromDatabase();
+            finish();
         } else if(id == R.id.action_cancel){
             mIsCancelling = true;
             finish();
@@ -399,24 +421,13 @@ public class PaymentActivity extends AppCompatActivity implements LoaderManager.
         } else if(id == R.id.action_previous){
             movePrevious();
         } else if(id == R.id.action_save) {
-            boolean isSaving = true;
-            onSavingPayment();
+            savePayment();
+            finish();
         }
 
         return super.onOptionsItemSelected(item);
     }
 
-    private void onSavingPayment() {
-        savePayment();
-        createNewPayment();
-        mIsNewPayment = true;
-
-        // display new payments options
-        displayPayments(
-        );
-        invalidateOptionsMenu(); // to enable calling of onPrepareOptionsMenu again and check for
-        // possible conditions to re-enable the menu item
-    }
 
     private void movePrevious() {
         savePayment();
@@ -448,18 +459,34 @@ public class PaymentActivity extends AppCompatActivity implements LoaderManager.
         if(mIsCancelling){
             // check if we're cancelling on newpayment otherwise do nothing
             if(mIsNewPayment){
-                DataManager.getInstance().removePayment(mPaymentId);
+//                DataManager.getInstance().removePayment(mPaymentId);
+                deletePaymentFromDatabase();
             } else {
                 storePreviousPaymentValues();
             }
-        } else {
-            savePayment();
+        } else if(mIsNewPayment) {
+            deletePaymentFromDatabase();
         }
     }
 
+    private void deletePaymentFromDatabase() {
+        final String selection = PaymentInfoEntry._ID + "=?";
+        final String[] selectionArgs = { Integer.toString(mPaymentId)};
+        AsyncTask task = new AsyncTask() {
+            @Override
+            protected Object doInBackground(Object[] objects) {
+                SQLiteDatabase db = mDbOpenHelper.getWritableDatabase();
+                db.delete(PaymentInfoEntry.TABLE_NAME, selection, selectionArgs);
+                return null;
+            }
+        };
+        task.execute();
+
+    }
+
     private void storePreviousPaymentValues() {
-//        ScheduleInfo schedule = DataManager.getInstance().getSchedule(mOriginalScheduleId);
-//        mPayment.setSchedule(schedule);
+        ScheduleInfo schedule = DataManager.getInstance().getSchedule(mOriginalScheduleId);
+        mPayment.setSchedule(schedule);
         mPayment.setChandaNo(mOriginalChandaNo);
         mPayment.setMonthPaid(mOriginalMonthPaid);
         mPayment.setReceiptNo(mOriginalPaymentReceiptNo);
@@ -467,24 +494,77 @@ public class PaymentActivity extends AppCompatActivity implements LoaderManager.
         mPayment.setWasiyyat(mOriginalPaymentWasiyyat);
         mPayment.setTahrikJadid(mOriginalPaymentTahrikJadid);
         mPayment.setWaqfJadid(mOriginalPaymentWaqfJadid);
-
     }
 
     private void savePayment() {
 
-        mTextReceiptNo.getText();
-        mTextReceiptNo.getText().toString();
-        Integer.parseInt(mTextReceiptNo.getText().toString());
-        mPayment.setSchedule(mSchedule);
-        mPayment.setChandaNo(selectedChandaNo());
-        mPayment.setMonthPaid(String.valueOf(mSpinnerMonthPaid.getSelectedItem()));
-        // parse the editText to String
-        mPayment.setReceiptNo(mTextReceiptNo.getText().toString());
-        // convert the String to float
-        mPayment.setChandaAm(Float.valueOf(mTextChandaAm.getText().toString()));
-        mPayment.setWasiyyat(Float.valueOf(mTextWasiyyat.getText().toString()));
-        mPayment.setTahrikJadid(Float.valueOf(mTextTahrikJadid.getText().toString()));
-        mPayment.setWaqfJadid(Float.valueOf(mTextWaqfJadid.getText().toString()));
+//        mPayment.setSchedule(mSchedule);
+//        mPayment.setChandaNo(selectedChandaNo());
+//        mPayment.setMonthPaid(String.valueOf(mSpinnerMonthPaid.getSelectedItem()));
+//        // parse the editText to String
+//        mPayment.setReceiptNo(mTextReceiptNo.getText().toString());
+//        // convert the String to float
+//        mPayment.setChandaAm(Float.valueOf(mTextChandaAm.getText().toString()));
+//        mPayment.setWasiyyat(Float.valueOf(mTextWasiyyat.getText().toString()));
+//        mPayment.setTahrikJadid(Float.valueOf(mTextTahrikJadid.getText().toString()));
+//        mPayment.setWaqfJadid(Float.valueOf(mTextWaqfJadid.getText().toString()));
+//        mPayment.setSubTotal();
+        int chandaNo = selectedChandaNo();
+        String monthPaid = String.valueOf(mSpinnerMonthPaid.getSelectedItem());
+        String receiptNo = mTextReceiptNo.getText().toString();
+        double chandaAm;
+        double wasiyyat;
+        double tahrikiJadid;
+        double waqfJadid;
+        if(mTextChandaAm.getText().toString().isEmpty() )
+            chandaAm = 0.0;
+        else {
+            chandaAm = Float.valueOf(mTextChandaAm.getText().toString());
+        }
+        if(mTextWasiyyat.getText().toString().isEmpty())
+            wasiyyat = 0.0;
+        else {
+            wasiyyat = Float.valueOf(mTextWasiyyat.getText().toString());
+        }
+        if(mTextTahrikJadid.getText().toString().isEmpty())
+            tahrikiJadid = 0.0;
+        else {
+            tahrikiJadid = Float.valueOf(mTextTahrikJadid.getText().toString());
+        }
+        if(mTextWaqfJadid.getText().toString().isEmpty())
+            waqfJadid = 0.0;
+        else {
+            waqfJadid = Float.valueOf(mTextWaqfJadid.getText().toString());
+        }
+
+        double subtotal = chandaAm + wasiyyat + tahrikiJadid + waqfJadid;
+
+        savePaymentToDatabase(chandaNo,mScheduleId,monthPaid,receiptNo,chandaAm,wasiyyat,
+                tahrikiJadid,waqfJadid,subtotal);
+    }
+
+    private void savePaymentToDatabase(int chandaNo, String schedule, String monthPaid,
+                                       String receiptNo, double chandaAm, double wasiyyat,
+                                       double tahrikiJadid, double waqfJaid, double subtotal){
+        // selection criteria for row to update
+        final String selection = PaymentInfoEntry._ID + "=?";
+        final String[] selectionArgs = {Integer.toString(mPaymentId)};
+
+        final ContentValues values = new ContentValues();
+        values.put(PaymentInfoEntry.COLUMN_MEMBER_CHANDANO, chandaNo);
+        values.put(PaymentInfoEntry.COLUMN_SCHEDULE_ID, schedule);
+        values.put(PaymentInfoEntry.COLUMN_PAYMENT_MONTHPAID, monthPaid);
+        values.put(PaymentInfoEntry.COLUMN_PAYMENT_LOCALRECEIPT, receiptNo);
+        values.put(PaymentInfoEntry.COLUMN_PAYMENT_CHANDAAM, chandaAm);
+        values.put(PaymentInfoEntry.COLUMN_PAYMENT_CHANDAWASIYYAT, wasiyyat);
+        values.put(PaymentInfoEntry.COLUMN_PAYMENT_TARIKIJADID, tahrikiJadid);
+        values.put(PaymentInfoEntry.COLUMN_PAYMENT_WAQFIJADID, waqfJaid);
+        values.put(PaymentInfoEntry.COLUMN_PAYMENT_SUBTOTAL, subtotal);
+
+        // get connection to the database
+        SQLiteDatabase db = mDbOpenHelper.getWritableDatabase();
+        db.update(PaymentInfoEntry.TABLE_NAME, values, selection, selectionArgs);
+
     }
 
     private int selectedChandaNo() {

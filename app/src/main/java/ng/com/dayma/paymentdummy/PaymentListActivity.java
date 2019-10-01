@@ -100,36 +100,18 @@ public class PaymentListActivity extends AppCompatActivity implements LoaderMana
         };
         String selection = PaymentInfoEntry.COLUMN_SCHEDULE_ID + "=?";
         String[] selectionArgs = { mScheID };
-        String paymentOrderby = PaymentInfoEntry.COLUMN_MEMBER_FULLNAME + "," + PaymentInfoEntry.COLUMN_PAYMENT_SUBTOTAL;
+        String paymentOrderby = PaymentInfoEntry.COLUMN_MEMBER_FULLNAME;
         Cursor cursor = db.query(PaymentInfoEntry.TABLE_NAME, paymentColumns, selection, selectionArgs,
                 null, null, paymentOrderby);
         mPaymentRecyclerAdapter.changeCursor(cursor);
     }
 
     private void initializeDisplayContent() {
-//        final ListView listPayments = (ListView) findViewById(R.id.list_payments);
-//
-//        List<PaymentInfo> payments = DataManager.getInstance().getPayments();
-//
-//        mAdapterPayments = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, mPayments);
-//
-//        listPayments.setAdapter(mAdapterPayments);
-//
-//        listPayments.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//            @Override
-//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//                Intent intent = new Intent(PaymentListActivity.this, PaymentActivity.class);
-////                PaymentInfo payment = (PaymentInfo) listPayments.getItemAtPosition(position);
-//                intent.putExtra(PaymentActivity.SCHEDULE_INFO, mSchedule.getScheduleId());
-//                intent.putExtra(PaymentActivity.PAYMENT_ID, position);
-//                startActivity(intent);
-//            }
-//        });
+
         final RecyclerView recyclerPayments = (RecyclerView) findViewById(R.id.list_payments);
         final LinearLayoutManager paymentsLayoutManager = new LinearLayoutManager(this);
         recyclerPayments.setLayoutManager(paymentsLayoutManager);
 
-        List<PaymentInfo> payments = DataManager.getInstance().getPayments();
         mPaymentRecyclerAdapter = new PaymentRecyclerAdapter(this, null);
         recyclerPayments.setAdapter(mPaymentRecyclerAdapter);
 

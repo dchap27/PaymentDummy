@@ -26,6 +26,11 @@ public class PaymentOpenHelper extends SQLiteOpenHelper {
         db.execSQL(ScheduleInfoEntry.SQL_CREATE_TABLE);
         db.execSQL(PaymentInfoEntry.SQL_CREATE_TABLE);
 
+        db.execSQL(MemberInfoEntry.SQL_CREATE_INDEX1);
+        db.execSQL(MonthInfoEntry.SQL_CREATE_INDEX1);
+        db.execSQL(ScheduleInfoEntry.SQL_CREATE_INDEX1);
+        db.execSQL(PaymentInfoEntry.SQL_CREATE_INDEX1);
+
         // create a dummy data
         DatabaseDataWorker worker = new DatabaseDataWorker(db);
         worker.insertMembers();

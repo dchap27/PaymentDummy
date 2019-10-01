@@ -167,8 +167,10 @@ public final class PaymentInfo implements Parcelable {
         mWaqfJadid = waqfJadid;
     }
 
-    public float getTotalAmountPaid() {
-        return mChandaAm + mWasiyyat + mJalsaSalana + mTahrikJadid + mWaqfJadid + mWelfare +
+    public float getSubtotal(){ return mSubtotal; }
+
+    public void setSubTotal() {
+        mSubtotal = mChandaAm + mWasiyyat + mJalsaSalana + mTahrikJadid + mWaqfJadid + mWelfare +
                 mScholarship + mTabligh + mMaryam + mCentinary + mMta + mWasiyyatHissan +
                 mMosqueDonation + mFitrana + mSadakat + mZakat + mMiscellaneous;
     }

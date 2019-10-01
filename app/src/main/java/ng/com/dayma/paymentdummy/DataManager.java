@@ -341,12 +341,13 @@ public class DataManager {
         return count;
     }
 
-    public float getScheduleAmount(List<PaymentInfo> payments) {
+    public float getScheduleAmount(ScheduleInfo schedule) {
         float amount = 0;
+        List<PaymentInfo> payments = getPayments(schedule);
         PaymentInfo payment;
         for(int i=0; i<payments.size(); i++){
             payment = payments.get(i);
-            amount = amount + payment.getTotalAmountPaid();
+            amount = amount + payment.getSubtotal();
         }
         return amount;
     }

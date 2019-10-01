@@ -45,7 +45,7 @@ public class DatabaseDataWorker {
         insertSchedule("May 2019", "May_2019_Felele_4", "Felele", "Schedule for chanda payment May 2019");
         insertSchedule("August 2019", "August_2019_Oke-Ado_5", "Oke-Ado", "Schedule for chanda payment August 2019");
         insertSchedule("June 2019", "June_2019_Kewulere_6", "Kewulere", "Schedule for chanda payment 2019");
-        insertSchedule("August 2019", "May_2019_Felele_7", "Felele", "Schedule for chanda payment Felele August 2019");
+        insertSchedule("August 2019", "August_2019_Felele_7", "Felele", "Schedule for chanda payment Felele August 2019");
 
     }
 
@@ -115,7 +115,7 @@ public class DatabaseDataWorker {
     private void insertMember(String jamaatName, int chandaNo, String fullname){
         ContentValues values = new ContentValues();
         values.put(PaymentDatabaseContract.MemberInfoEntry.COLUMN_MEMBER_JAMAATNAME, jamaatName);
-        values.put(PaymentDatabaseContract.MemberInfoEntry.COLUMN_MEMBER_ID, (chandaNo) + fullname);
+        values.put(PaymentDatabaseContract.MemberInfoEntry.COLUMN_MEMBER_ID, (chandaNo) + " - " + fullname);
         values.put(PaymentDatabaseContract.MemberInfoEntry.COLUMN_MEMBER_CHANDANO, chandaNo);
         values.put(PaymentDatabaseContract.MemberInfoEntry.COLUMN_MEMBER_FULLNAME, fullname);
 

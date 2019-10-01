@@ -29,8 +29,8 @@
         android:title="cancel"
         app:showAsAction="ifRoom|withText"/>
     <item
-        android:id="@+id/action_send_email"
+        android:id="@+id/action_delete_payment"
         android:orderInCategory="105"
-        android:title="send as mail"
-        app:showAsAction="never"/>
+        android:title="delete from record"
+        app:showAsAction="never" />
 </menu>
