@@ -111,5 +111,18 @@
         <item>Liberty_memberlist</item>
     </string-array>
     <string name="pref_default_jamaat_list">kewulere_memberlist</string>
-    
+    <string name="jalsa_salana_hint">Jalsa Salana</string>
+    <string name="welfare_fund_hint">welfare fund</string>
+    <string name="scholarship_fund_hint">Scholarship fund</string>
+    <string name="maryam_fund_hint">Maryam fund</string>
+    <string name="tabligh_fund_hint">Tabligh fund</string>
+    <string name="zakat_hint">Zakat</string>
+    <string name="sadakat_hint">Sadakat</string>
+    <string name="fitrana_hint">Fitrana</string>
+    <string name="mosque_fund_hint">Mosque Donation</string>
+    <string name="mta_fund_hint">Mta</string>
+    <string name="centinary_hint">Centinary khilafat</string>
+    <string name="wasiyyat_hissan_jaidad_hint">WasiyatHisan Jaida</string>
+    <string name="miscellaneous_hint">Miscellaneous</string>
+
 </resources>

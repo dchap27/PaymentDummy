@@ -96,6 +96,7 @@ public class PaymentActivity extends AppCompatActivity implements LoaderManager.
     private boolean mMembersQueriesFinished;
     private boolean mPaymentQueriesFinished;
     private String mScheduleId;
+    private boolean mIsSaving;
 
 
     @Override
@@ -421,6 +422,7 @@ public class PaymentActivity extends AppCompatActivity implements LoaderManager.
         } else if(id == R.id.action_previous){
             movePrevious();
         } else if(id == R.id.action_save) {
+            mIsSaving = true;
             savePayment();
             finish();
         }
@@ -464,8 +466,8 @@ public class PaymentActivity extends AppCompatActivity implements LoaderManager.
             } else {
                 storePreviousPaymentValues();
             }
-        } else if(mIsNewPayment) {
-            deletePaymentFromDatabase();
+        } else if(!mIsSaving && mIsNewPayment) {
+            deletePaymentFromDatabase(); // delete if payment is new and user is not saving
         }
     }
 
@@ -510,6 +512,7 @@ public class PaymentActivity extends AppCompatActivity implements LoaderManager.
 //        mPayment.setWaqfJadid(Float.valueOf(mTextWaqfJadid.getText().toString()));
 //        mPayment.setSubTotal();
         int chandaNo = selectedChandaNo();
+        String fullname = getNameOfPayer(chandaNo);
         String monthPaid = String.valueOf(mSpinnerMonthPaid.getSelectedItem());
         String receiptNo = mTextReceiptNo.getText().toString();
         double chandaAm;
@@ -539,11 +542,11 @@ public class PaymentActivity extends AppCompatActivity implements LoaderManager.
 
         double subtotal = chandaAm + wasiyyat + tahrikiJadid + waqfJadid;
 
-        savePaymentToDatabase(chandaNo,mScheduleId,monthPaid,receiptNo,chandaAm,wasiyyat,
+        savePaymentToDatabase(chandaNo,fullname,mScheduleId,monthPaid,receiptNo,chandaAm,wasiyyat,
                 tahrikiJadid,waqfJadid,subtotal);
     }
 
-    private void savePaymentToDatabase(int chandaNo, String schedule, String monthPaid,
+    private void savePaymentToDatabase(int chandaNo, String fullname, String schedule, String monthPaid,
                                        String receiptNo, double chandaAm, double wasiyyat,
                                        double tahrikiJadid, double waqfJaid, double subtotal){
         // selection criteria for row to update
@@ -552,6 +555,7 @@ public class PaymentActivity extends AppCompatActivity implements LoaderManager.
 
         final ContentValues values = new ContentValues();
         values.put(PaymentInfoEntry.COLUMN_MEMBER_CHANDANO, chandaNo);
+        values.put(PaymentInfoEntry.COLUMN_MEMBER_FULLNAME, fullname);
         values.put(PaymentInfoEntry.COLUMN_SCHEDULE_ID, schedule);
         values.put(PaymentInfoEntry.COLUMN_PAYMENT_MONTHPAID, monthPaid);
         values.put(PaymentInfoEntry.COLUMN_PAYMENT_LOCALRECEIPT, receiptNo);
@@ -575,6 +579,26 @@ public class PaymentActivity extends AppCompatActivity implements LoaderManager.
         int chandaNo = cursor.getInt(chandaNoPos);
         return chandaNo;
 
+    }
+
+    private String getNameOfPayer(int chandaNo) {
+        SQLiteDatabase db = mDbOpenHelper.getReadableDatabase();
+        String[] projection = {
+                MemberInfoEntry.COLUMN_MEMBER_CHANDANO,
+                MemberInfoEntry.COLUMN_MEMBER_ID,
+                MemberInfoEntry.COLUMN_MEMBER_JAMAATNAME,
+                MemberInfoEntry.COLUMN_MEMBER_FULLNAME
+        };
+        String selection = MemberInfoEntry.COLUMN_MEMBER_CHANDANO + "=?";
+        String[] selectionArgs = { Integer.toString(chandaNo)};
+        Cursor cursor = db.query(MemberInfoEntry.TABLE_NAME, projection, selection,
+                selectionArgs, null, null, null);
+        // get the index column for Fullname
+        int fullnamePos = cursor.getColumnIndex(MemberInfoEntry.COLUMN_MEMBER_FULLNAME);
+        // move to first row of table
+        cursor.moveToNext();
+        String fullname = cursor.getString(fullnamePos);
+        return fullname;
     }
 
     private void sendEmail() {

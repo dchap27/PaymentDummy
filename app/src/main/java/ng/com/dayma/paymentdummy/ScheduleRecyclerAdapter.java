@@ -81,6 +81,7 @@ public class ScheduleRecyclerAdapter extends RecyclerView.Adapter<ScheduleRecycl
         }
         holder.mScheduleTitle.setText(title);
         holder.mTextMonth.setText(monthId);
+        holder.mTextJamaatName.setText("Jamaat: " + jamaat);
         holder.mTextTotalPayers.setText(mContext.getString(R.string.text_no_of_payers) + String.valueOf(payers));
         holder.mTextScheduleTotalAmount.setText(String.format(
                 mContext.getString(R.string.text_total_amount_for_schedule), String.valueOf(totalAmount)));
@@ -100,6 +101,7 @@ public class ScheduleRecyclerAdapter extends RecyclerView.Adapter<ScheduleRecycl
         public final TextView mTextMonth;
         public final TextView mTextTotalPayers;
         public final TextView mTextScheduleTotalAmount;
+        public final TextView mTextJamaatName;
         public String mScheduleId;
         private int mId;
         private final TextView mTextCompletionStatus;
@@ -112,6 +114,7 @@ public class ScheduleRecyclerAdapter extends RecyclerView.Adapter<ScheduleRecycl
             mTextTotalPayers = (TextView) itemView.findViewById(R.id.text_payers_number_text);
             mTextScheduleTotalAmount = (TextView) itemView.findViewById(R.id.text_amount_text);
             mTextCompletionStatus = (TextView) itemView.findViewById(R.id.text_status_text);
+            mTextJamaatName = (TextView) itemView.findViewById(R.id.text_jamaat_name_text);
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override

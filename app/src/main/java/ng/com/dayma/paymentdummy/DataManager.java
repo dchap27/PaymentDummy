@@ -465,8 +465,8 @@ public class DataManager {
         monthsYear.add(11, "DEC");
         Calendar dateTime = Calendar.getInstance();
         int presentYear = Integer.parseInt(String.format("%1$TY", dateTime));
-        int year = presentYear - 3;
-        while(year < presentYear + 3){
+        int year = presentYear - 1;
+        while(year < presentYear + 2){
             for(int i = 0; i < monthsYear.size(); i++){
                 String mon = monthsYear.get(i) + year;
                 months.add(mon);
