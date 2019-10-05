@@ -25,6 +25,10 @@ public class ScheduleRecyclerAdapter extends RecyclerView.Adapter<ScheduleRecycl
     private int mTitlePos;
     private int mStatusPos;
     private int mIdPos;
+    private int mSubtotalPos;
+    private int mInitialId = -1;
+    private float mInitialSum = 0;
+    private int mTotalPayersPos;
 
     public ScheduleRecyclerAdapter(Context context, Cursor cursor) {
         mContext = context;
@@ -40,7 +44,9 @@ public class ScheduleRecyclerAdapter extends RecyclerView.Adapter<ScheduleRecycl
         mMonthIdPos = mCursor.getColumnIndex(ScheduleInfoEntry.COLUMN_MONTH_ID);
         mJamaatPos = mCursor.getColumnIndex(ScheduleInfoEntry.COLUMN_SCHEDULE_JAMAAT);
         mTitlePos = mCursor.getColumnIndex(ScheduleInfoEntry.COLUMN_SCHEDULE_TITLE);
-        mStatusPos = mCursor.getColumnIndex(ScheduleInfoEntry.COLUMN_SCHEDULE_IS_COMPLETE);
+        mStatusPos = mCursor.getColumnIndex(ScheduleInfoEntry.COLUMN_SCHEDULE_ISCOMPLETE);
+        mSubtotalPos = mCursor.getColumnIndex(ScheduleInfoEntry.COLUMN_SCHEDULE_TOTALAMOUNT);
+        mTotalPayersPos = mCursor.getColumnIndex(ScheduleInfoEntry.COLUMN_SCHEDULE_TOTALPAYERS);
         mIdPos = mCursor.getColumnIndex(ScheduleInfoEntry._ID);
     }
 
@@ -67,24 +73,21 @@ public class ScheduleRecyclerAdapter extends RecyclerView.Adapter<ScheduleRecycl
         String title = mCursor.getString(mTitlePos);
         int status = mCursor.getInt(mStatusPos);
         int id = mCursor.getInt(mIdPos);
-
-        DataManager dm = DataManager.getInstance();
-        ScheduleInfo schedule = dm.getSchedule(scheduleId);
-        int payers = dm.getPaymentCount(schedule);
-//        List<PaymentInfo> payments = dm.getPayments(scheduleId);
-        float totalAmount = dm.getScheduleAmount(schedule);
+        double subtotal = mCursor.getFloat(mSubtotalPos);
+        int payers = mCursor.getInt(mTotalPayersPos);
         String completion;
         if(status == 0){
             completion = "Draft";
         } else {
             completion = "completed";
         }
+
         holder.mScheduleTitle.setText(title);
         holder.mTextMonth.setText(monthId);
         holder.mTextJamaatName.setText("Jamaat: " + jamaat);
         holder.mTextTotalPayers.setText(mContext.getString(R.string.text_no_of_payers) + String.valueOf(payers));
         holder.mTextScheduleTotalAmount.setText(String.format(
-                mContext.getString(R.string.text_total_amount_for_schedule), String.valueOf(totalAmount)));
+                mContext.getString(R.string.text_total_amount_for_schedule), String.valueOf(subtotal)));
         holder.mTextCompletionStatus.setText(String.format("Status: %s", completion));
         holder.mId = id;
         holder.mScheduleId = scheduleId;

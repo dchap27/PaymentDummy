@@ -52,7 +52,7 @@ public class DataManager {
                 ScheduleInfoEntry.COLUMN_SCHEDULE_TITLE,
                 ScheduleInfoEntry.COLUMN_SCHEDULE_JAMAAT,
                 ScheduleInfoEntry.COLUMN_MONTH_ID,
-                ScheduleInfoEntry.COLUMN_SCHEDULE_IS_COMPLETE,
+                ScheduleInfoEntry.COLUMN_SCHEDULE_ISCOMPLETE,
                 ScheduleInfoEntry._ID
         };
         String scheduleOrderby = ScheduleInfoEntry.COLUMN_MONTH_ID + "," + ScheduleInfoEntry.COLUMN_SCHEDULE_JAMAAT;
@@ -171,7 +171,7 @@ public class DataManager {
         int monthIdPos = cursor.getColumnIndex(ScheduleInfoEntry.COLUMN_MONTH_ID);
         int titlePos = cursor.getColumnIndex(ScheduleInfoEntry.COLUMN_SCHEDULE_TITLE);
         int jamaatPos = cursor.getColumnIndex(ScheduleInfoEntry.COLUMN_SCHEDULE_JAMAAT);
-        int completionstatusPos = cursor.getColumnIndex(ScheduleInfoEntry.COLUMN_SCHEDULE_IS_COMPLETE);
+        int completionstatusPos = cursor.getColumnIndex(ScheduleInfoEntry.COLUMN_SCHEDULE_ISCOMPLETE);
         int idPos = cursor.getColumnIndex(ScheduleInfoEntry._ID);
 
         DataManager dm = getInstance();

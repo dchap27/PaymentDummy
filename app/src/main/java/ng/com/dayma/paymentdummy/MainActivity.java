@@ -92,7 +92,7 @@ public class MainActivity extends AppCompatActivity
                 ScheduleInfoEntry.COLUMN_MONTH_ID,
                 ScheduleInfoEntry._ID,
                 ScheduleInfoEntry.COLUMN_SCHEDULE_JAMAAT,
-                ScheduleInfoEntry.COLUMN_SCHEDULE_IS_COMPLETE,
+                ScheduleInfoEntry.COLUMN_SCHEDULE_ISCOMPLETE,
                 ScheduleInfoEntry.COLUMN_SCHEDULE_TITLE,
                 ScheduleInfoEntry.COLUMN_SCHEDULE_ID
 
@@ -248,15 +248,22 @@ public class MainActivity extends AppCompatActivity
 
                     final String[] scheduleColumns = {
                             ScheduleInfoEntry.COLUMN_MONTH_ID,
-                            ScheduleInfoEntry._ID,
+                            ScheduleInfoEntry.getQName(ScheduleInfoEntry._ID),
                             ScheduleInfoEntry.COLUMN_SCHEDULE_JAMAAT,
-                            ScheduleInfoEntry.COLUMN_SCHEDULE_IS_COMPLETE,
+                            ScheduleInfoEntry.COLUMN_SCHEDULE_ISCOMPLETE,
                             ScheduleInfoEntry.COLUMN_SCHEDULE_TITLE,
-                            ScheduleInfoEntry.COLUMN_SCHEDULE_ID
+                            ScheduleInfoEntry.COLUMN_SCHEDULE_TOTALAMOUNT,
+                            ScheduleInfoEntry.COLUMN_SCHEDULE_TOTALPAYERS,
+                            ScheduleInfoEntry.getQName(ScheduleInfoEntry.COLUMN_SCHEDULE_ID),
 
                     };
+//                    String tablesWithJoin = ScheduleInfoEntry.TABLE_NAME + " JOIN " +
+//                            PaymentInfoEntry.TABLE_NAME + " ON " +
+//                            ScheduleInfoEntry.getQName(ScheduleInfoEntry.COLUMN_SCHEDULE_ID) + " = " +
+//                            PaymentInfoEntry.getQName(PaymentInfoEntry.COLUMN_SCHEDULE_ID);
+
                     String scheduleOrder = ScheduleInfoEntry.COLUMN_MONTH_ID + "," + ScheduleInfoEntry.COLUMN_SCHEDULE_JAMAAT;
-                    return db.query(PaymentDatabaseContract.ScheduleInfoEntry.TABLE_NAME, scheduleColumns,
+                    return db.query(ScheduleInfoEntry.TABLE_NAME, scheduleColumns,
                             null, null, null, null, scheduleOrder);
                 }
             };

@@ -28,6 +28,11 @@ public final class PaymentDatabaseContract {
                         "(" + COLUMN_MEMBER_JAMAATNAME + "," +
                         COLUMN_MEMBER_ID + "," +
                         COLUMN_MEMBER_CHANDANO + ")";
+
+        // Get table qualified name
+        public static final String getQName(String columnName){
+            return TABLE_NAME + "." + columnName;
+        }
     }
 
     public static final class MonthInfoEntry implements BaseColumns {
@@ -49,6 +54,10 @@ public final class PaymentDatabaseContract {
                 "CREATE INDEX " + INDEX1 + " ON " + TABLE_NAME +
                         "(" + COLUMN_MONTH_ID + ")";
 
+        public static final String getQName(String columnName){
+            return TABLE_NAME + "." + columnName;
+        }
+
     }
 
     public static final class ScheduleInfoEntry implements BaseColumns {
@@ -58,8 +67,10 @@ public final class PaymentDatabaseContract {
         public static final String COLUMN_SCHEDULE_ID = "schedule_id";
         public static final String COLUMN_SCHEDULE_TITLE = "schedule_title";
         public static final String COLUMN_SCHEDULE_JAMAAT = "jamaat_name";
-        public static final String COLUMN_SCHEDULE_IS_COMPLETE = "completion_status";
+        public static final String COLUMN_SCHEDULE_ISCOMPLETE = "completion_status";
         public static final String COLUMN_MONTH_ID = "month_id";
+        public static final String COLUMN_SCHEDULE_TOTALAMOUNT = "total_amount";
+        public static final String COLUMN_SCHEDULE_TOTALPAYERS = "total_payers";
 
         // CREATE TABLE
         public static final String SQL_CREATE_TABLE =
@@ -68,15 +79,21 @@ public final class PaymentDatabaseContract {
                         COLUMN_SCHEDULE_ID + " TEXT UNIQUE NOT NULL, " +
                         COLUMN_SCHEDULE_TITLE + " TEXT NOT NULL, " +
                         COLUMN_SCHEDULE_JAMAAT + " TEXT NOT NULL, " +
-                        COLUMN_SCHEDULE_IS_COMPLETE + " INTEGER DEFAULT 0, " +
+                        COLUMN_SCHEDULE_ISCOMPLETE + " INTEGER DEFAULT 0, " +
+                        COLUMN_SCHEDULE_TOTALAMOUNT + " REAL DEFAULT 0, " +
+                        COLUMN_SCHEDULE_TOTALPAYERS + " INTEGER DEFAULT 0, " +
                         COLUMN_MONTH_ID + " TEXT NOT NULL)";
 
         // CREATE INDEX member_info_index1 ON member_info (columns)
         public static final String INDEX1 = TABLE_NAME + "_index1";
         public static final String SQL_CREATE_INDEX1 =
                 "CREATE INDEX " + INDEX1 + " ON " + TABLE_NAME +
-                        "(" + COLUMN_SCHEDULE_ID + "," +
-                        COLUMN_MONTH_ID + ")";
+                        "(" + COLUMN_SCHEDULE_ID + "," + COLUMN_SCHEDULE_TOTALAMOUNT + "," +
+                        COLUMN_SCHEDULE_TOTALPAYERS + "," + COLUMN_MONTH_ID + ")";
+
+        public static final String getQName(String columnName){
+            return TABLE_NAME + "." + columnName;
+        }
 
     }
 
@@ -142,6 +159,11 @@ public final class PaymentDatabaseContract {
                         "(" + COLUMN_SCHEDULE_ID + "," +
                         COLUMN_MEMBER_CHANDANO + ")";
 
+        public static final String getQName(String columnName){
+            return TABLE_NAME + "." + columnName;
+        }
+
     }
+
 
 }

@@ -75,7 +75,7 @@ public class ScheduleListActivity extends AppCompatActivity implements LoaderMan
                 ScheduleInfoEntry.COLUMN_MONTH_ID,
                 ScheduleInfoEntry._ID,
                 ScheduleInfoEntry.COLUMN_SCHEDULE_JAMAAT,
-                ScheduleInfoEntry.COLUMN_SCHEDULE_IS_COMPLETE,
+                ScheduleInfoEntry.COLUMN_SCHEDULE_ISCOMPLETE,
                 ScheduleInfoEntry.COLUMN_SCHEDULE_TITLE,
                 ScheduleInfoEntry.COLUMN_SCHEDULE_ID
 
@@ -118,7 +118,7 @@ public class ScheduleListActivity extends AppCompatActivity implements LoaderMan
                             ScheduleInfoEntry.COLUMN_MONTH_ID,
                             ScheduleInfoEntry._ID,
                             ScheduleInfoEntry.COLUMN_SCHEDULE_JAMAAT,
-                            ScheduleInfoEntry.COLUMN_SCHEDULE_IS_COMPLETE,
+                            ScheduleInfoEntry.COLUMN_SCHEDULE_ISCOMPLETE,
                             ScheduleInfoEntry.COLUMN_SCHEDULE_TITLE,
                             ScheduleInfoEntry.COLUMN_SCHEDULE_ID
 

@@ -97,6 +97,17 @@ public class PaymentActivity extends AppCompatActivity implements LoaderManager.
     private boolean mPaymentQueriesFinished;
     private String mScheduleId;
     private boolean mIsSaving;
+    private EditText mTextMaryam;
+    private EditText mTextScholarship;
+    private EditText mTextTabligh;
+    private EditText mTextCentinary;
+    private EditText mTextFitrana;
+    private EditText mTextSadakat;
+    private EditText mTextZakat;
+    private EditText mTextMosqueDonation;
+    private EditText mTextMta;
+    private EditText mTextWasiyatHissan;
+    private EditText mTextMiscellaneous;
 
 
     @Override
@@ -130,11 +141,11 @@ public class PaymentActivity extends AppCompatActivity implements LoaderManager.
         adapterMonths.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         mSpinnerMonthPaid.setAdapter(adapterMonths);
 
-//        loadMemberData();
-        getLoaderManager().initLoader(LOADER_MEMBERS, null, this);
-
 
         readDisplayStateValue();
+        //        loadMemberData();
+        getLoaderManager().initLoader(LOADER_MEMBERS, null, this);
+
         if(savedInstanceState == null) {
             saveOriginalPaymentValues(); // when first created
         } else {
@@ -148,6 +159,19 @@ public class PaymentActivity extends AppCompatActivity implements LoaderManager.
         mTextWasiyyat = (EditText) findViewById(R.id.text_wasiyyat);
         mTextTahrikJadid = (EditText) findViewById(R.id.text_tahrik);
         mTextWaqfJadid = (EditText) findViewById(R.id.text_waqf);
+        mTextWelfare = (EditText) findViewById(R.id.text_welfare);
+        mTextScholarship = (EditText) findViewById(R.id.text_scholarship);
+        mTextMaryam = (EditText) findViewById(R.id.text_maryam_fund);
+        mTextTabligh = (EditText) findViewById(R.id.text_tabligh);
+        mTextZakat = (EditText) findViewById(R.id.text_zakat);
+        mTextSadakat = (EditText) findViewById(R.id.text_sadakat);
+        mTextFitrana = (EditText) findViewById(R.id.text_fitrana);
+        mTextMosqueDonation = (EditText) findViewById(R.id.text_mosque_donation);
+        mTextMta = (EditText)  findViewById(R.id.text_mta);
+        mTextCentinary = (EditText) findViewById(R.id.text_centinary_khilafat);
+        mTextWasiyatHissan = (EditText) findViewById(R.id.text_wasiyyathissan);
+        mTextMiscellaneous = (EditText) findViewById(R.id.text_miscellaneous);
+        mTextJalsaSalana = (EditText) findViewById(R.id.text_jalsa_salana);
 
         if(!mIsNewPayment)
             // populate the views with values if not a new payment
@@ -311,15 +335,26 @@ public class PaymentActivity extends AppCompatActivity implements LoaderManager.
         int monthIndex = monthsYear.indexOf(mPayment.getMonthPaid());
         mSpinnerMonthPaid.setSelection(monthIndex);
 
-        mTextChandaNo.setText(String.valueOf(chandaNo));
+        mTextChandaNo.setText(String.valueOf(chandaNo) + " - " + fullname);
 
         mTextReceiptNo.setText(String.valueOf(localReceipt));
         mTextChandaAm.setText(String.valueOf(chandaAm));
         mTextWasiyyat.setText(String.valueOf(wasiyyat));
-//        mTextJalsaSalana.setText(String.valueOf(jalsaSalana));
+        mTextJalsaSalana.setText(String.valueOf(jalsaSalana));
         mTextTahrikJadid.setText(String.valueOf(tarikiJadid));
         mTextWaqfJadid.setText(String.valueOf(waqfJadid));
-//        mTextWelfare.setText(String.valueOf(welfare));
+        mTextWelfare.setText(String.valueOf(welfare));
+        mTextScholarship.setText(String.valueOf(scholarship));
+        mTextMaryam.setText(String.valueOf(maryam));
+        mTextTabligh.setText(String.valueOf(tabligh));
+        mTextZakat.setText(String.valueOf(zakat));
+        mTextSadakat.setText(String.valueOf(sadakat));
+        mTextFitrana.setText(String.valueOf(fitrana));
+        mTextMosqueDonation.setText(String.valueOf(mosqueDonation));
+        mTextMta.setText(String.valueOf(mta));
+        mTextCentinary.setText(String.valueOf(centinary));
+        mTextWasiyatHissan.setText(String.valueOf(wasiyyatHissan));
+        mTextMiscellaneous.setText(String.valueOf(miscellaneous));
     }
 
     private int getIndexOfMemberId(int chandaNo) {
@@ -499,18 +534,6 @@ public class PaymentActivity extends AppCompatActivity implements LoaderManager.
     }
 
     private void savePayment() {
-
-//        mPayment.setSchedule(mSchedule);
-//        mPayment.setChandaNo(selectedChandaNo());
-//        mPayment.setMonthPaid(String.valueOf(mSpinnerMonthPaid.getSelectedItem()));
-//        // parse the editText to String
-//        mPayment.setReceiptNo(mTextReceiptNo.getText().toString());
-//        // convert the String to float
-//        mPayment.setChandaAm(Float.valueOf(mTextChandaAm.getText().toString()));
-//        mPayment.setWasiyyat(Float.valueOf(mTextWasiyyat.getText().toString()));
-//        mPayment.setTahrikJadid(Float.valueOf(mTextTahrikJadid.getText().toString()));
-//        mPayment.setWaqfJadid(Float.valueOf(mTextWaqfJadid.getText().toString()));
-//        mPayment.setSubTotal();
         int chandaNo = selectedChandaNo();
         String fullname = getNameOfPayer(chandaNo);
         String monthPaid = String.valueOf(mSpinnerMonthPaid.getSelectedItem());
@@ -519,6 +542,19 @@ public class PaymentActivity extends AppCompatActivity implements LoaderManager.
         double wasiyyat;
         double tahrikiJadid;
         double waqfJadid;
+        double welfare;
+        double jalsa;
+        double scholarship;
+        double maryam;
+        double tabligh;
+        double zakat;
+        double sadakat;
+        double fitrana;
+        double mosqueDonation;
+        double mta;
+        double centinary;
+        double wasiyyatHissan;
+        double miscellaneous;
         if(mTextChandaAm.getText().toString().isEmpty() )
             chandaAm = 0.0;
         else {
@@ -539,16 +575,88 @@ public class PaymentActivity extends AppCompatActivity implements LoaderManager.
         else {
             waqfJadid = Float.valueOf(mTextWaqfJadid.getText().toString());
         }
+        if(mTextWelfare.getText().toString().isEmpty())
+            welfare = 0.0;
+        else {
+            welfare = Float.valueOf(mTextWelfare.getText().toString());
+        }
+        if(mTextJalsaSalana.getText().toString().isEmpty())
+            jalsa = 0.0;
+        else {
+            jalsa = Float.valueOf(mTextJalsaSalana.getText().toString());
+        }
+        if(mTextMaryam.getText().toString().isEmpty())
+            maryam = 0.0;
+        else {
+            maryam = Float.valueOf(mTextMaryam.getText().toString());
+        }
+        if(mTextTabligh.getText().toString().isEmpty())
+            tabligh = 0.0;
+        else {
+            tabligh = Float.valueOf(mTextTabligh.getText().toString());
+        }
+        if(mTextZakat.getText().toString().isEmpty())
+            zakat = 0.0;
+        else {
+            zakat = Float.valueOf(mTextZakat.getText().toString());
+        }
+        if(mTextSadakat.getText().toString().isEmpty())
+            sadakat = 0.0;
+        else {
+            sadakat = Float.valueOf(mTextSadakat.getText().toString());
+        }
+        if(mTextFitrana.getText().toString().isEmpty())
+            fitrana = 0.0;
+        else {
+            fitrana = Float.valueOf(mTextFitrana.getText().toString());
+        }
+        if(mTextMosqueDonation.getText().toString().isEmpty())
+            mosqueDonation = 0.0;
+        else {
+            mosqueDonation = Float.valueOf(mTextMosqueDonation.getText().toString());
+        }
+        if(mTextMta.getText().toString().isEmpty())
+            mta = 0.0;
+        else {
+            mta = Float.valueOf(mTextMta.getText().toString());
+        }
+        if(mTextCentinary.getText().toString().isEmpty())
+            centinary = 0.0;
+        else {
+            centinary = Float.valueOf(mTextCentinary.getText().toString());
+        }
+        if(mTextWasiyatHissan.getText().toString().isEmpty())
+            wasiyyatHissan = 0.0;
+        else {
+            wasiyyatHissan = Float.valueOf(mTextWasiyatHissan.getText().toString());
+        }
+        if(mTextMiscellaneous.getText().toString().isEmpty())
+            miscellaneous = 0.0;
+        else {
+            miscellaneous = Float.valueOf(mTextMiscellaneous.getText().toString());
+        }
+        if(mTextScholarship.getText().toString().isEmpty())
+            scholarship = 0.0;
+        else {
+            scholarship = Float.valueOf(mTextScholarship.getText().toString());
+        }
 
-        double subtotal = chandaAm + wasiyyat + tahrikiJadid + waqfJadid;
+
+        double subtotal = chandaAm + wasiyyat + tahrikiJadid + waqfJadid + jalsa + welfare +
+                tabligh + scholarship + maryam + zakat + fitrana + mosqueDonation +
+                mta + centinary + wasiyyatHissan + sadakat + miscellaneous;
 
         savePaymentToDatabase(chandaNo,fullname,mScheduleId,monthPaid,receiptNo,chandaAm,wasiyyat,
-                tahrikiJadid,waqfJadid,subtotal);
+                tahrikiJadid,waqfJadid,welfare,jalsa,tabligh,scholarship,maryam,zakat,fitrana,
+                mosqueDonation,mta,centinary,wasiyyatHissan,sadakat,miscellaneous,subtotal);
     }
 
     private void savePaymentToDatabase(int chandaNo, String fullname, String schedule, String monthPaid,
-                                       String receiptNo, double chandaAm, double wasiyyat,
-                                       double tahrikiJadid, double waqfJaid, double subtotal){
+                                       String receiptNo, double chandaAm, double wasiyyat, double tahrikiJadid,
+                                       double waqfJadid, double welfare, double jalsa, double tabligh,
+                                       double scholarship, double maryam, double zakat, double fitrana,
+                                       double mosqueDonation, double mta, double centinary, double wasiyyatHissan,
+                                       double sadakat, double miscellaneous, double subtotal){
         // selection criteria for row to update
         final String selection = PaymentInfoEntry._ID + "=?";
         final String[] selectionArgs = {Integer.toString(mPaymentId)};
@@ -562,7 +670,20 @@ public class PaymentActivity extends AppCompatActivity implements LoaderManager.
         values.put(PaymentInfoEntry.COLUMN_PAYMENT_CHANDAAM, chandaAm);
         values.put(PaymentInfoEntry.COLUMN_PAYMENT_CHANDAWASIYYAT, wasiyyat);
         values.put(PaymentInfoEntry.COLUMN_PAYMENT_TARIKIJADID, tahrikiJadid);
-        values.put(PaymentInfoEntry.COLUMN_PAYMENT_WAQFIJADID, waqfJaid);
+        values.put(PaymentInfoEntry.COLUMN_PAYMENT_WAQFIJADID, waqfJadid);
+        values.put(PaymentInfoEntry.COLUMN_PAYMENT_WELFAREFUND, welfare);
+        values.put(PaymentInfoEntry.COLUMN_PAYMENT_JALSASALANA, jalsa);
+        values.put(PaymentInfoEntry.COLUMN_PAYMENT_TABLIGH, tabligh);
+        values.put(PaymentInfoEntry.COLUMN_PAYMENT_SCHOLARSHIP, scholarship);
+        values.put(PaymentInfoEntry.COLUMN_PAYMENT_MARYAMFUND, maryam);
+        values.put(PaymentInfoEntry.COLUMN_PAYMENT_ZAKAT, zakat);
+        values.put(PaymentInfoEntry.COLUMN_PAYMENT_FITRANA, fitrana);
+        values.put(PaymentInfoEntry.COLUMN_PAYMENT_MOSQUEDONATION, mosqueDonation);
+        values.put(PaymentInfoEntry.COLUMN_PAYMENT_MTA, mta);
+        values.put(PaymentInfoEntry.COLUMN_PAYMENT_CENTINARYKHILAFAT, centinary);
+        values.put(PaymentInfoEntry.COLUMN_PAYMENT_WASIYYATHISSANJAIDAD, wasiyyatHissan);
+        values.put(PaymentInfoEntry.COLUMN_PAYMENT_SADAKAT, sadakat);
+        values.put(PaymentInfoEntry.COLUMN_PAYMENT_MISCELLANEOUS, miscellaneous);
         values.put(PaymentInfoEntry.COLUMN_PAYMENT_SUBTOTAL, subtotal);
 
         // get connection to the database
@@ -634,10 +755,13 @@ public class PaymentActivity extends AppCompatActivity implements LoaderManager.
                         MemberInfoEntry.COLUMN_MEMBER_ID,
                         MemberInfoEntry.COLUMN_MEMBER_CHANDANO,
                         MemberInfoEntry.COLUMN_MEMBER_FULLNAME,
-                        MemberInfoEntry.COLUMN_MEMBER_JAMAATNAME
+                        MemberInfoEntry.getQName(MemberInfoEntry.COLUMN_MEMBER_JAMAATNAME),
                 };
-                return db.query(MemberInfoEntry.TABLE_NAME,selectionColumns, null,
-                        null,null, null, MemberInfoEntry.COLUMN_MEMBER_FULLNAME);
+                String selection = MemberInfoEntry.COLUMN_MEMBER_JAMAATNAME + "=?";
+                String[] selectionArgs = { mSchedule.getJamaat()};
+
+                return db.query(MemberInfoEntry.TABLE_NAME,selectionColumns, selection,
+                        selectionArgs,null, null, MemberInfoEntry.COLUMN_MEMBER_FULLNAME);
             }
         };
     }

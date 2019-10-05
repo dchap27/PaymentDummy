@@ -1,6 +1,7 @@
 package ng.com.dayma.paymentdummy;
 
 import android.app.LoaderManager;
+import android.content.ContentValues;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
@@ -15,8 +16,10 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import ng.com.dayma.paymentdummy.data.PaymentDatabaseContract;
 import ng.com.dayma.paymentdummy.data.PaymentDatabaseContract.PaymentInfoEntry;
 import ng.com.dayma.paymentdummy.data.PaymentOpenHelper;
 
@@ -77,6 +80,54 @@ public class PaymentListActivity extends AppCompatActivity implements LoaderMana
         super.onResume();
 //        loadPaymentsData();
         getLoaderManager().restartLoader(LOADER_PAYMENTS, null, this);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        // update the totalAmount on Schedule table
+        updateTotalAmountOnSchedule();
+    }
+
+
+    private void updateTotalAmountOnSchedule() {
+        SQLiteDatabase db = mDbOpenHelper.getReadableDatabase();
+        String[] projection = {
+                PaymentInfoEntry.COLUMN_SCHEDULE_ID,
+                PaymentInfoEntry.COLUMN_PAYMENT_SUBTOTAL,
+                PaymentInfoEntry.COLUMN_MEMBER_CHANDANO,
+        };
+        String selection = PaymentInfoEntry.COLUMN_SCHEDULE_ID + "=?";
+        String[] selectionArgs = { mScheID };
+        Cursor paymentsCursor = db.query(PaymentInfoEntry.TABLE_NAME, projection,selection,selectionArgs,
+                null, null, null);
+
+        int amountPos = paymentsCursor.getColumnIndex(PaymentInfoEntry.COLUMN_PAYMENT_SUBTOTAL);
+        int chandaNoPos = paymentsCursor.getColumnIndex(PaymentInfoEntry.COLUMN_MEMBER_CHANDANO);
+
+        ArrayList<Integer> payers = new ArrayList<>();
+        double totalAmount = 0;
+
+        while(paymentsCursor.moveToNext()){
+            double amount = paymentsCursor.getFloat(amountPos);
+            totalAmount = totalAmount + amount;
+            int payer = paymentsCursor.getInt(chandaNoPos);
+            if(payers.contains(payer))
+                continue;
+            payers.add(payer);
+        }
+        paymentsCursor.close();
+
+        SQLiteDatabase db1 = mDbOpenHelper.getWritableDatabase();
+        // selection criteria for row to update
+        final String rowScheduleSelection = PaymentDatabaseContract.ScheduleInfoEntry.COLUMN_SCHEDULE_ID + "=?";
+        final String[] rowScheduleSelectionArgs = {mScheID};
+
+        ContentValues values = new ContentValues();
+        values.put(PaymentDatabaseContract.ScheduleInfoEntry.COLUMN_SCHEDULE_TOTALAMOUNT, totalAmount);
+        values.put(PaymentDatabaseContract.ScheduleInfoEntry.COLUMN_SCHEDULE_TOTALPAYERS, payers.size());
+        db1.update(PaymentDatabaseContract.ScheduleInfoEntry.TABLE_NAME, values, rowScheduleSelection, rowScheduleSelectionArgs);
+
     }
 
     private void loadPaymentsData() {

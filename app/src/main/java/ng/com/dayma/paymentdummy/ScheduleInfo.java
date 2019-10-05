@@ -12,6 +12,8 @@ public final class ScheduleInfo implements Parcelable {
     private final String mJamaat;
     private final String mTitle;
     private MonthInfo mMonth;
+    private double mTotalAmount;
+    private int mTotalPayers;
     private int mId;
     private boolean mIsComplete = false;
 
@@ -47,6 +49,12 @@ public final class ScheduleInfo implements Parcelable {
     public String getTitle() { return mTitle; }
 
     public String getJamaat() { return mJamaat; }
+
+    public double getTotalAmount(){
+        return mTotalAmount;
+    }
+
+    public int getTotalPayers() { return mTotalPayers; }
 
     public boolean isComplete() {
         return mIsComplete;
