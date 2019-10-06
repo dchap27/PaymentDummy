@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -26,6 +27,7 @@ import java.util.List;
 import ng.com.dayma.paymentdummy.data.PaymentDatabaseContract.MemberInfoEntry;
 import ng.com.dayma.paymentdummy.data.PaymentDatabaseContract.PaymentInfoEntry;
 import ng.com.dayma.paymentdummy.data.PaymentOpenHelper;
+import ng.com.dayma.paymentdummy.data.PaymentProviderContract.Members;
 
 public class PaymentActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
     public static final String PAYMENT_ID = "ng.com.dayma.paymentdummy.PAYMENT_ID";
@@ -742,25 +744,37 @@ public class PaymentActivity extends AppCompatActivity implements LoaderManager.
 
     private CursorLoader createLoaderMembers() {
         mMembersQueriesFinished = false;
-        return new CursorLoader(this){
-            @Override
-            public Cursor loadInBackground() {
-                SQLiteDatabase db = mDbOpenHelper.getReadableDatabase();
-
-                String[] selectionColumns = {
-                        MemberInfoEntry._ID,
-                        MemberInfoEntry.COLUMN_MEMBER_ID,
-                        MemberInfoEntry.COLUMN_MEMBER_CHANDANO,
-                        MemberInfoEntry.COLUMN_MEMBER_FULLNAME,
-                        MemberInfoEntry.getQName(MemberInfoEntry.COLUMN_MEMBER_JAMAATNAME),
-                };
-                String selection = MemberInfoEntry.COLUMN_MEMBER_JAMAATNAME + "=?";
-                String[] selectionArgs = { mSchedule.getJamaat()};
-
-                return db.query(MemberInfoEntry.TABLE_NAME,selectionColumns, selection,
-                        selectionArgs,null, null, MemberInfoEntry.COLUMN_MEMBER_FULLNAME);
-            }
+        Uri uri = Members.CONTENT_URI;
+        String[] selectionColumns = {
+                Members._ID,
+                Members.COLUMN_MEMBER_ID,
+                Members.COLUMN_MEMBER_CHANDANO,
+                Members.COLUMN_MEMBER_FULLNAME,
+                Members.COLUMN_MEMBER_JAMAATNAME,
         };
+        String selection = Members.COLUMN_MEMBER_JAMAATNAME + "=?";
+        String[] selectionArgs = { mSchedule.getJamaat()};
+
+        return new CursorLoader(this, uri, selectionColumns, selection, selectionArgs, Members.COLUMN_MEMBER_FULLNAME);
+//        return new CursorLoader(this){
+//            @Override
+//            public Cursor loadInBackground() {
+//                SQLiteDatabase db = mDbOpenHelper.getReadableDatabase();
+//
+//                String[] selectionColumns = {
+//                        MemberInfoEntry._ID,
+//                        MemberInfoEntry.COLUMN_MEMBER_ID,
+//                        MemberInfoEntry.COLUMN_MEMBER_CHANDANO,
+//                        MemberInfoEntry.COLUMN_MEMBER_FULLNAME,
+//                        MemberInfoEntry.getQName(MemberInfoEntry.COLUMN_MEMBER_JAMAATNAME),
+//                };
+//                String selection = MemberInfoEntry.COLUMN_MEMBER_JAMAATNAME + "=?";
+//                String[] selectionArgs = { mSchedule.getJamaat()};
+//
+//                return db.query(MemberInfoEntry.TABLE_NAME,selectionColumns, selection,
+//                        selectionArgs,null, null, MemberInfoEntry.COLUMN_MEMBER_FULLNAME);
+//            }
+//        };
     }
 
     private CursorLoader createLoaderPayments() {
