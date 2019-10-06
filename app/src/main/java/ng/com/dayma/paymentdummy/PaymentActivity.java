@@ -332,7 +332,7 @@ public class PaymentActivity extends AppCompatActivity implements LoaderManager.
             mTextChandaNo.setVisibility(View.INVISIBLE); // show textview if not a new payment
             mSpinnerChandaNo.setVisibility(View.VISIBLE); // hide spinner
         }
-        int monthIndex = monthsYear.indexOf(mPayment.getMonthPaid());
+        int monthIndex = monthsYear.indexOf(monthPaid);
         mSpinnerMonthPaid.setSelection(monthIndex);
 
         mTextChandaNo.setText(String.valueOf(chandaNo) + " - " + fullname);
@@ -410,9 +410,6 @@ public class PaymentActivity extends AppCompatActivity implements LoaderManager.
         };
         task.execute();
 
-//        DataManager dm = DataManager.getInstance();
-//        mPaymentId = dm.createNewPayment(); // create a new payment and return its position
-//        mPayment = DataManager.getInstance().getPayments().get(mPaymentId);
     }
 
     @Override
@@ -558,87 +555,87 @@ public class PaymentActivity extends AppCompatActivity implements LoaderManager.
         if(mTextChandaAm.getText().toString().isEmpty() )
             chandaAm = 0.0;
         else {
-            chandaAm = Float.valueOf(mTextChandaAm.getText().toString());
+            chandaAm = Float.valueOf(mTextChandaAm.getText().toString().trim());
         }
         if(mTextWasiyyat.getText().toString().isEmpty())
             wasiyyat = 0.0;
         else {
-            wasiyyat = Float.valueOf(mTextWasiyyat.getText().toString());
+            wasiyyat = Float.valueOf(mTextWasiyyat.getText().toString().trim());
         }
         if(mTextTahrikJadid.getText().toString().isEmpty())
             tahrikiJadid = 0.0;
         else {
-            tahrikiJadid = Float.valueOf(mTextTahrikJadid.getText().toString());
+            tahrikiJadid = Float.valueOf(mTextTahrikJadid.getText().toString().trim());
         }
         if(mTextWaqfJadid.getText().toString().isEmpty())
             waqfJadid = 0.0;
         else {
-            waqfJadid = Float.valueOf(mTextWaqfJadid.getText().toString());
+            waqfJadid = Float.valueOf(mTextWaqfJadid.getText().toString().trim());
         }
         if(mTextWelfare.getText().toString().isEmpty())
             welfare = 0.0;
         else {
-            welfare = Float.valueOf(mTextWelfare.getText().toString());
+            welfare = Float.valueOf(mTextWelfare.getText().toString().trim());
         }
         if(mTextJalsaSalana.getText().toString().isEmpty())
             jalsa = 0.0;
         else {
-            jalsa = Float.valueOf(mTextJalsaSalana.getText().toString());
+            jalsa = Float.valueOf(mTextJalsaSalana.getText().toString().trim());
         }
         if(mTextMaryam.getText().toString().isEmpty())
             maryam = 0.0;
         else {
-            maryam = Float.valueOf(mTextMaryam.getText().toString());
+            maryam = Float.valueOf(mTextMaryam.getText().toString().trim());
         }
         if(mTextTabligh.getText().toString().isEmpty())
             tabligh = 0.0;
         else {
-            tabligh = Float.valueOf(mTextTabligh.getText().toString());
+            tabligh = Float.valueOf(mTextTabligh.getText().toString().trim());
         }
         if(mTextZakat.getText().toString().isEmpty())
             zakat = 0.0;
         else {
-            zakat = Float.valueOf(mTextZakat.getText().toString());
+            zakat = Float.valueOf(mTextZakat.getText().toString().trim());
         }
         if(mTextSadakat.getText().toString().isEmpty())
             sadakat = 0.0;
         else {
-            sadakat = Float.valueOf(mTextSadakat.getText().toString());
+            sadakat = Float.valueOf(mTextSadakat.getText().toString().trim());
         }
         if(mTextFitrana.getText().toString().isEmpty())
             fitrana = 0.0;
         else {
-            fitrana = Float.valueOf(mTextFitrana.getText().toString());
+            fitrana = Float.valueOf(mTextFitrana.getText().toString().trim());
         }
         if(mTextMosqueDonation.getText().toString().isEmpty())
             mosqueDonation = 0.0;
         else {
-            mosqueDonation = Float.valueOf(mTextMosqueDonation.getText().toString());
+            mosqueDonation = Float.valueOf(mTextMosqueDonation.getText().toString().trim());
         }
         if(mTextMta.getText().toString().isEmpty())
             mta = 0.0;
         else {
-            mta = Float.valueOf(mTextMta.getText().toString());
+            mta = Float.valueOf(mTextMta.getText().toString().trim());
         }
         if(mTextCentinary.getText().toString().isEmpty())
             centinary = 0.0;
         else {
-            centinary = Float.valueOf(mTextCentinary.getText().toString());
+            centinary = Float.valueOf(mTextCentinary.getText().toString().trim());
         }
         if(mTextWasiyatHissan.getText().toString().isEmpty())
             wasiyyatHissan = 0.0;
         else {
-            wasiyyatHissan = Float.valueOf(mTextWasiyatHissan.getText().toString());
+            wasiyyatHissan = Float.valueOf(mTextWasiyatHissan.getText().toString().trim());
         }
         if(mTextMiscellaneous.getText().toString().isEmpty())
             miscellaneous = 0.0;
         else {
-            miscellaneous = Float.valueOf(mTextMiscellaneous.getText().toString());
+            miscellaneous = Float.valueOf(mTextMiscellaneous.getText().toString().trim());
         }
         if(mTextScholarship.getText().toString().isEmpty())
             scholarship = 0.0;
         else {
-            scholarship = Float.valueOf(mTextScholarship.getText().toString());
+            scholarship = Float.valueOf(mTextScholarship.getText().toString().trim());
         }
 
 
