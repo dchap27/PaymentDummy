@@ -42,7 +42,7 @@ public class ScheduleRecyclerAdapter extends RecyclerView.Adapter<ScheduleRecycl
             return;
         mScheduleIdPos = mCursor.getColumnIndex(ScheduleInfoEntry.COLUMN_SCHEDULE_ID);
         mMonthIdPos = mCursor.getColumnIndex(ScheduleInfoEntry.COLUMN_MONTH_ID);
-        mJamaatPos = mCursor.getColumnIndex(ScheduleInfoEntry.COLUMN_SCHEDULE_JAMAAT);
+        mJamaatPos = mCursor.getColumnIndex(ScheduleInfoEntry.COLUMN_MEMBER_JAMAATNAME);
         mTitlePos = mCursor.getColumnIndex(ScheduleInfoEntry.COLUMN_SCHEDULE_TITLE);
         mStatusPos = mCursor.getColumnIndex(ScheduleInfoEntry.COLUMN_SCHEDULE_ISCOMPLETE);
         mSubtotalPos = mCursor.getColumnIndex(ScheduleInfoEntry.COLUMN_SCHEDULE_TOTALAMOUNT);

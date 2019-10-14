@@ -50,12 +50,12 @@ public class DataManager {
         final String[] scheduleColumnsProjection = {
                 ScheduleInfoEntry.COLUMN_SCHEDULE_ID,
                 ScheduleInfoEntry.COLUMN_SCHEDULE_TITLE,
-                ScheduleInfoEntry.COLUMN_SCHEDULE_JAMAAT,
+                ScheduleInfoEntry.COLUMN_MEMBER_JAMAATNAME,
                 ScheduleInfoEntry.COLUMN_MONTH_ID,
                 ScheduleInfoEntry.COLUMN_SCHEDULE_ISCOMPLETE,
                 ScheduleInfoEntry._ID
         };
-        String scheduleOrderby = ScheduleInfoEntry.COLUMN_MONTH_ID + "," + ScheduleInfoEntry.COLUMN_SCHEDULE_JAMAAT;
+        String scheduleOrderby = ScheduleInfoEntry.COLUMN_MONTH_ID + "," + ScheduleInfoEntry.COLUMN_MEMBER_JAMAATNAME;
         // query the schedule_info table
         Cursor scheduleCursor = db.query(ScheduleInfoEntry.TABLE_NAME, scheduleColumnsProjection, null,
                 null, null, null, scheduleOrderby);
@@ -170,7 +170,7 @@ public class DataManager {
         int scheduleIdPos = cursor.getColumnIndex(ScheduleInfoEntry.COLUMN_SCHEDULE_ID);
         int monthIdPos = cursor.getColumnIndex(ScheduleInfoEntry.COLUMN_MONTH_ID);
         int titlePos = cursor.getColumnIndex(ScheduleInfoEntry.COLUMN_SCHEDULE_TITLE);
-        int jamaatPos = cursor.getColumnIndex(ScheduleInfoEntry.COLUMN_SCHEDULE_JAMAAT);
+        int jamaatPos = cursor.getColumnIndex(ScheduleInfoEntry.COLUMN_MEMBER_JAMAATNAME);
         int completionstatusPos = cursor.getColumnIndex(ScheduleInfoEntry.COLUMN_SCHEDULE_ISCOMPLETE);
         int idPos = cursor.getColumnIndex(ScheduleInfoEntry._ID);
 
@@ -466,7 +466,7 @@ public class DataManager {
         Calendar dateTime = Calendar.getInstance();
         int presentYear = Integer.parseInt(String.format("%1$TY", dateTime));
         int year = presentYear - 1;
-        while(year < presentYear + 2){
+        while(year < presentYear + 1){
             for(int i = 0; i < monthsYear.size(); i++){
                 String mon = monthsYear.get(i) + year;
                 months.add(mon);

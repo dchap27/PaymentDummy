@@ -90,7 +90,7 @@ public class DatabaseDataWorker {
         ContentValues values = new ContentValues();
         values.put(PaymentDatabaseContract.ScheduleInfoEntry.COLUMN_MONTH_ID, monthId);
         values.put(PaymentDatabaseContract.ScheduleInfoEntry.COLUMN_SCHEDULE_ID, scheduleId);
-        values.put(PaymentDatabaseContract.ScheduleInfoEntry.COLUMN_SCHEDULE_JAMAAT, jamaat);
+        values.put(PaymentDatabaseContract.ScheduleInfoEntry.COLUMN_MEMBER_JAMAATNAME, jamaat);
         values.put(PaymentDatabaseContract.ScheduleInfoEntry.COLUMN_SCHEDULE_TITLE, title);
 
         long newRowId = mDb.insert(PaymentDatabaseContract.ScheduleInfoEntry.TABLE_NAME, null, values);

@@ -7,6 +7,7 @@ import android.content.Loader;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
@@ -29,6 +30,7 @@ import java.util.List;
 import ng.com.dayma.paymentdummy.data.PaymentDatabaseContract;
 import ng.com.dayma.paymentdummy.data.PaymentDatabaseContract.ScheduleInfoEntry;
 import ng.com.dayma.paymentdummy.data.PaymentOpenHelper;
+import ng.com.dayma.paymentdummy.data.PaymentProviderContract;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, LoaderManager.LoaderCallbacks<Cursor> {
@@ -91,13 +93,13 @@ public class MainActivity extends AppCompatActivity
         final String[] scheduleColumns = {
                 ScheduleInfoEntry.COLUMN_MONTH_ID,
                 ScheduleInfoEntry._ID,
-                ScheduleInfoEntry.COLUMN_SCHEDULE_JAMAAT,
+                ScheduleInfoEntry.COLUMN_MEMBER_JAMAATNAME,
                 ScheduleInfoEntry.COLUMN_SCHEDULE_ISCOMPLETE,
                 ScheduleInfoEntry.COLUMN_SCHEDULE_TITLE,
                 ScheduleInfoEntry.COLUMN_SCHEDULE_ID
 
         };
-        String scheduleOrder = ScheduleInfoEntry.COLUMN_MONTH_ID + "," + ScheduleInfoEntry.COLUMN_SCHEDULE_JAMAAT;
+        String scheduleOrder = ScheduleInfoEntry.COLUMN_MONTH_ID + "," + ScheduleInfoEntry.COLUMN_MEMBER_JAMAATNAME;
         Cursor cursor = db.query(PaymentDatabaseContract.ScheduleInfoEntry.TABLE_NAME, scheduleColumns,
                 null, null, null, null, scheduleOrder);
         mScheduleRecyclerAdapter.changeCursor(cursor);
@@ -241,32 +243,23 @@ public class MainActivity extends AppCompatActivity
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         CursorLoader loader = null;
         if(id == LOADER_SCHEDULES) {
-            loader = new CursorLoader(this) {
-                @Override
-                public Cursor loadInBackground() {
-                    SQLiteDatabase db = mDbOpenHelper.getReadableDatabase();
+            Uri uri = PaymentProviderContract.Schedules.CONTENT_URI;
+            final String[] scheduleColumns = {
+                    PaymentProviderContract.Schedules.COLUMN_MONTH_ID,
+                    PaymentProviderContract.Schedules._ID,
+                    PaymentProviderContract.Schedules.COLUMN_MEMBER_JAMAATNAME,
+                    PaymentProviderContract.Schedules.COLUMN_SCHEDULE_ISCOMPLETE,
+                    PaymentProviderContract.Schedules.COLUMN_SCHEDULE_TITLE,
+                    PaymentProviderContract.Schedules.COLUMN_SCHEDULE_TOTALAMOUNT,
+                    PaymentProviderContract.Schedules.COLUMN_SCHEDULE_TOTALPAYERS,
+                    PaymentProviderContract.Schedules.COLUMN_SCHEDULE_ID,
 
-                    final String[] scheduleColumns = {
-                            ScheduleInfoEntry.COLUMN_MONTH_ID,
-                            ScheduleInfoEntry.getQName(ScheduleInfoEntry._ID),
-                            ScheduleInfoEntry.COLUMN_SCHEDULE_JAMAAT,
-                            ScheduleInfoEntry.COLUMN_SCHEDULE_ISCOMPLETE,
-                            ScheduleInfoEntry.COLUMN_SCHEDULE_TITLE,
-                            ScheduleInfoEntry.COLUMN_SCHEDULE_TOTALAMOUNT,
-                            ScheduleInfoEntry.COLUMN_SCHEDULE_TOTALPAYERS,
-                            ScheduleInfoEntry.getQName(ScheduleInfoEntry.COLUMN_SCHEDULE_ID),
-
-                    };
-//                    String tablesWithJoin = ScheduleInfoEntry.TABLE_NAME + " JOIN " +
-//                            PaymentInfoEntry.TABLE_NAME + " ON " +
-//                            ScheduleInfoEntry.getQName(ScheduleInfoEntry.COLUMN_SCHEDULE_ID) + " = " +
-//                            PaymentInfoEntry.getQName(PaymentInfoEntry.COLUMN_SCHEDULE_ID);
-
-                    String scheduleOrder = ScheduleInfoEntry.COLUMN_MONTH_ID + "," + ScheduleInfoEntry.COLUMN_SCHEDULE_JAMAAT;
-                    return db.query(ScheduleInfoEntry.TABLE_NAME, scheduleColumns,
-                            null, null, null, null, scheduleOrder);
-                }
             };
+            String scheduleOrder = PaymentProviderContract.Schedules.COLUMN_MONTH_ID + "," +
+                    PaymentProviderContract.Schedules.COLUMN_MEMBER_JAMAATNAME;
+
+            loader = new CursorLoader(this, uri, scheduleColumns, null, null, scheduleOrder);
+            return loader;
         }
         else if(id == LOADER_MONTHS){
             loader = cursorLoaderMonths();
@@ -275,20 +268,14 @@ public class MainActivity extends AppCompatActivity
     }
 
     private CursorLoader cursorLoaderMonths() {
-        return new CursorLoader(this){
-            @Override
-            public Cursor loadInBackground() {
-                SQLiteDatabase db = mDbOpenHelper.getReadableDatabase();
-
-                final String[] monthColumns = {
-                        PaymentDatabaseContract.MonthInfoEntry._ID,
-                        PaymentDatabaseContract.MonthInfoEntry.COLUMN_MONTH_ID
-                };
-
-                return db.query(PaymentDatabaseContract.MonthInfoEntry.TABLE_NAME, monthColumns, null,
-                        null, null, null, PaymentDatabaseContract.MonthInfoEntry.COLUMN_MONTH_ID);
-            }
+        Uri uri = PaymentProviderContract.Months.CONTENT_URI;
+        final String[] monthColumns = {
+                PaymentProviderContract.Months._ID,
+                PaymentProviderContract.Months.COLUMN_MONTH_ID
         };
+        String sortOrder = PaymentProviderContract.Months.COLUMN_MONTH_ID;
+        return new CursorLoader(this, uri, monthColumns, null, null, sortOrder);
+
     }
 
     @Override

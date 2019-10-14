@@ -12,8 +12,8 @@ public final class PaymentProviderContract {
 
     // create columns common among the tables
     protected interface MembersCommonColumns {
-        public static final String COLUMN_MEMBER_CHANDANO = "chanda_no";
-        public static final String COLUMN_MEMBER_FULLNAME = "fullname";
+        public static final String COLUMN_MEMBER_CHANDANO = "ChandaNo";
+        public static final String COLUMN_MEMBER_FULLNAME = "Fullname";
     }
 
     protected interface SchedulesIdColumns {
@@ -23,8 +23,8 @@ public final class PaymentProviderContract {
     Create the column constants for the tables and using protected interfaces
      */
     protected interface MembersColumns {
-        public static final String COLUMN_MEMBER_JAMAATNAME = "jamaat_name";
         public static final String COLUMN_MEMBER_ID = "member_id";
+        public static final String COLUMN_MEMBER_JAMAATNAME = "jamaat_name";
     }
 
     protected interface MonthsColumns {
@@ -34,7 +34,7 @@ public final class PaymentProviderContract {
     protected interface SchedulesColumns {
 
         public static final String COLUMN_SCHEDULE_TITLE = "schedule_title";
-        public static final String COLUMN_SCHEDULE_JAMAAT = "jamaat_name";
+        public static final String COLUMN_MEMBER_JAMAATNAME = "jamaat_name";
         public static final String COLUMN_SCHEDULE_ISCOMPLETE = "completion_status";
         public static final String COLUMN_SCHEDULE_TOTALAMOUNT = "total_amount";
         public static final String COLUMN_SCHEDULE_TOTALPAYERS = "total_payers";

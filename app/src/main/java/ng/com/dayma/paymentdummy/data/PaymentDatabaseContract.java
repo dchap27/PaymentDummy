@@ -10,8 +10,8 @@ public final class PaymentDatabaseContract {
 
         public static final String COLUMN_MEMBER_JAMAATNAME = "jamaat_name";
         public static final String COLUMN_MEMBER_ID = "member_id";
-        public static final String COLUMN_MEMBER_CHANDANO = "chanda_no";
-        public static final String COLUMN_MEMBER_FULLNAME = "fullname";
+        public static final String COLUMN_MEMBER_CHANDANO = "ChandaNo";
+        public static final String COLUMN_MEMBER_FULLNAME = "Fullname";
 
         public static final String SQL_CREATE_TABLE =
                 "CREATE TABLE " + TABLE_NAME + "(" +
@@ -66,7 +66,7 @@ public final class PaymentDatabaseContract {
 
         public static final String COLUMN_SCHEDULE_ID = "schedule_id";
         public static final String COLUMN_SCHEDULE_TITLE = "schedule_title";
-        public static final String COLUMN_SCHEDULE_JAMAAT = "jamaat_name";
+        public static final String COLUMN_MEMBER_JAMAATNAME = "jamaat_name";
         public static final String COLUMN_SCHEDULE_ISCOMPLETE = "completion_status";
         public static final String COLUMN_MONTH_ID = "month_id";
         public static final String COLUMN_SCHEDULE_TOTALAMOUNT = "total_amount";
@@ -78,7 +78,7 @@ public final class PaymentDatabaseContract {
                         _ID + " INTEGER PRIMARY KEY, " +
                         COLUMN_SCHEDULE_ID + " TEXT UNIQUE NOT NULL, " +
                         COLUMN_SCHEDULE_TITLE + " TEXT NOT NULL, " +
-                        COLUMN_SCHEDULE_JAMAAT + " TEXT NOT NULL, " +
+                        COLUMN_MEMBER_JAMAATNAME + " TEXT NOT NULL, " +
                         COLUMN_SCHEDULE_ISCOMPLETE + " INTEGER DEFAULT 0, " +
                         COLUMN_SCHEDULE_TOTALAMOUNT + " REAL DEFAULT 0, " +
                         COLUMN_SCHEDULE_TOTALPAYERS + " INTEGER DEFAULT 0, " +

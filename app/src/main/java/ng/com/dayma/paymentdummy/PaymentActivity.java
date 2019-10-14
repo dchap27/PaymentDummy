@@ -1,6 +1,7 @@
 package ng.com.dayma.paymentdummy;
 
 import android.app.LoaderManager;
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.CursorLoader;
 import android.content.Intent;
@@ -20,13 +21,16 @@ import android.widget.EditText;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import ng.com.dayma.paymentdummy.data.PaymentDatabaseContract.MemberInfoEntry;
 import ng.com.dayma.paymentdummy.data.PaymentDatabaseContract.PaymentInfoEntry;
 import ng.com.dayma.paymentdummy.data.PaymentOpenHelper;
+import ng.com.dayma.paymentdummy.data.PaymentProviderContract;
 import ng.com.dayma.paymentdummy.data.PaymentProviderContract.Members;
 
 public class PaymentActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
@@ -110,6 +114,7 @@ public class PaymentActivity extends AppCompatActivity implements LoaderManager.
     private EditText mTextMta;
     private EditText mTextWasiyatHissan;
     private EditText mTextMiscellaneous;
+    private Uri mPaymentUri;
 
 
     @Override
@@ -175,10 +180,26 @@ public class PaymentActivity extends AppCompatActivity implements LoaderManager.
         mTextMiscellaneous = (EditText) findViewById(R.id.text_miscellaneous);
         mTextJalsaSalana = (EditText) findViewById(R.id.text_jalsa_salana);
 
-        if(!mIsNewPayment)
+        if(!mIsNewPayment){
             // populate the views with values if not a new payment
             getLoaderManager().initLoader(LOADER_PAYMENTS, null, this);
+        }
+        else {
+            initializeMonthPaid();
+        }
 //            loadPaymentData();
+    }
+
+    private void initializeMonthPaid() {
+        Calendar dateTime = Calendar.getInstance();
+        String presentMonth = String.format("%1$Tb", dateTime);
+        String presentYear = String.format("%1$TY", dateTime);
+        String preselectedMonth = presentMonth + presentYear;
+        for(int i = 0; i<mSpinnerMonthPaid.getCount(); i++){
+            if(mSpinnerMonthPaid.getItemAtPosition(i).equals(preselectedMonth)){
+                mSpinnerMonthPaid.setSelection(i);
+            }
+        }
     }
 
     private void loadMemberData() {
@@ -389,24 +410,26 @@ public class PaymentActivity extends AppCompatActivity implements LoaderManager.
         }
         else {
             mPayment = DataManager.getInstance().getPayment(mPaymentId);
+            mPaymentUri = ContentUris.withAppendedId(PaymentProviderContract.Payments.CONTENT_URI, mPaymentId);
         }
 
     }
 
     private void createNewPayment() {
+
         AsyncTask task = new AsyncTask() {
             @Override
             protected Object doInBackground(Object[] objects) {
                 ContentValues values = new ContentValues();
-                values.put(PaymentInfoEntry.COLUMN_MEMBER_CHANDANO, 0);
-                values.put(PaymentInfoEntry.COLUMN_SCHEDULE_ID, mScheduleId);
-                values.put(PaymentInfoEntry.COLUMN_PAYMENT_MONTHPAID, "");
-                values.put(PaymentInfoEntry.COLUMN_PAYMENT_LOCALRECEIPT, "");
-                values.put(PaymentInfoEntry.COLUMN_PAYMENT_CHANDAAM, 0);
+                values.put(PaymentProviderContract.Payments.COLUMN_MEMBER_CHANDANO, 0);
+                values.put(PaymentProviderContract.Payments.COLUMN_SCHEDULE_ID, mScheduleId);
+                values.put(PaymentProviderContract.Payments.COLUMN_PAYMENT_MONTHPAID, "");
+                values.put(PaymentProviderContract.Payments.COLUMN_PAYMENT_LOCALRECEIPT, "");
+                values.put(PaymentProviderContract.Payments.COLUMN_PAYMENT_CHANDAAM, 0);
                 // get connection to the database
-                SQLiteDatabase db = mDbOpenHelper.getWritableDatabase();
-                // insert new row
-                mPaymentId = (int) db.insert(PaymentInfoEntry.TABLE_NAME, null, values);
+                mPaymentUri = getContentResolver().insert(PaymentProviderContract.Payments.CONTENT_URI, values);
+                // get the id
+                mPaymentId = (int) ContentUris.parseId(mPaymentUri);
                 return null;
             }
         };
@@ -447,21 +470,43 @@ public class PaymentActivity extends AppCompatActivity implements LoaderManager.
         if (id == R.id.action_delete_payment) {
 //            sendEmail();
             deletePaymentFromDatabase();
-            finish();
+            finish(); // Exit the Activity
         } else if(id == R.id.action_cancel){
             mIsCancelling = true;
-            finish();
+            finish(); // Exit the Activity
         } else if(id == R.id.action_next){
             moveNext();
         } else if(id == R.id.action_previous){
             movePrevious();
         } else if(id == R.id.action_save) {
-            mIsSaving = true;
-            savePayment();
-            finish();
+            if (validatePaymentInputs()){
+                mIsSaving = true;
+                savePayment();
+                Toast.makeText(this, "Payment saved", Toast.LENGTH_LONG).show();
+                if(mIsNewPayment){
+                    // called if new Payment is saved and open another empty views for new payment
+                    moveNext();
+                    mIsSaving = false;
+                }
+                else {
+                    finish(); // exit the Activity
+                }
+            }
+            else {
+                return false;
+            }
+
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private boolean validatePaymentInputs() {
+        if(mTextReceiptNo.getText().toString().isEmpty()){
+            Toast.makeText(this, "Receipt Number field cannot be empty!", Toast.LENGTH_LONG).show();
+            return false;
+        }
+        return true;
     }
 
 
@@ -478,15 +523,34 @@ public class PaymentActivity extends AppCompatActivity implements LoaderManager.
     }
 
     private void moveNext() {
-        savePayment(); // save the present Note we're looking at
-        ++mPaymentId;
-        mPayment = DataManager.getInstance().getPayments(mSchedule).get(mPaymentId);
+        createNewPayment(); // insert dummy data
+        createEmptyEditTextViews();
 
-        saveOriginalPaymentValues(); // save the next note displayed before any editing
-        displayPayments(
-        );
         invalidateOptionsMenu(); // to enable calling of onPrepareOptionsMenu again and check for
         // possible conditions to re-enable the menu item
+    }
+
+    private void createEmptyEditTextViews() {
+        mTextChandaNo.setText("");
+
+        mTextReceiptNo.setText("");
+        mTextChandaAm.setText(String.valueOf(0.0));
+        mTextWasiyyat.setText(String.valueOf(0.0));
+        mTextJalsaSalana.setText(String.valueOf(0.0));
+        mTextTahrikJadid.setText(String.valueOf(0.0));
+        mTextWaqfJadid.setText(String.valueOf(0.0));
+        mTextWelfare.setText(String.valueOf(0.0));
+        mTextScholarship.setText(String.valueOf(0.0));
+        mTextMaryam.setText(String.valueOf(0.0));
+        mTextTabligh.setText(String.valueOf(0.0));
+        mTextZakat.setText(String.valueOf(0.0));
+        mTextSadakat.setText(String.valueOf(0.0));
+        mTextFitrana.setText(String.valueOf(0.0));
+        mTextMosqueDonation.setText(String.valueOf(0.0));
+        mTextMta.setText(String.valueOf(0.0));
+        mTextCentinary.setText(String.valueOf(0.0));
+        mTextWasiyatHissan.setText(String.valueOf(0.0));
+        mTextMiscellaneous.setText(String.valueOf(0.0));
     }
 
     @Override
@@ -506,17 +570,7 @@ public class PaymentActivity extends AppCompatActivity implements LoaderManager.
     }
 
     private void deletePaymentFromDatabase() {
-        final String selection = PaymentInfoEntry._ID + "=?";
-        final String[] selectionArgs = { Integer.toString(mPaymentId)};
-        AsyncTask task = new AsyncTask() {
-            @Override
-            protected Object doInBackground(Object[] objects) {
-                SQLiteDatabase db = mDbOpenHelper.getWritableDatabase();
-                db.delete(PaymentInfoEntry.TABLE_NAME, selection, selectionArgs);
-                return null;
-            }
-        };
-        task.execute();
+        getContentResolver().delete(mPaymentUri, null, null);
 
     }
 
@@ -656,38 +710,33 @@ public class PaymentActivity extends AppCompatActivity implements LoaderManager.
                                        double scholarship, double maryam, double zakat, double fitrana,
                                        double mosqueDonation, double mta, double centinary, double wasiyyatHissan,
                                        double sadakat, double miscellaneous, double subtotal){
-        // selection criteria for row to update
-        final String selection = PaymentInfoEntry._ID + "=?";
-        final String[] selectionArgs = {Integer.toString(mPaymentId)};
 
         final ContentValues values = new ContentValues();
-        values.put(PaymentInfoEntry.COLUMN_MEMBER_CHANDANO, chandaNo);
-        values.put(PaymentInfoEntry.COLUMN_MEMBER_FULLNAME, fullname);
-        values.put(PaymentInfoEntry.COLUMN_SCHEDULE_ID, schedule);
-        values.put(PaymentInfoEntry.COLUMN_PAYMENT_MONTHPAID, monthPaid);
-        values.put(PaymentInfoEntry.COLUMN_PAYMENT_LOCALRECEIPT, receiptNo);
-        values.put(PaymentInfoEntry.COLUMN_PAYMENT_CHANDAAM, chandaAm);
-        values.put(PaymentInfoEntry.COLUMN_PAYMENT_CHANDAWASIYYAT, wasiyyat);
-        values.put(PaymentInfoEntry.COLUMN_PAYMENT_TARIKIJADID, tahrikiJadid);
-        values.put(PaymentInfoEntry.COLUMN_PAYMENT_WAQFIJADID, waqfJadid);
-        values.put(PaymentInfoEntry.COLUMN_PAYMENT_WELFAREFUND, welfare);
-        values.put(PaymentInfoEntry.COLUMN_PAYMENT_JALSASALANA, jalsa);
-        values.put(PaymentInfoEntry.COLUMN_PAYMENT_TABLIGH, tabligh);
-        values.put(PaymentInfoEntry.COLUMN_PAYMENT_SCHOLARSHIP, scholarship);
-        values.put(PaymentInfoEntry.COLUMN_PAYMENT_MARYAMFUND, maryam);
-        values.put(PaymentInfoEntry.COLUMN_PAYMENT_ZAKAT, zakat);
-        values.put(PaymentInfoEntry.COLUMN_PAYMENT_FITRANA, fitrana);
-        values.put(PaymentInfoEntry.COLUMN_PAYMENT_MOSQUEDONATION, mosqueDonation);
-        values.put(PaymentInfoEntry.COLUMN_PAYMENT_MTA, mta);
-        values.put(PaymentInfoEntry.COLUMN_PAYMENT_CENTINARYKHILAFAT, centinary);
-        values.put(PaymentInfoEntry.COLUMN_PAYMENT_WASIYYATHISSANJAIDAD, wasiyyatHissan);
-        values.put(PaymentInfoEntry.COLUMN_PAYMENT_SADAKAT, sadakat);
-        values.put(PaymentInfoEntry.COLUMN_PAYMENT_MISCELLANEOUS, miscellaneous);
-        values.put(PaymentInfoEntry.COLUMN_PAYMENT_SUBTOTAL, subtotal);
-
-        // get connection to the database
-        SQLiteDatabase db = mDbOpenHelper.getWritableDatabase();
-        db.update(PaymentInfoEntry.TABLE_NAME, values, selection, selectionArgs);
+        values.put(PaymentProviderContract.Payments.COLUMN_MEMBER_CHANDANO, chandaNo);
+        values.put(PaymentProviderContract.Payments.COLUMN_MEMBER_FULLNAME, fullname);
+        values.put(PaymentProviderContract.Payments.COLUMN_SCHEDULE_ID, schedule);
+        values.put(PaymentProviderContract.Payments.COLUMN_PAYMENT_MONTHPAID, monthPaid);
+        values.put(PaymentProviderContract.Payments.COLUMN_PAYMENT_LOCALRECEIPT, receiptNo);
+        values.put(PaymentProviderContract.Payments.COLUMN_PAYMENT_CHANDAAM, chandaAm);
+        values.put(PaymentProviderContract.Payments.COLUMN_PAYMENT_CHANDAWASIYYAT, wasiyyat);
+        values.put(PaymentProviderContract.Payments.COLUMN_PAYMENT_TARIKIJADID, tahrikiJadid);
+        values.put(PaymentProviderContract.Payments.COLUMN_PAYMENT_WAQFIJADID, waqfJadid);
+        values.put(PaymentProviderContract.Payments.COLUMN_PAYMENT_WELFAREFUND, welfare);
+        values.put(PaymentProviderContract.Payments.COLUMN_PAYMENT_JALSASALANA, jalsa);
+        values.put(PaymentProviderContract.Payments.COLUMN_PAYMENT_TABLIGH, tabligh);
+        values.put(PaymentProviderContract.Payments.COLUMN_PAYMENT_SCHOLARSHIP, scholarship);
+        values.put(PaymentProviderContract.Payments.COLUMN_PAYMENT_MARYAMFUND, maryam);
+        values.put(PaymentProviderContract.Payments.COLUMN_PAYMENT_ZAKAT, zakat);
+        values.put(PaymentProviderContract.Payments.COLUMN_PAYMENT_FITRANA, fitrana);
+        values.put(PaymentProviderContract.Payments.COLUMN_PAYMENT_MOSQUEDONATION, mosqueDonation);
+        values.put(PaymentProviderContract.Payments.COLUMN_PAYMENT_MTA, mta);
+        values.put(PaymentProviderContract.Payments.COLUMN_PAYMENT_CENTINARYKHILAFAT, centinary);
+        values.put(PaymentProviderContract.Payments.COLUMN_PAYMENT_WASIYYATHISSANJAIDAD, wasiyyatHissan);
+        values.put(PaymentProviderContract.Payments.COLUMN_PAYMENT_SADAKAT, sadakat);
+        values.put(PaymentProviderContract.Payments.COLUMN_PAYMENT_MISCELLANEOUS, miscellaneous);
+        values.put(PaymentProviderContract.Payments.COLUMN_PAYMENT_SUBTOTAL, subtotal);
+        // get connection to the content provider
+        getContentResolver().update(mPaymentUri, values, null, null);
 
     }
 
@@ -702,19 +751,18 @@ public class PaymentActivity extends AppCompatActivity implements LoaderManager.
     }
 
     private String getNameOfPayer(int chandaNo) {
-        SQLiteDatabase db = mDbOpenHelper.getReadableDatabase();
+        Uri uri = Members.CONTENT_URI;
         String[] projection = {
-                MemberInfoEntry.COLUMN_MEMBER_CHANDANO,
-                MemberInfoEntry.COLUMN_MEMBER_ID,
-                MemberInfoEntry.COLUMN_MEMBER_JAMAATNAME,
-                MemberInfoEntry.COLUMN_MEMBER_FULLNAME
+                Members.COLUMN_MEMBER_CHANDANO,
+                Members.COLUMN_MEMBER_ID,
+                Members.COLUMN_MEMBER_JAMAATNAME,
+                Members.COLUMN_MEMBER_FULLNAME
         };
-        String selection = MemberInfoEntry.COLUMN_MEMBER_CHANDANO + "=?";
+        String selection = Members.COLUMN_MEMBER_CHANDANO + "=?";
         String[] selectionArgs = { Integer.toString(chandaNo)};
-        Cursor cursor = db.query(MemberInfoEntry.TABLE_NAME, projection, selection,
-                selectionArgs, null, null, null);
+        Cursor cursor = getContentResolver().query(uri,projection,selection,selectionArgs,null);
         // get the index column for Fullname
-        int fullnamePos = cursor.getColumnIndex(MemberInfoEntry.COLUMN_MEMBER_FULLNAME);
+        int fullnamePos = cursor.getColumnIndex(Members.COLUMN_MEMBER_FULLNAME);
         // move to first row of table
         cursor.moveToNext();
         String fullname = cursor.getString(fullnamePos);
@@ -756,68 +804,37 @@ public class PaymentActivity extends AppCompatActivity implements LoaderManager.
         String[] selectionArgs = { mSchedule.getJamaat()};
 
         return new CursorLoader(this, uri, selectionColumns, selection, selectionArgs, Members.COLUMN_MEMBER_FULLNAME);
-//        return new CursorLoader(this){
-//            @Override
-//            public Cursor loadInBackground() {
-//                SQLiteDatabase db = mDbOpenHelper.getReadableDatabase();
-//
-//                String[] selectionColumns = {
-//                        MemberInfoEntry._ID,
-//                        MemberInfoEntry.COLUMN_MEMBER_ID,
-//                        MemberInfoEntry.COLUMN_MEMBER_CHANDANO,
-//                        MemberInfoEntry.COLUMN_MEMBER_FULLNAME,
-//                        MemberInfoEntry.getQName(MemberInfoEntry.COLUMN_MEMBER_JAMAATNAME),
-//                };
-//                String selection = MemberInfoEntry.COLUMN_MEMBER_JAMAATNAME + "=?";
-//                String[] selectionArgs = { mSchedule.getJamaat()};
-//
-//                return db.query(MemberInfoEntry.TABLE_NAME,selectionColumns, selection,
-//                        selectionArgs,null, null, MemberInfoEntry.COLUMN_MEMBER_FULLNAME);
-//            }
-//        };
     }
 
     private CursorLoader createLoaderPayments() {
         mPaymentQueriesFinished = false;
-        return new CursorLoader(this){
-            @Override
-            public Cursor loadInBackground() {
-                SQLiteDatabase db = mDbOpenHelper.getReadableDatabase();
-
-                String selection = PaymentInfoEntry._ID + " =? ";
-
-                String[] selectionArgs = {
-                        Integer.toString(mPaymentId)
-                };
-
-                String[] paymentColumns = {
-                        PaymentInfoEntry.COLUMN_MEMBER_CHANDANO,
-                        PaymentInfoEntry.COLUMN_MEMBER_FULLNAME,
-                        PaymentInfoEntry.COLUMN_PAYMENT_LOCALRECEIPT,
-                        PaymentInfoEntry.COLUMN_PAYMENT_MONTHPAID,
-                        PaymentInfoEntry.COLUMN_PAYMENT_CHANDAAM,
-                        PaymentInfoEntry.COLUMN_PAYMENT_CHANDAWASIYYAT,
-                        PaymentInfoEntry.COLUMN_PAYMENT_JALSASALANA,
-                        PaymentInfoEntry.COLUMN_PAYMENT_TARIKIJADID,
-                        PaymentInfoEntry.COLUMN_PAYMENT_WAQFIJADID,
-                        PaymentInfoEntry.COLUMN_PAYMENT_WELFAREFUND,
-                        PaymentInfoEntry.COLUMN_PAYMENT_SCHOLARSHIP,
-                        PaymentInfoEntry.COLUMN_PAYMENT_MARYAMFUND,
-                        PaymentInfoEntry.COLUMN_PAYMENT_TABLIGH,
-                        PaymentInfoEntry.COLUMN_PAYMENT_ZAKAT,
-                        PaymentInfoEntry.COLUMN_PAYMENT_SADAKAT,
-                        PaymentInfoEntry.COLUMN_PAYMENT_FITRANA,
-                        PaymentInfoEntry.COLUMN_PAYMENT_MOSQUEDONATION,
-                        PaymentInfoEntry.COLUMN_PAYMENT_MTA,
-                        PaymentInfoEntry.COLUMN_PAYMENT_CENTINARYKHILAFAT,
-                        PaymentInfoEntry.COLUMN_PAYMENT_WASIYYATHISSANJAIDAD,
-                        PaymentInfoEntry.COLUMN_PAYMENT_MISCELLANEOUS,
-                        PaymentInfoEntry.COLUMN_PAYMENT_SUBTOTAL
-                };
-                return db.query(PaymentInfoEntry.TABLE_NAME, paymentColumns, selection,
-                        selectionArgs, null, null, null);
-            }
+        mPaymentUri = ContentUris.withAppendedId(PaymentProviderContract.Payments.CONTENT_URI, mPaymentId);
+        String[] paymentColumns = {
+                PaymentInfoEntry.COLUMN_MEMBER_CHANDANO,
+                PaymentInfoEntry.COLUMN_MEMBER_FULLNAME,
+                PaymentInfoEntry.COLUMN_PAYMENT_LOCALRECEIPT,
+                PaymentInfoEntry.COLUMN_PAYMENT_MONTHPAID,
+                PaymentInfoEntry.COLUMN_PAYMENT_CHANDAAM,
+                PaymentInfoEntry.COLUMN_PAYMENT_CHANDAWASIYYAT,
+                PaymentInfoEntry.COLUMN_PAYMENT_JALSASALANA,
+                PaymentInfoEntry.COLUMN_PAYMENT_TARIKIJADID,
+                PaymentInfoEntry.COLUMN_PAYMENT_WAQFIJADID,
+                PaymentInfoEntry.COLUMN_PAYMENT_WELFAREFUND,
+                PaymentInfoEntry.COLUMN_PAYMENT_SCHOLARSHIP,
+                PaymentInfoEntry.COLUMN_PAYMENT_MARYAMFUND,
+                PaymentInfoEntry.COLUMN_PAYMENT_TABLIGH,
+                PaymentInfoEntry.COLUMN_PAYMENT_ZAKAT,
+                PaymentInfoEntry.COLUMN_PAYMENT_SADAKAT,
+                PaymentInfoEntry.COLUMN_PAYMENT_FITRANA,
+                PaymentInfoEntry.COLUMN_PAYMENT_MOSQUEDONATION,
+                PaymentInfoEntry.COLUMN_PAYMENT_MTA,
+                PaymentInfoEntry.COLUMN_PAYMENT_CENTINARYKHILAFAT,
+                PaymentInfoEntry.COLUMN_PAYMENT_WASIYYATHISSANJAIDAD,
+                PaymentInfoEntry.COLUMN_PAYMENT_MISCELLANEOUS,
+                PaymentInfoEntry.COLUMN_PAYMENT_SUBTOTAL
         };
+        return new CursorLoader(this, mPaymentUri, paymentColumns, null, null, null);
+
     }
 
     @Override
