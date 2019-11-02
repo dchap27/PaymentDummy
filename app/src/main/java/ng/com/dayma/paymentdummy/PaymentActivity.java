@@ -7,17 +7,20 @@ import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.StrictMode;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -36,6 +39,7 @@ import ng.com.dayma.paymentdummy.data.PaymentProviderContract.Members;
 public class PaymentActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
     public static final String PAYMENT_ID = "ng.com.dayma.paymentdummy.PAYMENT_ID";
     public static final int ID_NOT_SET = -1;
+    private final String TAG = getClass().getSimpleName();
     public static final String SCHEDULE_INFO = "ng.com.dayma.paymentdummy.SCHEDULE_INFO";
 
     public static final String ORIGINAL_PAYMENT_ID = "ng.com.dayma.paymentdummy.ORIGINAL_PAYMENT_ID";
@@ -115,6 +119,7 @@ public class PaymentActivity extends AppCompatActivity implements LoaderManager.
     private EditText mTextWasiyatHissan;
     private EditText mTextMiscellaneous;
     private Uri mPaymentUri;
+    private int mChandaNo;
 
 
     @Override
@@ -125,16 +130,20 @@ public class PaymentActivity extends AppCompatActivity implements LoaderManager.
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.d(TAG,"*********onCreate**********");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_payment);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        enableStrictMode();
 
         mDbOpenHelper = new PaymentOpenHelper(this);
 
         mSpinnerMonthPaid = (Spinner) findViewById(R.id.spinner_monthpaid);
         mSpinnerChandaNo = (Spinner) findViewById(R.id.spinner_payment_text);
 
+        Log.d(TAG,"populate the members id into spinner");
         mAdapterMemberIds = new SimpleCursorAdapter(this, android.R.layout.simple_spinner_item, null,
                 new String[] {MemberInfoEntry.COLUMN_MEMBER_ID},
                 new int[] {android.R.id.text1}, 0);
@@ -142,6 +151,7 @@ public class PaymentActivity extends AppCompatActivity implements LoaderManager.
         mAdapterMemberIds.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         mSpinnerChandaNo.setAdapter(mAdapterMemberIds);
 
+        Log.d(TAG,"populate months into spinner");
         ArrayList<String> monthsYear = DataManager.getInstance().getMonthsOfTheYear();
         ArrayAdapter<String> adapterMonths =
                 new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, monthsYear);
@@ -150,7 +160,7 @@ public class PaymentActivity extends AppCompatActivity implements LoaderManager.
 
 
         readDisplayStateValue();
-        //        loadMemberData();
+
         getLoaderManager().initLoader(LOADER_MEMBERS, null, this);
 
         if(savedInstanceState == null) {
@@ -160,7 +170,7 @@ public class PaymentActivity extends AppCompatActivity implements LoaderManager.
         }
 
         // get references to the views
-        mTextChandaNo = (TextView) findViewById(R.id.text_payer_title);
+        mTextChandaNo = (TextView) findViewById(R.id.text_payer_name);
         mTextReceiptNo = (EditText) findViewById(R.id.text_receiptno);
         mTextChandaAm = (EditText) findViewById(R.id.text_chandaam);
         mTextWasiyyat = (EditText) findViewById(R.id.text_wasiyyat);
@@ -190,6 +200,18 @@ public class PaymentActivity extends AppCompatActivity implements LoaderManager.
 //            loadPaymentData();
     }
 
+    private void enableStrictMode() {
+        if (BuildConfig.DEBUG){
+            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
+                    .detectAll()
+                    .penaltyLog()
+                    .build();
+            StrictMode.setThreadPolicy(policy);
+
+        }
+
+    }
+
     private void initializeMonthPaid() {
         Calendar dateTime = Calendar.getInstance();
         String presentMonth = String.format("%1$Tb", dateTime);
@@ -200,85 +222,6 @@ public class PaymentActivity extends AppCompatActivity implements LoaderManager.
                 mSpinnerMonthPaid.setSelection(i);
             }
         }
-    }
-
-    private void loadMemberData() {
-        SQLiteDatabase db = mDbOpenHelper.getReadableDatabase();
-
-        String[] selectionColumns = {
-                MemberInfoEntry._ID,
-                MemberInfoEntry.COLUMN_MEMBER_ID,
-                MemberInfoEntry.COLUMN_MEMBER_CHANDANO,
-                MemberInfoEntry.COLUMN_MEMBER_FULLNAME,
-                MemberInfoEntry.COLUMN_MEMBER_JAMAATNAME
-        };
-        Cursor cursor = db.query(MemberInfoEntry.TABLE_NAME,selectionColumns, null,
-                null,null, null, MemberInfoEntry.COLUMN_MEMBER_FULLNAME);
-        mAdapterMemberIds.changeCursor(cursor);
-
-    }
-
-    private void loadPaymentData() {
-        SQLiteDatabase db = mDbOpenHelper.getReadableDatabase();
-
-        String selection = PaymentInfoEntry._ID + " =? ";
-
-        String[] selectionArgs = {
-                Integer.toString(mPaymentId)
-        };
-
-        String[] paymentColumns = {
-                PaymentInfoEntry.COLUMN_MEMBER_CHANDANO,
-                PaymentInfoEntry.COLUMN_MEMBER_FULLNAME,
-                PaymentInfoEntry.COLUMN_PAYMENT_LOCALRECEIPT,
-                PaymentInfoEntry.COLUMN_PAYMENT_MONTHPAID,
-                PaymentInfoEntry.COLUMN_PAYMENT_CHANDAAM,
-                PaymentInfoEntry.COLUMN_PAYMENT_CHANDAWASIYYAT,
-                PaymentInfoEntry.COLUMN_PAYMENT_JALSASALANA,
-                PaymentInfoEntry.COLUMN_PAYMENT_TARIKIJADID,
-                PaymentInfoEntry.COLUMN_PAYMENT_WAQFIJADID,
-                PaymentInfoEntry.COLUMN_PAYMENT_WELFAREFUND,
-                PaymentInfoEntry.COLUMN_PAYMENT_SCHOLARSHIP,
-                PaymentInfoEntry.COLUMN_PAYMENT_MARYAMFUND,
-                PaymentInfoEntry.COLUMN_PAYMENT_TABLIGH,
-                PaymentInfoEntry.COLUMN_PAYMENT_ZAKAT,
-                PaymentInfoEntry.COLUMN_PAYMENT_SADAKAT,
-                PaymentInfoEntry.COLUMN_PAYMENT_FITRANA,
-                PaymentInfoEntry.COLUMN_PAYMENT_MOSQUEDONATION,
-                PaymentInfoEntry.COLUMN_PAYMENT_MTA,
-                PaymentInfoEntry.COLUMN_PAYMENT_CENTINARYKHILAFAT,
-                PaymentInfoEntry.COLUMN_PAYMENT_WASIYYATHISSANJAIDAD,
-                PaymentInfoEntry.COLUMN_PAYMENT_MISCELLANEOUS,
-                PaymentInfoEntry.COLUMN_PAYMENT_SUBTOTAL
-        };
-        mPaymentCursor = db.query(PaymentInfoEntry.TABLE_NAME, paymentColumns, selection,
-                selectionArgs, null, null, null);
-        // get the positions of the columns
-        mChandaNoPos = mPaymentCursor.getColumnIndex(PaymentInfoEntry.COLUMN_MEMBER_CHANDANO);
-        mFullnamePos = mPaymentCursor.getColumnIndex(PaymentInfoEntry.COLUMN_MEMBER_FULLNAME);
-        mLocalReceiptPos = mPaymentCursor.getColumnIndex(PaymentInfoEntry.COLUMN_PAYMENT_LOCALRECEIPT);
-        mMonthPaidPos = mPaymentCursor.getColumnIndex(PaymentInfoEntry.COLUMN_PAYMENT_MONTHPAID);
-        mChandaPos = mPaymentCursor.getColumnIndex(PaymentInfoEntry.COLUMN_PAYMENT_CHANDAAM);
-        mWasiyyatPos = mPaymentCursor.getColumnIndex(PaymentInfoEntry.COLUMN_PAYMENT_CHANDAWASIYYAT);
-        mJalsaPos = mPaymentCursor.getColumnIndex(PaymentInfoEntry.COLUMN_PAYMENT_JALSASALANA);
-        mTarikiPos = mPaymentCursor.getColumnIndex(PaymentInfoEntry.COLUMN_PAYMENT_TARIKIJADID);
-        mWaqfPos = mPaymentCursor.getColumnIndex(PaymentInfoEntry.COLUMN_PAYMENT_WAQFIJADID);
-        mWelfarePos = mPaymentCursor.getColumnIndex(PaymentInfoEntry.COLUMN_PAYMENT_WELFAREFUND);
-        mScholarshipPos = mPaymentCursor.getColumnIndex(PaymentInfoEntry.COLUMN_PAYMENT_SCHOLARSHIP);
-        mMaryamPos = mPaymentCursor.getColumnIndex(PaymentInfoEntry.COLUMN_PAYMENT_MARYAMFUND);
-        mTablighPos = mPaymentCursor.getColumnIndex(PaymentInfoEntry.COLUMN_PAYMENT_TABLIGH);
-        mZakatPos = mPaymentCursor.getColumnIndex(PaymentInfoEntry.COLUMN_PAYMENT_ZAKAT);
-        mSadakatPos = mPaymentCursor.getColumnIndex(PaymentInfoEntry.COLUMN_PAYMENT_SADAKAT);
-        mFitranaPos = mPaymentCursor.getColumnIndex(PaymentInfoEntry.COLUMN_PAYMENT_FITRANA);
-        mMosqueDonationPos = mPaymentCursor.getColumnIndex(PaymentInfoEntry.COLUMN_PAYMENT_MOSQUEDONATION);
-        mMtaPos = mPaymentCursor.getColumnIndex(PaymentInfoEntry.COLUMN_PAYMENT_MTA);
-        mCentinaryPos = mPaymentCursor.getColumnIndex(PaymentInfoEntry.COLUMN_PAYMENT_CENTINARYKHILAFAT);
-        mWasiyyatHissanPos = mPaymentCursor.getColumnIndex(PaymentInfoEntry.COLUMN_PAYMENT_WASIYYATHISSANJAIDAD);
-        mMiscellaneousPos = mPaymentCursor.getColumnIndex(PaymentInfoEntry.COLUMN_PAYMENT_MISCELLANEOUS);
-        mSubtotalPos = mPaymentCursor.getColumnIndex(PaymentInfoEntry.COLUMN_PAYMENT_SUBTOTAL);
-
-        mPaymentCursor.moveToNext();
-        displayPayments();
     }
 
     private void restoreOriginalPaymentValues(Bundle savedInstanceState) {
@@ -321,7 +264,7 @@ public class PaymentActivity extends AppCompatActivity implements LoaderManager.
 
     private void displayPayments() {
 
-        int chandaNo = mPaymentCursor.getInt(mChandaNoPos);
+        mChandaNo = mPaymentCursor.getInt(mChandaNoPos);
         String fullname = mPaymentCursor.getString(mFullnamePos);
         String localReceipt = mPaymentCursor.getString(mLocalReceiptPos);
         String monthPaid = mPaymentCursor.getString(mMonthPaidPos);
@@ -346,7 +289,7 @@ public class PaymentActivity extends AppCompatActivity implements LoaderManager.
 
         List<String> monthsYear = DataManager.getInstance().getMonthsOfTheYear();
 
-        int memberIndex = getIndexOfMemberId(chandaNo);
+        int memberIndex = getIndexOfMemberId(mChandaNo);
         mSpinnerChandaNo.setSelection(memberIndex);
         if(!mIsNewPayment){
             mTextChandaNo.setVisibility(View.VISIBLE); // show textview if not a new payment
@@ -358,7 +301,7 @@ public class PaymentActivity extends AppCompatActivity implements LoaderManager.
         int monthIndex = monthsYear.indexOf(monthPaid);
         mSpinnerMonthPaid.setSelection(monthIndex);
 
-        mTextChandaNo.setText(String.valueOf(chandaNo) + " - " + fullname);
+        mTextChandaNo.setText(String.valueOf(mChandaNo) + " - " + fullname);
 
         mTextReceiptNo.setText(String.valueOf(localReceipt));
         mTextChandaAm.setText(String.valueOf(chandaAm));
@@ -410,6 +353,7 @@ public class PaymentActivity extends AppCompatActivity implements LoaderManager.
         }
         else {
             mPayment = DataManager.getInstance().getPayment(mPaymentId);
+            Log.i(TAG, "Generating Uri for payment " + mPaymentId);
             mPaymentUri = ContentUris.withAppendedId(PaymentProviderContract.Payments.CONTENT_URI, mPaymentId);
         }
 
@@ -417,24 +361,58 @@ public class PaymentActivity extends AppCompatActivity implements LoaderManager.
 
     private void createNewPayment() {
 
-        AsyncTask task = new AsyncTask() {
+        AsyncTask<ContentValues, Integer, Uri> task = new AsyncTask<ContentValues, Integer, Uri>() {
+            private ProgressBar mProgressBar;
+
             @Override
-            protected Object doInBackground(Object[] objects) {
-                ContentValues values = new ContentValues();
-                values.put(PaymentProviderContract.Payments.COLUMN_MEMBER_CHANDANO, 0);
-                values.put(PaymentProviderContract.Payments.COLUMN_SCHEDULE_ID, mScheduleId);
-                values.put(PaymentProviderContract.Payments.COLUMN_PAYMENT_MONTHPAID, "");
-                values.put(PaymentProviderContract.Payments.COLUMN_PAYMENT_LOCALRECEIPT, "");
-                values.put(PaymentProviderContract.Payments.COLUMN_PAYMENT_CHANDAAM, 0);
-                // get connection to the database
-                mPaymentUri = getContentResolver().insert(PaymentProviderContract.Payments.CONTENT_URI, values);
-                // get the id
-                mPaymentId = (int) ContentUris.parseId(mPaymentUri);
-                return null;
+            protected void onPreExecute() {
+                mProgressBar = (ProgressBar) findViewById(R.id.progress_bar_horizontal);
+                mProgressBar.setVisibility(View.VISIBLE);
+                mProgressBar.setProgress(1);
+            }
+
+            @Override
+            protected Uri doInBackground(ContentValues... contentValues) {
+                Log.d(TAG, "doInBackground - thread: " + Thread.currentThread().getId());
+                ContentValues insertValues = contentValues[0];
+                Uri uri = getContentResolver().insert(PaymentProviderContract.Payments.CONTENT_URI, insertValues);
+                publishProgress(2);
+                simulateLongRunningWork();
+                publishProgress(3);
+
+                return uri;
+            }
+
+            @Override
+            protected void onProgressUpdate(Integer... values) {
+                int progressValue = values[0];
+                mProgressBar.setProgress(progressValue);
+            }
+
+            @Override
+            protected void onPostExecute(Uri uri) {
+                Log.d(TAG, "onPostExecute - thread: " + Thread.currentThread().getId());
+                mPaymentUri = uri;
+                mProgressBar.setVisibility(View.GONE);
             }
         };
-        task.execute();
 
+        ContentValues values = new ContentValues();
+        values.put(PaymentProviderContract.Payments.COLUMN_MEMBER_CHANDANO, 0);
+        values.put(PaymentProviderContract.Payments.COLUMN_SCHEDULE_ID, mScheduleId);
+        values.put(PaymentProviderContract.Payments.COLUMN_PAYMENT_MONTHPAID, "");
+        values.put(PaymentProviderContract.Payments.COLUMN_PAYMENT_LOCALRECEIPT, "");
+        values.put(PaymentProviderContract.Payments.COLUMN_PAYMENT_CHANDAAM, 0);
+
+        Log.d(TAG, "call to execute - thread: " + Thread.currentThread().getId());
+        task.execute(values);
+
+    }
+
+    private void simulateLongRunningWork() {
+        try {
+            Thread.sleep(5000);
+        } catch(Exception ex) {}
     }
 
     @Override
@@ -449,12 +427,6 @@ public class PaymentActivity extends AppCompatActivity implements LoaderManager.
         MenuItem item1 = menu.findItem(R.id.action_next);
         MenuItem item2 = menu.findItem(R.id.action_previous);
         MenuItem item3 = menu.findItem(R.id.action_save);
-//        int lastPaymentIndex = DataManager.getInstance().getPayments(mSchedule).size() - 1;
-//        item1.setEnabled(mPaymentId < lastPaymentIndex);
-//        item2.setEnabled(mPaymentId > 0); // if position is on index greater than startindex 0
-//        if(mIsNewPayment){
-//            item1.setEnabled(false); // disable next menu
-//        }
         item3.setEnabled(true); // enable the button always
         return super.onPrepareOptionsMenu(menu);
     }
@@ -468,7 +440,7 @@ public class PaymentActivity extends AppCompatActivity implements LoaderManager.
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_delete_payment) {
-//            sendEmail();
+            Log.d(TAG, "delete payment clicked");
             deletePaymentFromDatabase();
             finish(); // Exit the Activity
         } else if(id == R.id.action_cancel){
@@ -483,14 +455,7 @@ public class PaymentActivity extends AppCompatActivity implements LoaderManager.
                 mIsSaving = true;
                 savePayment();
                 Toast.makeText(this, "Payment saved", Toast.LENGTH_LONG).show();
-                if(mIsNewPayment){
-                    // called if new Payment is saved and open another empty views for new payment
-                    moveNext();
-                    mIsSaving = false;
-                }
-                else {
-                    finish(); // exit the Activity
-                }
+                finish();
             }
             else {
                 return false;
@@ -502,11 +467,73 @@ public class PaymentActivity extends AppCompatActivity implements LoaderManager.
     }
 
     private boolean validatePaymentInputs() {
+        View view = findViewById(R.id.payment_scrollview);
         if(mTextReceiptNo.getText().toString().isEmpty()){
             Toast.makeText(this, "Receipt Number field cannot be empty!", Toast.LENGTH_LONG).show();
+            mTextReceiptNo.requestFocus();
             return false;
+        } else {
+            String receiptNo = mTextReceiptNo.getText().toString().trim();
+            Log.d(TAG, "Checking for duplicate receipt number");
+            Cursor cursor = checkForDuplicatereceiptNo(receiptNo);
+
+            int receiptNoPos = cursor.getColumnIndex(PaymentProviderContract.Payments.COLUMN_PAYMENT_LOCALRECEIPT);
+            int payerNamePos = cursor.getColumnIndex(PaymentProviderContract.Payments.COLUMN_MEMBER_FULLNAME);
+            int monthPaidPos = cursor.getColumnIndex(PaymentProviderContract.Payments.COLUMN_PAYMENT_MONTHPAID);
+            int chandaPos = cursor.getColumnIndex(PaymentProviderContract.Payments.COLUMN_MEMBER_CHANDANO);
+
+            if(cursor.moveToNext()){
+                String receiptNumber = cursor.getString(receiptNoPos);
+                String payerName = cursor.getString(payerNamePos);
+                String monthPaid = cursor.getString(monthPaidPos);
+                int chandaNo = cursor.getInt(chandaPos);
+                String jamaatName = getPayerJamaat(chandaNo);
+                if(mChandaNo != chandaNo) {
+                    Snackbar.make(view, "Receipt Number: " +
+                            receiptNumber + " already entered for " +
+                            payerName.toUpperCase() + " at " +
+                            jamaatName + " Jamaat for " + monthPaid, Snackbar.LENGTH_LONG).show();
+                    mTextReceiptNo.requestFocus();
+                    return false;
+                }
+
+            }
+
         }
+
         return true;
+    }
+
+    private String getPayerJamaat(int chandaNo) {
+        Uri uri = Members.CONTENT_URI;
+        String[] projection = {Members.COLUMN_MEMBER_CHANDANO, Members.COLUMN_MEMBER_JAMAATNAME};
+        String selection = Members.COLUMN_MEMBER_CHANDANO + "=?";
+        String[] selectionArgs = { Integer.toString(chandaNo) };
+        Cursor cursor = getContentResolver().query(uri, projection, selection, selectionArgs,null);
+
+        if(cursor.moveToNext()){
+            int jamaatNamePos = cursor.getColumnIndex(Members.COLUMN_MEMBER_JAMAATNAME);
+            String jamaatName = cursor.getString(jamaatNamePos);
+            return jamaatName;
+        }
+        return null;
+    }
+
+    private Cursor checkForDuplicatereceiptNo(String receiptNo) {
+        Uri uri = PaymentProviderContract.Payments.CONTENT_URI;
+        String[] projection = {
+                PaymentProviderContract.Payments.COLUMN_MEMBER_CHANDANO,
+                PaymentProviderContract.Payments.COLUMN_MEMBER_FULLNAME,
+                PaymentProviderContract.Payments.COLUMN_PAYMENT_MONTHPAID,
+                PaymentProviderContract.Payments.COLUMN_PAYMENT_LOCALRECEIPT,
+
+        };
+        String selection = PaymentProviderContract.Payments.COLUMN_PAYMENT_LOCALRECEIPT + "=?";
+        String[] selectionArgs = { receiptNo };
+        Cursor cursor = getContentResolver().query(uri,projection,selection,selectionArgs,null);
+
+        return cursor;
+
     }
 
 
@@ -555,21 +582,26 @@ public class PaymentActivity extends AppCompatActivity implements LoaderManager.
 
     @Override
     protected void onPause() {
+        Log.d(TAG, "**********onPause**********");
         super.onPause();
         if(mIsCancelling){
             // check if we're cancelling on newpayment otherwise do nothing
             if(mIsNewPayment){
 //                DataManager.getInstance().removePayment(mPaymentId);
+                Log.d(TAG, "Cancelling newly created payment");
                 deletePaymentFromDatabase();
             } else {
+                Log.d(TAG, "Existing editing of payment "+ mPaymentUri);
                 storePreviousPaymentValues();
             }
         } else if(!mIsSaving && mIsNewPayment) {
+            Log.d(TAG, "user cancelling creation of new payment clicking back button");
             deletePaymentFromDatabase(); // delete if payment is new and user is not saving
         }
     }
 
     private void deletePaymentFromDatabase() {
+        Log.i(TAG, "Deleting payment: "+ mPaymentUri);
         getContentResolver().delete(mPaymentUri, null, null);
 
     }
@@ -698,6 +730,7 @@ public class PaymentActivity extends AppCompatActivity implements LoaderManager.
         double subtotal = chandaAm + wasiyyat + tahrikiJadid + waqfJadid + jalsa + welfare +
                 tabligh + scholarship + maryam + zakat + fitrana + mosqueDonation +
                 mta + centinary + wasiyyatHissan + sadakat + miscellaneous;
+        Log.d(TAG, "Preparing to save input data for " + mPaymentUri);
 
         savePaymentToDatabase(chandaNo,fullname,mScheduleId,monthPaid,receiptNo,chandaAm,wasiyyat,
                 tahrikiJadid,waqfJadid,welfare,jalsa,tabligh,scholarship,maryam,zakat,fitrana,
@@ -736,6 +769,7 @@ public class PaymentActivity extends AppCompatActivity implements LoaderManager.
         values.put(PaymentProviderContract.Payments.COLUMN_PAYMENT_MISCELLANEOUS, miscellaneous);
         values.put(PaymentProviderContract.Payments.COLUMN_PAYMENT_SUBTOTAL, subtotal);
         // get connection to the content provider
+        Log.i(TAG, "Saving " + mPaymentUri + " to the database");
         getContentResolver().update(mPaymentUri, values, null, null);
 
     }
@@ -769,24 +803,17 @@ public class PaymentActivity extends AppCompatActivity implements LoaderManager.
         return fullname;
     }
 
-    private void sendEmail() {
-        String monthpaid = (String) mSpinnerMonthPaid.getSelectedItem();
-        String subject = "Payment for " + monthpaid;
-        String text = mTextChandaAm.getText().toString() + "\n" + mTextReceiptNo.getText().toString();
-        Intent intent = new Intent(Intent.ACTION_SEND);
-        intent.setType("message/rfc2822");
-        intent.putExtra(Intent.EXTRA_SUBJECT, subject);
-        intent.putExtra(Intent.EXTRA_TEXT, text);
-        startActivity(intent);
-    }
-
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         CursorLoader loader = null;
-        if(id == LOADER_PAYMENTS)
+        if(id == LOADER_PAYMENTS) {
+            Log.d(TAG, "Loading payments");
             loader = createLoaderPayments();
-        else if(id == LOADER_MEMBERS)
+        }
+        else if(id == LOADER_MEMBERS) {
+            Log.d(TAG, "Loading members");
             loader = createLoaderMembers();
+        }
         return loader;
     }
 
@@ -882,8 +909,10 @@ public class PaymentActivity extends AppCompatActivity implements LoaderManager.
     }
 
     private void displayPaymentWhenQueriesFinished() {
-        if(mMembersQueriesFinished && mPaymentQueriesFinished)
+        if(mMembersQueriesFinished && mPaymentQueriesFinished) {
+            Log.d(TAG, "Finished loading payments and members");
             displayPayments();
+        }
     }
 
     @Override

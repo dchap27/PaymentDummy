@@ -112,7 +112,7 @@ public class ScheduleRecyclerAdapter extends RecyclerView.Adapter<ScheduleRecycl
         public ViewHolder(View itemView) {
             super(itemView);
 
-            mScheduleTitle = (TextView) itemView.findViewById(R.id.text_payer_title);
+            mScheduleTitle = (TextView) itemView.findViewById(R.id.text_schedule_title);
             mTextMonth = (TextView) itemView.findViewById(R.id.text_month_text);
             mTextTotalPayers = (TextView) itemView.findViewById(R.id.text_payers_number_text);
             mTextScheduleTotalAmount = (TextView) itemView.findViewById(R.id.text_amount_text);
