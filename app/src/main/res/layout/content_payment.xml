@@ -31,592 +31,440 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <LinearLayout
+        <android.support.constraint.ConstraintLayout
+            android:id="@+id/topmost_linearlayout_paymentactivity"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:paddingBottom="16dp">
+
+            <EditText
+                android:id="@+id/text_receiptno"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="@dimen/standard_top_margin"
+                android:ems="10"
+                android:hint="@string/receipt_number_hint"
+                android:inputType="number"
+                app:layout_constraintEnd_toStartOf="@+id/guideline"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/spinner_monthpaid"
+                tools:ignore="RtlHardcoded" />
+
+            <EditText
+                android:id="@+id/text_chandaam"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="@dimen/standard_top_margin"
+                android:ems="10"
+                android:hint="@string/chanda_am_hint"
+                android:inputType="number"
+                app:layout_constraintEnd_toEndOf="@+id/spinner_payment_text"
+                app:layout_constraintStart_toStartOf="@+id/guideline"
+                app:layout_constraintTop_toBottomOf="@+id/spinner_payment_text" />
+
+            <EditText
+                android:id="@+id/text_wasiyyat"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/standard_top_margin"
+                android:ems="10"
+                android:hint="@string/wasiyyat_hint"
+                android:inputType="number"
+                app:layout_constraintEnd_toEndOf="@+id/text_receiptno"
+                app:layout_constraintStart_toStartOf="@+id/text_receiptno"
+                app:layout_constraintTop_toBottomOf="@+id/textView2"
+                tools:ignore="RtlHardcoded" />
+
+            <EditText
+                android:id="@+id/text_jalsa_salana"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/standard_top_margin"
+                android:ems="10"
+                android:hint="@string/jalsa_salana_hint"
+                android:inputType="number"
+                app:layout_constraintEnd_toEndOf="@+id/text_chandaam"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="@+id/text_chandaam"
+                app:layout_constraintTop_toBottomOf="@+id/textView3" />
+
+            <EditText
+                android:id="@+id/text_waqf"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/standard_top_margin"
+                android:ems="10"
+                android:hint="@string/waqf_jadid_hint"
+                android:inputType="number"
+                app:layout_constraintEnd_toEndOf="@+id/text_receiptno"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="@+id/text_receiptno"
+                app:layout_constraintTop_toBottomOf="@+id/textView4" />
+
+            <EditText
+                android:id="@+id/text_tahrik"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/standard_top_margin"
+                android:ems="10"
+                android:hint="@string/tahrik_jadid_hint"
+                android:inputType="number"
+                app:layout_constraintEnd_toEndOf="@+id/text_jalsa_salana"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="@+id/text_jalsa_salana"
+                app:layout_constraintTop_toBottomOf="@+id/textView5" />
+
+            <EditText
+                android:id="@+id/text_welfare"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/standard_top_margin"
+                android:ems="10"
+                android:hint="@string/welfare_fund_hint"
+                android:inputType="number"
+                app:layout_constraintEnd_toEndOf="@+id/text_waqf"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="@+id/textView6"
+                app:layout_constraintTop_toBottomOf="@+id/textView6" />
+
+            <EditText
+                android:id="@+id/text_scholarship"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/standard_top_margin"
+                android:ems="10"
+                android:hint="@string/scholarship_fund_hint"
+                android:inputType="number"
+                app:layout_constraintEnd_toEndOf="@+id/text_tahrik"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="@+id/textView7"
+                app:layout_constraintTop_toBottomOf="@+id/textView7" />
+
+            <EditText
+                android:id="@+id/text_maryam_fund"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/standard_top_margin"
+                android:ems="10"
+                android:hint="@string/maryam_fund_hint"
+                android:inputType="number"
+                app:layout_constraintEnd_toEndOf="@+id/text_welfare"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="@+id/text_welfare"
+                app:layout_constraintTop_toBottomOf="@+id/textView8" />
+
+            <EditText
+                android:id="@+id/text_tabligh"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/standard_top_margin"
+                android:ems="10"
+                android:hint="@string/tabligh_fund_hint"
+                android:inputType="number"
+                app:layout_constraintEnd_toEndOf="@+id/text_scholarship"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="@+id/text_scholarship"
+                app:layout_constraintTop_toBottomOf="@+id/textView9" />
+
+            <EditText
+                android:id="@+id/text_zakat"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/standard_top_margin"
+                android:ems="10"
+                android:hint="@string/zakat_hint"
+                android:inputType="number"
+                app:layout_constraintEnd_toEndOf="@+id/text_maryam_fund"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="@+id/text_maryam_fund"
+                app:layout_constraintTop_toBottomOf="@+id/textView10" />
+
+            <EditText
+                android:id="@+id/text_sadakat"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/standard_top_margin"
+                android:ems="10"
+                android:hint="@string/sadakat_hint"
+                android:inputType="number"
+                app:layout_constraintEnd_toEndOf="@+id/text_tabligh"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="@+id/text_tabligh"
+                app:layout_constraintTop_toBottomOf="@+id/textView11" />
+
+            <EditText
+                android:id="@+id/text_fitrana"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/standard_top_margin"
+                android:ems="10"
+                android:hint="@string/fitrana_hint"
+                android:inputType="number"
+                app:layout_constraintEnd_toEndOf="@+id/text_zakat"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="@+id/text_zakat"
+                app:layout_constraintTop_toBottomOf="@+id/textView12" />
+
+            <EditText
+                android:id="@+id/text_mosque_donation"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/standard_top_margin"
+                android:ems="10"
+                android:hint="@string/mosque_fund_hint"
+                android:inputType="number"
+                app:layout_constraintEnd_toEndOf="@+id/text_sadakat"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="@+id/text_sadakat"
+                app:layout_constraintTop_toBottomOf="@+id/textView13" />
+
+            <EditText
+                android:id="@+id/text_mta"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/standard_top_margin"
+                android:ems="10"
+                android:hint="@string/mta_fund_hint"
+                android:inputType="number"
+                app:layout_constraintEnd_toEndOf="@+id/text_fitrana"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="@+id/text_fitrana"
+                app:layout_constraintTop_toBottomOf="@+id/textView14" />
+
+            <EditText
+                android:id="@+id/text_centinary_khilafat"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/standard_top_margin"
+                android:ems="10"
+                android:hint="@string/centinary_hint"
+                android:inputType="number"
+                app:layout_constraintEnd_toEndOf="@+id/text_mosque_donation"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="@+id/text_mosque_donation"
+                app:layout_constraintTop_toBottomOf="@+id/textView15" />
+
+            <EditText
+                android:id="@+id/text_wasiyyathissan"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/standard_top_margin"
+                android:ems="10"
+                android:hint="@string/wasiyyat_hissan_jaidad_hint"
+                android:inputType="number"
+                app:layout_constraintEnd_toEndOf="@+id/text_mta"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="@+id/text_mta"
+                app:layout_constraintTop_toBottomOf="@+id/textView16" />
+
+            <EditText
+                android:id="@+id/text_miscellaneous"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/standard_top_margin"
+                android:ems="10"
+                android:hint="@string/miscellaneous_hint"
+                android:inputType="number"
+                app:layout_constraintEnd_toEndOf="@+id/text_centinary_khilafat"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="@+id/text_centinary_khilafat"
+                app:layout_constraintTop_toBottomOf="@+id/textView17" />
+
+            <Spinner
+                android:id="@+id/spinner_monthpaid"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:padding="16dp"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toLeftOf="@+id/guideline"
+                app:layout_constraintTop_toBottomOf="@+id/text_payer_name"
+                tools:ignore="RtlHardcoded" />
+
+            <Spinner
+                android:id="@+id/spinner_payment_text"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:padding="16dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintRight_toRightOf="@+id/spinner_monthpaid"
+                app:layout_constraintStart_toStartOf="@+id/guideline"
+                app:layout_constraintTop_toBottomOf="@+id/text_payer_name"
+                tools:ignore="RtlHardcoded" />
+
+            <TextView
+                android:id="@+id/textView5"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/jalsa_salana_hint"
+                app:layout_constraintStart_toStartOf="@+id/text_jalsa_salana"
+                app:layout_constraintTop_toBottomOf="@+id/text_jalsa_salana" />
+
+            <TextView
+                android:id="@+id/textView6"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/waqf_jadid_hint"
+                app:layout_constraintStart_toStartOf="@+id/text_waqf"
+                app:layout_constraintTop_toBottomOf="@+id/text_waqf" />
+
+            <TextView
+                android:id="@+id/textView7"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/tahrik_jadid_hint"
+                app:layout_constraintStart_toStartOf="@+id/text_tahrik"
+                app:layout_constraintTop_toBottomOf="@+id/text_tahrik" />
+
+            <TextView
+                android:id="@+id/textView8"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/welfare_fund_hint"
+                app:layout_constraintStart_toStartOf="@+id/text_welfare"
+                app:layout_constraintTop_toBottomOf="@+id/text_welfare" />
+
+            <TextView
+                android:id="@+id/textView9"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/scholarship_fund_hint"
+                app:layout_constraintStart_toStartOf="@+id/text_scholarship"
+                app:layout_constraintTop_toBottomOf="@+id/text_scholarship" />
+
+            <TextView
+                android:id="@+id/textView10"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/maryam_fund_hint"
+                app:layout_constraintStart_toStartOf="@+id/text_maryam_fund"
+                app:layout_constraintTop_toBottomOf="@+id/text_maryam_fund" />
+
+            <TextView
+                android:id="@+id/textView11"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/tabligh_fund_hint"
+                app:layout_constraintStart_toStartOf="@+id/text_tabligh"
+                app:layout_constraintTop_toBottomOf="@+id/text_tabligh" />
+
+            <TextView
+                android:id="@+id/textView12"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/zakat_hint"
+                app:layout_constraintStart_toStartOf="@+id/text_zakat"
+                app:layout_constraintTop_toBottomOf="@+id/text_zakat" />
+
+            <TextView
+                android:id="@+id/textView13"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/sadakat_hint"
+                app:layout_constraintStart_toStartOf="@+id/text_sadakat"
+                app:layout_constraintTop_toBottomOf="@+id/text_sadakat" />
+
+            <TextView
+                android:id="@+id/textView14"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/fitrana_hint"
+                app:layout_constraintStart_toStartOf="@+id/text_fitrana"
+                app:layout_constraintTop_toBottomOf="@+id/text_fitrana" />
+
+            <TextView
+                android:id="@+id/textView15"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/mosque_fund_hint"
+                app:layout_constraintStart_toStartOf="@+id/text_mosque_donation"
+                app:layout_constraintTop_toBottomOf="@+id/text_mosque_donation" />
+
+            <TextView
+                android:id="@+id/textView16"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/mta_fund_hint"
+                app:layout_constraintStart_toStartOf="@+id/text_mta"
+                app:layout_constraintTop_toBottomOf="@+id/text_mta" />
+
+            <TextView
+                android:id="@+id/textView17"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/centinary_hint"
+                app:layout_constraintStart_toStartOf="@+id/text_centinary_khilafat"
+                app:layout_constraintTop_toBottomOf="@+id/text_centinary_khilafat" />
+
+            <TextView
+                android:id="@+id/textView18"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/wasiyyat_hissan_jaidad_hint"
+                app:layout_constraintStart_toStartOf="@+id/text_wasiyyathissan"
+                app:layout_constraintTop_toBottomOf="@+id/text_wasiyyathissan" />
+
+            <TextView
+                android:id="@+id/textView19"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/miscellaneous_hint"
+                app:layout_constraintStart_toStartOf="@+id/text_miscellaneous"
+                app:layout_constraintTop_toBottomOf="@+id/text_miscellaneous" />
 
             <TextView
                 android:id="@+id/text_payer_name"
                 android:layout_width="wrap_content"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:layout_marginStart="8dp"
+                android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:textAppearance="@android:style/TextAppearance.Material.Large"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <LinearLayout
-                android:id="@+id/linearLayout3"
-                android:layout_width="match_parent"
+            <TextView
+                android:id="@+id/textView2"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
-                android:layout_marginTop="16dp"
-                android:orientation="horizontal"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toRightOf="parent"
-                tools:layout_editor_absoluteX="136dp">
+                android:text="@string/text_receipt_number"
+                app:layout_constraintStart_toStartOf="@+id/text_receiptno"
+                app:layout_constraintTop_toBottomOf="@+id/text_receiptno" />
 
-                <Spinner
-                    android:id="@+id/spinner_monthpaid"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
-                    android:layout_marginLeft="16dp"
-                    android:layout_marginRight="8dp"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginTop="8dp"
-                    android:layout_weight="1"
-                    android:padding="16dp"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    tools:ignore="RtlHardcoded" />
 
-                <Spinner
-                    android:id="@+id/spinner_payment_text"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="8dp"
-                    android:layout_marginLeft="8dp"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginTop="8dp"
-                    android:layout_weight="2"
-                    android:padding="16dp"
-                    tools:ignore="RtlHardcoded" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/linearLayout4"
-                android:layout_width="match_parent"
+            <TextView
+                android:id="@+id/textView3"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
-                android:layout_marginTop="8dp"
-                android:baselineAligned="false"
-                android:orientation="horizontal"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/linearLayout3"
-                tools:layout_editor_absoluteX="136dp">
+                android:text="@string/chanda_am_hint"
+                app:layout_constraintStart_toStartOf="@+id/text_chandaam"
+                app:layout_constraintTop_toBottomOf="@+id/text_chandaam" />
 
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
-
-                    <EditText
-                        android:id="@+id/text_receiptno"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:ems="10"
-                        android:hint="@string/receipt_number_hint"
-                        android:inputType="number"
-                        app:layout_constraintHorizontal_bias="0.0"
-                        app:layout_constraintLeft_toLeftOf="parent"
-                        app:layout_constraintRight_toLeftOf="parent"
-                        tools:ignore="RtlHardcoded" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:text="@string/text_receipt_number" />
-                </LinearLayout>
-
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
-
-                    <EditText
-                        android:id="@+id/text_chandaam"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="8dp"
-                        android:ems="10"
-                        android:hint="@string/chanda_am_hint"
-                        android:inputType="number"
-                        app:layout_constraintLeft_toRightOf="@+id/text_receiptno" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:text="@string/chanda_am_hint" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
-
-                    <EditText
-                        android:id="@+id/text_wasiyyat"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="8dp"
-                        android:layout_marginLeft="8dp"
-                        android:layout_marginStart="8dp"
-                        android:ems="10"
-                        android:hint="@string/wasiyyat_hint"
-                        android:inputType="number"
-                        app:layout_constraintRight_toRightOf="parent"
-                        tools:ignore="RtlHardcoded" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:text="@string/wasiyyat_hint" />
-                </LinearLayout>
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/linearLayout5"
-                android:layout_width="match_parent"
+            <TextView
+                android:id="@+id/textView4"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
-                android:layout_marginTop="8dp"
-                android:baselineAligned="false"
-                android:orientation="horizontal"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/linearLayout4"
-                tools:layout_editor_absoluteX="136dp">
+                android:text="@string/wasiyyat_hint"
+                app:layout_constraintStart_toStartOf="@+id/text_receiptno"
+                app:layout_constraintTop_toBottomOf="@+id/text_wasiyyat" />
 
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
-
-                    <EditText
-                        android:id="@+id/text_jalsa_salana"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:ems="10"
-                        android:hint="@string/jalsa_salana_hint"
-                        android:inputType="number"
-                        app:layout_constraintHorizontal_bias="0.0"
-                        app:layout_constraintLeft_toLeftOf="parent" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:text="@string/jalsa_salana_hint" />
-                </LinearLayout>
-
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
-
-                    <EditText
-                        android:id="@+id/text_tahrik"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:ems="10"
-                        android:hint="@string/tahrik_jadid_hint"
-                        android:inputType="number"
-                        app:layout_constraintLeft_toRightOf="@+id/text_jalsa_salana" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:text="@string/tahrik_jadid_hint" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
-
-                    <EditText
-                        android:id="@+id/text_waqf"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="8dp"
-                        android:layout_marginRight="8dp"
-                        android:ems="10"
-                        android:hint="@string/waqf_jadid_hint"
-                        android:inputType="number"
-                        app:layout_constraintHorizontal_bias="0.0"
-                        app:layout_constraintRight_toRightOf="parent" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:text="@string/waqf_jadid_hint" />
-                </LinearLayout>
-
-            </LinearLayout>
-
-
-            <LinearLayout
-                android:id="@+id/linearLayout6"
-                android:layout_width="match_parent"
+            <android.support.constraint.Guideline
+                android:id="@+id/guideline"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
-                android:layout_marginTop="8dp"
-                android:baselineAligned="false"
-                android:orientation="horizontal"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/linearLayout5"
-                tools:layout_editor_absoluteX="136dp">
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent="0.5" />
 
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
 
-                    <EditText
-                        android:id="@+id/text_welfare"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:ems="10"
-                        android:hint="@string/welfare_fund_hint"
-                        android:inputType="number"
-                        app:layout_constraintHorizontal_bias="0.0"
-                        app:layout_constraintLeft_toLeftOf="parent" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:text="@string/welfare_fund_hint" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
-
-                    <EditText
-                        android:id="@+id/text_scholarship"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:ems="10"
-                        android:hint="@string/scholarship_fund_hint"
-                        android:inputType="number"
-                        app:layout_constraintLeft_toRightOf="@+id/text_welfare" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:text="@string/scholarship_fund_hint" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
-
-                    <EditText
-                        android:id="@+id/text_maryam_fund"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="8dp"
-                        android:layout_marginRight="8dp"
-                        android:ems="10"
-                        android:hint="@string/maryam_fund_hint"
-                        android:inputType="number"
-                        app:layout_constraintHorizontal_bias="0.0"
-                        app:layout_constraintRight_toRightOf="parent" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:text="@string/maryam_fund_hint" />
-                </LinearLayout>
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/linearLayout7"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
-                android:layout_marginTop="8dp"
-                android:baselineAligned="false"
-                android:orientation="horizontal"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/linearLayout6"
-                tools:layout_editor_absoluteX="136dp">
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
-
-                    <EditText
-                        android:id="@+id/text_tabligh"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:ems="10"
-                        android:hint="@string/tabligh_fund_hint"
-                        android:inputType="number"
-                        app:layout_constraintHorizontal_bias="0.0"
-                        app:layout_constraintLeft_toLeftOf="parent" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:text="@string/tabligh_fund_hint" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
-
-                    <EditText
-                        android:id="@+id/text_zakat"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:ems="10"
-                        android:hint="@string/zakat_hint"
-                        android:inputType="number"
-                        app:layout_constraintLeft_toRightOf="@+id/text_tabligh" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:text="@string/zakat_hint" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
-
-                    <EditText
-                        android:id="@+id/text_sadakat"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="8dp"
-                        android:layout_marginRight="8dp"
-                        android:ems="10"
-                        android:hint="@string/sadakat_hint"
-                        android:inputType="number"
-                        app:layout_constraintHorizontal_bias="0.0"
-                        app:layout_constraintRight_toRightOf="parent" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:text="@string/sadakat_hint" />
-                </LinearLayout>
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/linearLayout8"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
-                android:layout_marginTop="8dp"
-                android:baselineAligned="false"
-                android:orientation="horizontal"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/linearLayout7"
-                tools:layout_editor_absoluteX="136dp">
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
-
-                    <EditText
-                        android:id="@+id/text_fitrana"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:ems="10"
-                        android:hint="@string/fitrana_hint"
-                        android:inputType="number"
-                        app:layout_constraintHorizontal_bias="0.0"
-                        app:layout_constraintLeft_toLeftOf="parent" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:text="@string/fitrana_hint" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
-
-                    <EditText
-                        android:id="@+id/text_mosque_donation"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:ems="10"
-                        android:hint="@string/mosque_fund_hint"
-                        android:inputType="number"
-                        app:layout_constraintLeft_toRightOf="@+id/text_fitrana" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:text="@string/mosque_fund_hint" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
-
-                    <EditText
-                        android:id="@+id/text_mta"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="8dp"
-                        android:layout_marginRight="8dp"
-                        android:ems="10"
-                        android:hint="@string/mta_fund_hint"
-                        android:inputType="number"
-                        app:layout_constraintHorizontal_bias="0.0"
-                        app:layout_constraintRight_toRightOf="parent" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:text="@string/mta_fund_hint" />
-                </LinearLayout>
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/linearLayout9"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
-                android:layout_marginTop="8dp"
-                android:baselineAligned="false"
-                android:orientation="horizontal"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/linearLayout8"
-                tools:layout_editor_absoluteX="136dp">
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
-
-                    <EditText
-                        android:id="@+id/text_centinary_khilafat"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:ems="10"
-                        android:hint="@string/centinary_hint"
-                        android:inputType="number"
-                        app:layout_constraintHorizontal_bias="0.0"
-                        app:layout_constraintLeft_toLeftOf="parent" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:text="@string/centinary_hint" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
-
-                    <EditText
-                        android:id="@+id/text_wasiyyathissan"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:ems="10"
-                        android:hint="@string/wasiyyat_hissan_jaidad_hint"
-                        android:inputType="number"
-                        app:layout_constraintLeft_toRightOf="@+id/text_centinary_khilafat" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:text="@string/wasiyyat_hissan_jaidad_hint" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
-
-                    <EditText
-                        android:id="@+id/text_miscellaneous"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="8dp"
-                        android:layout_marginRight="8dp"
-                        android:ems="10"
-                        android:hint="@string/miscellaneous_hint"
-                        android:inputType="number"
-                        app:layout_constraintHorizontal_bias="0.0"
-                        app:layout_constraintRight_toRightOf="parent" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:text="@string/miscellaneous_hint" />
-                </LinearLayout>
-
-            </LinearLayout>
-
-        </LinearLayout>
+        </android.support.constraint.ConstraintLayout>
     </ScrollView>
 
 </android.support.constraint.ConstraintLayout>

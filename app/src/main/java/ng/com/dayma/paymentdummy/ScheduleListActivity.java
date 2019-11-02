@@ -96,7 +96,7 @@ public class ScheduleListActivity extends AppCompatActivity implements LoaderMan
 //        List<ScheduleInfo> schedules = DataManager.getInstance().getSchedules(month);
         mMonthSchedulesAdapter = new ScheduleRecyclerAdapter(this, null);
 
-        GridLayoutManager mMonthSchedulesLayoutManager = new GridLayoutManager(this, 2);
+        GridLayoutManager mMonthSchedulesLayoutManager = new GridLayoutManager(this, R.integer.schedule_grid_span);
         mRecyclerItems.setLayoutManager(mMonthSchedulesLayoutManager);
         mRecyclerItems.setAdapter(mMonthSchedulesAdapter);
 
