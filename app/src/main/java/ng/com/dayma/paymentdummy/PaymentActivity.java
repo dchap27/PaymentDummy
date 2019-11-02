@@ -39,6 +39,20 @@ import ng.com.dayma.paymentdummy.data.PaymentProviderContract.Members;
 public class PaymentActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
     public static final String PAYMENT_ID = "ng.com.dayma.paymentdummy.PAYMENT_ID";
     public static final int ID_NOT_SET = -1;
+    public static final String ORIGINAL_PAYMENT_WELFARE = "ng.com.dayma.paymentdummy.ORIGINAL_PAYMENT_WELFARE";
+    public static final String ORIGINAL_PAYMENT_SCHOLARSHIP = "ng.com.dayma.paymentdummy.ORIGINAL_PAYMENT_SCHOLARSHIP";
+    public static final String ORIGINAL_PAYMENT_TABLIGH = "ng.com.dayma.paymentdummy.ORIGINAL_PAYMENT_TABLIGH";
+    public static final String ORIGINAL_PAYMENT_MTA = "ng.com.dayma.paymentdummy.ORIGINAL_PAYMENT_MTA";
+    public static final String ORIGINAL_PAYMENT_MARYAM = "ng.com.dayma.paymentdummy.ORIGINAL_PAYMENT_MARYAM";
+    public static final String ORIGINAL_PAYMENT_MOSQUEDONATION = "ng.com.dayma.paymentdummy.ORIGINAL_PAYMENT_MOSQUEDONATION";
+    public static final String ORIGINAL_PAYMENT_SADAQA = "ng.com.dayma.paymentdummy.ORIGINAL_PAYMENT_SADAQA";
+    public static final String ORIGINAL_PAYMENT_JALSASALANA = "ng.com.dayma.paymentdummy.ORIGINAL_PAYMENT_JALSASALANA";
+    public static final String ORIGINAL_PAYMENT_ZAKAT = "ng.com.dayma.paymentdummy.ORIGINAL_PAYMENT_ZAKAT";
+    public static final String ORIGINAL_PAYMENT_FITRANA = "ng.com.dayma.paymentdummy.ORIGINAL_PAYMENT_FITRANA";
+    public static final String ORIGINAL_PAYMENT_FULLNAME = "ng.com.dayma.paymentdummy.ORIGINAL_PAYMENT_FULLNAME";
+    public static final String ORIGINAL_PAYMENT_MISCELLANEOUS = "ng.com.dayma.paymentdummy.ORIGINAL_PAYMENT_MISCELLANEOUS";
+    public static final String ORIGINAL_PAYMENT_CENTINARY = "ng.com.dayma.paymentdummy.ORIGINAL_PAYMENT_CENTINARY";
+    public static final String ORIGINAL_PAYMENT_WASIYYATHISSAN = "ng.com.dayma.paymentdummy.ORIGINAL_PAYMENT_WASIIYYATHISSAN";
     private final String TAG = getClass().getSimpleName();
     public static final String SCHEDULE_INFO = "ng.com.dayma.paymentdummy.SCHEDULE_INFO";
 
@@ -120,6 +134,20 @@ public class PaymentActivity extends AppCompatActivity implements LoaderManager.
     private EditText mTextMiscellaneous;
     private Uri mPaymentUri;
     private int mChandaNo;
+    private float mOriginalPaymentWelfare;
+    private float mOriginalPaymentScholarship;
+    private float mOriginalPaymentTabligh;
+    private float mOriginalPaymentMta;
+    private float mOriginalPaymentMaryam;
+    private float mOriginalPaymentMosqueDonation;
+    private float mOriginalPaymentSadaqa;
+    private float mOriginalPaymentZakat;
+    private float mOriginalPaymentFitrana;
+    private String mOriginalPaymentFullname;
+    private float mOriginalPaymentMiscellaneous;
+    private float mOriginalPaymentCentinary;
+    private float mOriginalPaymentWasiyyatHissan;
+    private float mOriginalPaymentJalsaSalana;
 
 
     @Override
@@ -166,6 +194,7 @@ public class PaymentActivity extends AppCompatActivity implements LoaderManager.
         if(savedInstanceState == null) {
             saveOriginalPaymentValues(); // when first created
         } else {
+            Log.d(TAG, "Restoring Original values from savedInstanceState");
             restoreOriginalPaymentValues(savedInstanceState); // restore the values when activity is recreated
         }
 
@@ -233,6 +262,21 @@ public class PaymentActivity extends AppCompatActivity implements LoaderManager.
         mOriginalPaymentWasiyyat = Float.parseFloat(savedInstanceState.getString(ORIGINAL_PAYMENT_WASIYYAT));
         mOriginalPaymentTahrikJadid = Float.parseFloat(savedInstanceState.getString(ORIGINAL_PAYMENT_TAHRIKJADID));
         mOriginalPaymentWaqfJadid = Float.parseFloat(savedInstanceState.getString(ORIGINAL_PAYMENT_WAQFJADID));
+        mOriginalPaymentWelfare = Float.parseFloat(savedInstanceState.getString(ORIGINAL_PAYMENT_WELFARE));
+        mOriginalPaymentScholarship = Float.parseFloat(savedInstanceState.getString(ORIGINAL_PAYMENT_SCHOLARSHIP));
+        mOriginalPaymentTabligh = Float.parseFloat(savedInstanceState.getString(ORIGINAL_PAYMENT_TABLIGH));
+        mOriginalPaymentFitrana = Float.parseFloat(savedInstanceState.getString(ORIGINAL_PAYMENT_FITRANA));
+        mOriginalPaymentFullname = (savedInstanceState.getString(ORIGINAL_PAYMENT_FULLNAME));
+        mOriginalPaymentJalsaSalana = Float.parseFloat(savedInstanceState.getString(ORIGINAL_PAYMENT_JALSASALANA));
+        mOriginalPaymentCentinary = Float.parseFloat(savedInstanceState.getString(ORIGINAL_PAYMENT_CENTINARY));
+        mOriginalPaymentMaryam = Float.parseFloat(savedInstanceState.getString(ORIGINAL_PAYMENT_MARYAM));
+        mOriginalPaymentMiscellaneous = Float.parseFloat(savedInstanceState.getString(ORIGINAL_PAYMENT_MISCELLANEOUS));
+        mOriginalPaymentMosqueDonation = Float.parseFloat(savedInstanceState.getString(ORIGINAL_PAYMENT_MOSQUEDONATION));
+        mOriginalPaymentMta = Float.parseFloat(savedInstanceState.getString(ORIGINAL_PAYMENT_MTA));
+        mOriginalPaymentSadaqa = Float.parseFloat(savedInstanceState.getString(ORIGINAL_PAYMENT_SADAQA));
+        mOriginalPaymentZakat = Float.parseFloat(savedInstanceState.getString(ORIGINAL_PAYMENT_ZAKAT));
+        mOriginalPaymentWasiyyatHissan = Float.parseFloat(savedInstanceState.getString(ORIGINAL_PAYMENT_WASIYYATHISSAN));
+
 
     }
 
@@ -247,6 +291,21 @@ public class PaymentActivity extends AppCompatActivity implements LoaderManager.
         outState.putString(ORIGINAL_PAYMENT_WASIYYAT, String.valueOf(mOriginalPaymentWasiyyat));
         outState.putString(ORIGINAL_PAYMENT_TAHRIKJADID, String.valueOf(mOriginalPaymentTahrikJadid));
         outState.putString(ORIGINAL_PAYMENT_WAQFJADID, String.valueOf(mOriginalPaymentWaqfJadid));
+        outState.putString(ORIGINAL_PAYMENT_WELFARE, String.valueOf(mOriginalPaymentWelfare));
+        outState.putString(ORIGINAL_PAYMENT_SCHOLARSHIP, String.valueOf(mOriginalPaymentScholarship));
+        outState.putString(ORIGINAL_PAYMENT_TABLIGH, String.valueOf(mOriginalPaymentTabligh));
+        outState.putString(ORIGINAL_PAYMENT_MTA, String.valueOf(mOriginalPaymentMta));
+        outState.putString(ORIGINAL_PAYMENT_MARYAM, String.valueOf(mOriginalPaymentMaryam));
+        outState.putString(ORIGINAL_PAYMENT_MOSQUEDONATION, String.valueOf(mOriginalPaymentMosqueDonation));
+        outState.putString(ORIGINAL_PAYMENT_SADAQA, String.valueOf(mOriginalPaymentSadaqa));
+        outState.putString(ORIGINAL_PAYMENT_JALSASALANA, String.valueOf(mOriginalPaymentJalsaSalana));
+        outState.putString(ORIGINAL_PAYMENT_ZAKAT, String.valueOf(mOriginalPaymentZakat));
+        outState.putString(ORIGINAL_PAYMENT_FITRANA, String.valueOf(mOriginalPaymentFitrana));
+        outState.putString(ORIGINAL_PAYMENT_FULLNAME, String.valueOf(mOriginalPaymentFullname));
+        outState.putString(ORIGINAL_PAYMENT_MISCELLANEOUS, String.valueOf(mOriginalPaymentMiscellaneous));
+        outState.putString(ORIGINAL_PAYMENT_CENTINARY, String.valueOf(mOriginalPaymentCentinary));
+        outState.putString(ORIGINAL_PAYMENT_WASIYYATHISSAN, String.valueOf(mOriginalPaymentWasiyyatHissan));
+
     }
 
     private void saveOriginalPaymentValues() {
@@ -259,6 +318,20 @@ public class PaymentActivity extends AppCompatActivity implements LoaderManager.
         mOriginalPaymentWasiyyat = mPayment.getWasiyyat();
         mOriginalPaymentTahrikJadid = mPayment.getTahrikJadid();
         mOriginalPaymentWaqfJadid = mPayment.getWaqfJadid();
+        mOriginalPaymentWelfare = mPayment.getWelfare();
+        mOriginalPaymentScholarship = mPayment.getScholarship();
+        mOriginalPaymentTabligh = mPayment.getTabligh();
+        mOriginalPaymentMta = mPayment.getMta();
+        mOriginalPaymentMaryam = mPayment.getMaryam();
+        mOriginalPaymentMosqueDonation = mPayment.getMosqueDonation();
+        mOriginalPaymentSadaqa = mPayment.getSadakat();
+        mOriginalPaymentZakat = mPayment.getZakat();
+        mOriginalPaymentFitrana = mPayment.getFitrana();
+        mOriginalPaymentFullname = mPayment.getFullname();
+        mOriginalPaymentMiscellaneous = mPayment.getMiscellaneous();
+        mOriginalPaymentCentinary = mPayment.getCentinary();
+        mOriginalPaymentWasiyyatHissan = mPayment.getWasiyyatHissan();
+        mOriginalPaymentJalsaSalana = mPayment.getJalsaSalana();
         mOriginalScheduleId = mPayment.getSchedule().getScheduleId();
     }
 
@@ -494,6 +567,7 @@ public class PaymentActivity extends AppCompatActivity implements LoaderManager.
                             payerName.toUpperCase() + " at " +
                             jamaatName + " Jamaat for " + monthPaid, Snackbar.LENGTH_LONG).show();
                     mTextReceiptNo.requestFocus();
+                    Log.v(TAG, "Duplicate receipt detected");
                     return false;
                 }
 
@@ -902,7 +976,7 @@ public class PaymentActivity extends AppCompatActivity implements LoaderManager.
         mMiscellaneousPos = mPaymentCursor.getColumnIndex(PaymentInfoEntry.COLUMN_PAYMENT_MISCELLANEOUS);
         mSubtotalPos = mPaymentCursor.getColumnIndex(PaymentInfoEntry.COLUMN_PAYMENT_SUBTOTAL);
 
-        mPaymentCursor.moveToNext();
+        mPaymentCursor.moveToFirst();
         mPaymentQueriesFinished = true; // payment queries finished loading
         displayPaymentWhenQueriesFinished();
 
