@@ -53,6 +53,7 @@ public class PaymentActivity extends AppCompatActivity implements LoaderManager.
     public static final String ORIGINAL_PAYMENT_MISCELLANEOUS = "ng.com.dayma.paymentdummy.ORIGINAL_PAYMENT_MISCELLANEOUS";
     public static final String ORIGINAL_PAYMENT_CENTINARY = "ng.com.dayma.paymentdummy.ORIGINAL_PAYMENT_CENTINARY";
     public static final String ORIGINAL_PAYMENT_WASIYYATHISSAN = "ng.com.dayma.paymentdummy.ORIGINAL_PAYMENT_WASIIYYATHISSAN";
+    public static final String PAYMENT_URI = "ng.com.dayma.paymentdummy.PAYMENT_URI";
     private final String TAG = getClass().getSimpleName();
     public static final String SCHEDULE_INFO = "ng.com.dayma.paymentdummy.SCHEDULE_INFO";
 
@@ -196,6 +197,8 @@ public class PaymentActivity extends AppCompatActivity implements LoaderManager.
         } else {
             Log.d(TAG, "Restoring Original values from savedInstanceState");
             restoreOriginalPaymentValues(savedInstanceState); // restore the values when activity is recreated
+            String StringPaymentUri = savedInstanceState.getString(PAYMENT_URI);
+            mPaymentUri = Uri.parse(StringPaymentUri);
         }
 
         // get references to the views
@@ -305,6 +308,8 @@ public class PaymentActivity extends AppCompatActivity implements LoaderManager.
         outState.putString(ORIGINAL_PAYMENT_MISCELLANEOUS, String.valueOf(mOriginalPaymentMiscellaneous));
         outState.putString(ORIGINAL_PAYMENT_CENTINARY, String.valueOf(mOriginalPaymentCentinary));
         outState.putString(ORIGINAL_PAYMENT_WASIYYATHISSAN, String.valueOf(mOriginalPaymentWasiyyatHissan));
+
+        outState.putString(PAYMENT_URI, mPaymentUri.toString());
 
     }
 

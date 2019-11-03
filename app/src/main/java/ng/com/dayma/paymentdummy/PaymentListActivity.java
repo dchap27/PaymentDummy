@@ -14,6 +14,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 
 import java.util.ArrayList;
@@ -28,6 +29,7 @@ public class PaymentListActivity extends AppCompatActivity implements LoaderMana
     public static final String ID_NOT_SET = null;
     public static final String SCHEDULE_ID = "ng.com.dayma.paymentdummy.SCHEDULE_ID";
     public static final int LOADER_PAYMENTS = 0;
+    private final String TAG = getClass().getSimpleName();
 
     //    private ArrayAdapter<PaymentInfo> mAdapterPayments;
     private List<PaymentInfo> mPayments;
@@ -39,6 +41,7 @@ public class PaymentListActivity extends AppCompatActivity implements LoaderMana
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.d(TAG, "**********onCreate*********");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_payment_list);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -77,13 +80,14 @@ public class PaymentListActivity extends AppCompatActivity implements LoaderMana
 
     @Override
     protected void onResume() {
+        Log.d(TAG, "**********onResume*********");
         super.onResume();
-//        loadPaymentsData();
         getLoaderManager().restartLoader(LOADER_PAYMENTS, null, this);
     }
 
     @Override
     protected void onPause() {
+        Log.d(TAG, "**********onPause*********");
         super.onPause();
         // update the totalAmount on Schedule table
         updateTotalAmountOnSchedule();
