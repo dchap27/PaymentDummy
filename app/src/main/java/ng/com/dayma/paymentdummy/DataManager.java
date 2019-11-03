@@ -3,6 +3,7 @@ package ng.com.dayma.paymentdummy;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
+import java.text.DateFormatSymbols;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -22,6 +23,7 @@ public class DataManager {
     private List<PaymentInfo> mPayments = new ArrayList<>();
     private List<ScheduleInfo> mSchedules = new ArrayList<>();
     private List<MemberInfo> mMembers = new ArrayList<>();
+    public static final int CURRENT_YEAR = Calendar.getInstance().get(Calendar.YEAR);
 
     public static DataManager getInstance() {
         if(ourInstance == null){
@@ -356,124 +358,57 @@ public class DataManager {
 
     }
 
-//    public void initializeExamplePayments() {
-//        final DataManager dm = getInstance();
-//
-//        MonthInfo month = dm.getMonth("April 2019");
-//        ScheduleInfo schedule1 = month.getSchedule("Schedule1 for kewulere");
-//        schedule1.setComplete(true);
-//        ScheduleInfo schedule2 = month.getSchedule("Schedule1 for felele");
-//        schedule2.setComplete(true);
-//        ScheduleInfo schedule3 = month.getSchedule("Oke-Ado schedule1");
-//        schedule3.setComplete(true);
-//        mSchedules.add(schedule1);
-//        mSchedules.add(schedule2);
-//        mSchedules.add(schedule3);
-//        mPayments.add(new PaymentInfo("Adelaja", "April", 12328, 0, 10000, 200, 300, schedule3));
-//        mPayments.add(new PaymentInfo("Kunle", "March", 12327, 450, 30 ,0 ,40, schedule1));
-//        mPayments.add(new PaymentInfo("Ope", "April", 12330, 45000, 0 ,10 ,400, schedule2));
-//
-//        month = dm.getMonth("May 2019");
-//        ScheduleInfo schedule4 = month.getSchedule("Schedule2 for kewulere");
-//        schedule4.setComplete(true);
-//        ScheduleInfo schedule5 = month.getSchedule("Oke-Ado schedule2");
-//        schedule5.setComplete(true);
-//        mSchedules.add(schedule4);
-//        mSchedules.add(schedule5);
-//
-//        mPayments.add(new PaymentInfo("Modupe Ade", "May", 12534, 230, 20, 0, 0, schedule4));
-//        mPayments.add(new PaymentInfo("Adeola", "April", 23452, 4000, 0,0,0, schedule5));
-//
-//        month = dm.getMonth("June 2019");
-//        ScheduleInfo schedule6 = month.getSchedule("Schedule3 for felele");
-//        schedule6.setComplete(true);
-//        ScheduleInfo schedule7 = month.getSchedule("Oke-Ado schedule3");
-//        schedule7.setComplete(true);
-////        month.getSchedule("Schedule3 for kewulere").setComplete(true);
-//        mSchedules.add(schedule6);
-//        mSchedules.add(schedule7);
-//
-//        mPayments.add(new PaymentInfo("Faiza", "June", 12345, 0, 0, 2300, 0, schedule6));
-//        mPayments.add(new PaymentInfo("Adelaja", "June", 123420, 3400, 80, 50, 30, schedule6));
-//        mPayments.add(new PaymentInfo("Ope", "June", 123430, 8400, 40, 0, 0, schedule1));
-//        mPayments.add(new PaymentInfo("Adeola", "May", 123410, 400, 0, 5000, 30, schedule7));
-//    }
-//
-//    private void initializeMonths() {
-//        mMonths.add(initializeMonth1());
-//        mMonths.add(initializeMonth2());
-//        mMonths.add(initializeMonth3());
-//
-//    }
-//
-//    private MonthInfo initializeMonth3() {
-//        MonthInfo month = new MonthInfo("April 2019");
-//        List<ScheduleInfo> schedules = new ArrayList<>();
-//        schedules.add(new ScheduleInfo("Schedule1 for kewulere", month));
-//        schedules.add(new ScheduleInfo("Schedule1 for felele", month));
-//        schedules.add(new ScheduleInfo("Oke-Ado schedule1", month));
-//        for(int i=0; i < schedules.size(); i++) {
-//            ScheduleInfo schedule = schedules.get(i);
-//            month.addSchedule(schedule);
-//        }
-//
-//        return month;
-//    }
-//
-//    private MonthInfo initializeMonth2() {
-//        MonthInfo month = new MonthInfo("May 2019");
-//        List<ScheduleInfo> schedules = new ArrayList<>();
-//        schedules.add(new ScheduleInfo("Schedule2 for kewulere", month));
-//        schedules.add(new ScheduleInfo("Schedule2 for felele", month));
-//        schedules.add(new ScheduleInfo("Oke-Ado schedule2", month));
-//        for(int i=0; i < schedules.size(); i++) {
-//            ScheduleInfo schedule = schedules.get(i);
-//            month.addSchedule(schedule);
-//        }
-//
-//        return month;
-//    }
-//
-//    private MonthInfo initializeMonth1() {
-//        MonthInfo month = new MonthInfo("June 2019");
-//        List<ScheduleInfo> schedules = new ArrayList<>();
-//        schedules.add(new ScheduleInfo("Schedule3 for kewulere",month));
-//        schedules.add(new ScheduleInfo("Schedule3 for felele", month));
-//        schedules.add(new ScheduleInfo("Oke-Ado schedule3", month));
-//        for(int i=0; i < schedules.size(); i++) {
-//            ScheduleInfo schedule = schedules.get(i);
-//            month.addSchedule(schedule);
-//        }
-//
-//        return month;
-//    }
 
-    public ArrayList<String> getMonthsOfTheYear() {
-        ArrayList months = new ArrayList<>();
-        List<String> monthsYear = new ArrayList<>();
-        monthsYear.add(0,"JAN");
-        monthsYear.add(1, "FEB");
-        monthsYear.add(2, "MAR");
-        monthsYear.add(3, "APR");
-        monthsYear.add(4, "MAY");
-        monthsYear.add(5, "JUN");
-        monthsYear.add(6, "JUL");
-        monthsYear.add(7, "AUG");
-        monthsYear.add(8, "SEP");
-        monthsYear.add(9, "OCT");
-        monthsYear.add(10, "NOV");
-        monthsYear.add(11, "DEC");
-        Calendar dateTime = Calendar.getInstance();
-        int presentYear = Integer.parseInt(String.format("%1$TY", dateTime));
-        int year = presentYear - 1;
-        while(year < presentYear + 1){
-            for(int i = 0; i < monthsYear.size(); i++){
-                String mon = monthsYear.get(i) + year;
-                months.add(mon);
+    public ArrayList<String> getMonthsWithYear() {
+        ArrayList monthsList = new ArrayList();
+//        List<String> monthsYear = new ArrayList<>();
+//        monthsYear.add(0,"JAN");
+//        monthsYear.add(1, "FEB");
+//        monthsYear.add(2, "MAR");
+//        monthsYear.add(3, "APR");
+//        monthsYear.add(4, "MAY");
+//        monthsYear.add(5, "JUN");
+//        monthsYear.add(6, "JUL");
+//        monthsYear.add(7, "AUG");
+//        monthsYear.add(8, "SEP");
+//        monthsYear.add(9, "OCT");
+//        monthsYear.add(10, "NOV");
+//        monthsYear.add(11, "DEC");
+
+        String[] months = new DateFormatSymbols().getShortMonths();
+//        for (int i = 0; i < months.length; i++) {
+//            String month = months[i];
+//            monthsList.add(months[i]);
+//        }
+        int year = CURRENT_YEAR - 1;
+        while(year < CURRENT_YEAR + 1){
+            for(int i = 0; i < months.length; i++){
+                String mon = months[i] + year;
+                monthsList.add(mon);
             }
             year++;
         }
 
-        return months;
+        return monthsList;
+    }
+
+    public ArrayList<String> getMonthsOnly(){
+        ArrayList monthsList = new ArrayList();
+        String[] months = new DateFormatSymbols().getMonths();
+        for (int i = 0; i < months.length; i++) {
+            String month = months[i];
+            monthsList.add(months[i]);
+        }
+        return monthsList;
+    }
+
+    public ArrayList<String> getYearsOnly(){
+        ArrayList years = new ArrayList();
+        int yearlimit = CURRENT_YEAR - 1;
+        while (yearlimit < CURRENT_YEAR + 1){
+            years.add(yearlimit);
+            ++yearlimit;
+        }
+        return years;
     }
 }

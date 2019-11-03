@@ -181,7 +181,7 @@ public class PaymentActivity extends AppCompatActivity implements LoaderManager.
         mSpinnerChandaNo.setAdapter(mAdapterMemberIds);
 
         Log.d(TAG,"populate months into spinner");
-        ArrayList<String> monthsYear = DataManager.getInstance().getMonthsOfTheYear();
+        ArrayList<String> monthsYear = DataManager.getInstance().getMonthsWithYear();
         ArrayAdapter<String> adapterMonths =
                 new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, monthsYear);
         adapterMonths.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -365,7 +365,7 @@ public class PaymentActivity extends AppCompatActivity implements LoaderManager.
         float miscellaneous = mPaymentCursor.getFloat(mMiscellaneousPos);
         float subtotal = mPaymentCursor.getFloat(mSubtotalPos);
 
-        List<String> monthsYear = DataManager.getInstance().getMonthsOfTheYear();
+        List<String> monthsYear = DataManager.getInstance().getMonthsWithYear();
 
         int memberIndex = getIndexOfMemberId(mChandaNo);
         mSpinnerChandaNo.setSelection(memberIndex);
