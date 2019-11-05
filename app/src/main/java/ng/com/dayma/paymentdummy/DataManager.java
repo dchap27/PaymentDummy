@@ -361,29 +361,12 @@ public class DataManager {
 
     public ArrayList<String> getMonthsWithYear() {
         ArrayList monthsList = new ArrayList();
-//        List<String> monthsYear = new ArrayList<>();
-//        monthsYear.add(0,"JAN");
-//        monthsYear.add(1, "FEB");
-//        monthsYear.add(2, "MAR");
-//        monthsYear.add(3, "APR");
-//        monthsYear.add(4, "MAY");
-//        monthsYear.add(5, "JUN");
-//        monthsYear.add(6, "JUL");
-//        monthsYear.add(7, "AUG");
-//        monthsYear.add(8, "SEP");
-//        monthsYear.add(9, "OCT");
-//        monthsYear.add(10, "NOV");
-//        monthsYear.add(11, "DEC");
 
         String[] months = new DateFormatSymbols().getShortMonths();
-//        for (int i = 0; i < months.length; i++) {
-//            String month = months[i];
-//            monthsList.add(months[i]);
-//        }
         int year = CURRENT_YEAR - 1;
-        while(year < CURRENT_YEAR + 1){
+        while(year < CURRENT_YEAR + 2){
             for(int i = 0; i < months.length; i++){
-                String mon = months[i] + year;
+                String mon = months[i].toUpperCase() + year;
                 monthsList.add(mon);
             }
             year++;
@@ -405,7 +388,7 @@ public class DataManager {
     public ArrayList<String> getYearsOnly(){
         ArrayList years = new ArrayList();
         int yearlimit = CURRENT_YEAR - 1;
-        while (yearlimit < CURRENT_YEAR + 1){
+        while (yearlimit < CURRENT_YEAR + 2){
             years.add(yearlimit);
             ++yearlimit;
         }

@@ -74,6 +74,27 @@ public class PaymentProvider extends ContentProvider {
                 nRows = db.delete(PaymentDatabaseContract.PaymentInfoEntry.TABLE_NAME, rowSelection, rowSelectionArgs);
                 break;
 
+            case MONTHS_ROW:
+                rowId = ContentUris.parseId(uri);
+                rowSelection = MonthInfoEntry._ID + "=?";
+                rowSelectionArgs = new String[] {Long.toString(rowId)};
+                nRows = db.delete(MonthInfoEntry.TABLE_NAME, rowSelection, rowSelectionArgs);
+                break;
+
+            case SCHEDULES_ROW:
+                rowId = ContentUris.parseId(uri);
+                rowSelection = ScheduleInfoEntry._ID + "=?";
+                rowSelectionArgs = new String[] {Long.toString(rowId)};
+                nRows = db.delete(ScheduleInfoEntry.TABLE_NAME, rowSelection, rowSelectionArgs);
+                break;
+
+            case MEMBERS_ROW:
+                rowId = ContentUris.parseId(uri);
+                rowSelection = MemberInfoEntry._ID + "=?";
+                rowSelectionArgs = new String[] {Long.toString(rowId)};
+                nRows = db.delete(MemberInfoEntry.TABLE_NAME, rowSelection, rowSelectionArgs);
+                break;
+
         }
 
         return nRows;
