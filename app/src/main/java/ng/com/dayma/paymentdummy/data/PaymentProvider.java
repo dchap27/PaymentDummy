@@ -72,7 +72,6 @@ public class PaymentProvider extends ContentProvider {
                 rowSelectionArgs = new String[] {Long.toString(rowId)};
                 // returns the no of rows deleted
                 nRows = db.delete(PaymentDatabaseContract.PaymentInfoEntry.TABLE_NAME, rowSelection, rowSelectionArgs);
-                getContext().getContentResolver().notifyChange(uri, null);
                 break;
 
             case MONTHS_ROW:
@@ -80,7 +79,6 @@ public class PaymentProvider extends ContentProvider {
                 rowSelection = MonthInfoEntry._ID + "=?";
                 rowSelectionArgs = new String[] {Long.toString(rowId)};
                 nRows = db.delete(MonthInfoEntry.TABLE_NAME, rowSelection, rowSelectionArgs);
-                getContext().getContentResolver().notifyChange(uri, null);
                 break;
 
             case SCHEDULES_ROW:
@@ -88,7 +86,6 @@ public class PaymentProvider extends ContentProvider {
                 rowSelection = ScheduleInfoEntry._ID + "=?";
                 rowSelectionArgs = new String[] {Long.toString(rowId)};
                 nRows = db.delete(ScheduleInfoEntry.TABLE_NAME, rowSelection, rowSelectionArgs);
-                getContext().getContentResolver().notifyChange(uri, null);
                 break;
 
             case MEMBERS_ROW:
@@ -96,11 +93,10 @@ public class PaymentProvider extends ContentProvider {
                 rowSelection = MemberInfoEntry._ID + "=?";
                 rowSelectionArgs = new String[] {Long.toString(rowId)};
                 nRows = db.delete(MemberInfoEntry.TABLE_NAME, rowSelection, rowSelectionArgs);
-                getContext().getContentResolver().notifyChange(uri, null);
                 break;
 
         }
-
+        getContext().getContentResolver().notifyChange(uri, null);
         return nRows;
 
     }
@@ -143,6 +139,7 @@ public class PaymentProvider extends ContentProvider {
                 rowUri = ContentUris.withAppendedId(PaymentProviderContract.Schedules.CONTENT_URI, rowId);
                 break;
         }
+        getContext().getContentResolver().notifyChange(uri, null);
         return rowUri;
     }
 
@@ -276,6 +273,7 @@ public class PaymentProvider extends ContentProvider {
                 break;
 
         }
+        getContext().getContentResolver().notifyChange(uri, null);
         return nRows;
     }
 }

@@ -1,7 +1,6 @@
 package ng.com.dayma.paymentdummy;
 
 import android.app.LoaderManager;
-import android.content.ContentUris;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
@@ -331,14 +330,6 @@ public class MainActivity extends AppCompatActivity
         return false;
     }
 
-    @Override
-    public void onDeleteSchedule(int id) {
-        Uri scheduleUri = ContentUris.withAppendedId(PaymentProviderContract.Schedules.CONTENT_URI, (long)id);
-        Log.d(TAG, "Deleting schedule");
-        getContentResolver().delete(scheduleUri, null, null);
-
-    }
-
     private void enableActionMode(int position, int cursorIdPos) {
         if(mActionMode == null ){
             mActionMode = startActionMode(mActionModecallbacks);
@@ -422,8 +413,8 @@ public class MainActivity extends AppCompatActivity
         for (int i = selectedItemPositions.size() - 1; i >= 0; i--) {
             mScheduleRecyclerAdapter.editData((Integer) selectedItemPositions.get(i));
         }
-        mScheduleRecyclerAdapter.notifyDataSetChanged();
         mActionMode = null;
+        mScheduleRecyclerAdapter.notifyDataSetChanged();
     }
 
 }

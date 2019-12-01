@@ -28,6 +28,7 @@ import ng.com.dayma.paymentdummy.data.PaymentProviderContract;
 public class ScheduleActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
     public static final int LOADER_JAMAATS = 0;
+    public static final int LOADER_SCHEDULES = 1;
     public static final int ID_NOT_SET = -1;
     public static final String SCHEDULE_MID = "ng.com.dayma.paymentdummy.SCHEDULE_MID";
     private final String TAG = getClass().getSimpleName();
@@ -43,6 +44,15 @@ public class ScheduleActivity extends AppCompatActivity implements LoaderManager
     private Calendar mDateTime;
     private MonthInfo mMonth;
     private boolean mIsSaving;
+    private Cursor mScheduleCursor;
+    private int mScheduleTitlePos;
+    private int mScheduleJamaatPos;
+    private int mScheduleMonthPos;
+    private boolean mScheduleQueriesFinished;
+    private int mId;
+    private Cursor mJamaatListsCursor;
+    private ArrayList<String> mMonths;
+    private ArrayList<String> mYears;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,16 +68,16 @@ public class ScheduleActivity extends AppCompatActivity implements LoaderManager
         mSpinnerJamaat = (Spinner) findViewById(R.id.spinner_jamaat_name);
 
         Log.d(TAG,"Populate the Months into spinner");
-        ArrayList<String> months = DataManager.getInstance().getMonthsOnly();
+        mMonths = DataManager.getInstance().getMonthsOnly();
         ArrayAdapter<String> adapterMonths =
-                new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, months);
+                new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, mMonths);
         adapterMonths.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         mSpinnerMonth.setAdapter(adapterMonths);
 
         Log.d(TAG,"Populate the years into spinner");
-        ArrayList<String> years = DataManager.getInstance().getYearsOnly();
+        mYears = DataManager.getInstance().getYearsOnly();
         ArrayAdapter<String> adapterYears =
-                new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, years);
+                new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, mYears);
         adapterYears.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         mSpinnerYear.setAdapter(adapterYears);
 
@@ -83,9 +93,12 @@ public class ScheduleActivity extends AppCompatActivity implements LoaderManager
 
         mScheduleTitle = (EditText) findViewById(R.id.schedule_title_edittext);
 
-        if(mIsNewSchedule)
-            initializeToCurrentMonthAndYear();
 
+        if(mIsNewSchedule) {
+            initializeToCurrentMonthAndYear();
+        } else {
+            getLoaderManager().initLoader(LOADER_SCHEDULES, null, this);
+        }
 
     }
 
@@ -106,7 +119,7 @@ public class ScheduleActivity extends AppCompatActivity implements LoaderManager
         Log.d(TAG, "Reading display state value");
         Intent intent = getIntent();
         //get value that was put into the intent
-        int mId = intent.getIntExtra(SCHEDULE_MID, ID_NOT_SET);
+        mId = intent.getIntExtra(SCHEDULE_MID, ID_NOT_SET);
         mIsNewSchedule = mId == ID_NOT_SET;
         if(mIsNewSchedule){
             createNewSchedule();
@@ -221,14 +234,31 @@ public class ScheduleActivity extends AppCompatActivity implements LoaderManager
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         CursorLoader loader = null;
         if(id == LOADER_JAMAATS) {
-            mJamaatListQueriesFinished = false;
             Log.d(TAG, "Loading Jamaat list");
             loader = createLoaderJamaats();
+        } else if (id == LOADER_SCHEDULES){
+            loader = createLoaderSchedule();
         }
         return loader;
     }
 
+    private CursorLoader createLoaderSchedule() {
+        mScheduleQueriesFinished = false;
+        mScheduleUri = ContentUris.withAppendedId(PaymentProviderContract.Schedules.CONTENT_URI, mId);
+        final String[] scheduleColumns = {
+                PaymentProviderContract.Schedules.COLUMN_MONTH_ID,
+                PaymentProviderContract.Schedules._ID,
+                PaymentProviderContract.Schedules.COLUMN_MEMBER_JAMAATNAME,
+                PaymentProviderContract.Schedules.COLUMN_SCHEDULE_ISCOMPLETE,
+                PaymentProviderContract.Schedules.COLUMN_SCHEDULE_TITLE,
+                PaymentProviderContract.Schedules.COLUMN_SCHEDULE_ID,
+        };
+        Log.d(TAG, "Load schedule columns");
+        return new CursorLoader(this, mScheduleUri, scheduleColumns, null, null, null);
+    }
+
     private CursorLoader createLoaderJamaats() {
+        mJamaatListQueriesFinished = false;
         Uri uri = PaymentProviderContract.Members.CONTENT_URI;
         String[] projection = {
                 PaymentProviderContract.Members._ID,
@@ -244,15 +274,53 @@ public class ScheduleActivity extends AppCompatActivity implements LoaderManager
             onFinishedJamaatList(data);
             mJamaatListQueriesFinished = true;
             mSpinnerJamaat.setAdapter(mAdapterJamaat);
+            displayScheduleWhenQueryFinishes();
+        } else if (loader.getId() == LOADER_SCHEDULES){
+            onFinishedSchedule(data);
         }
 
     }
 
+    private void onFinishedSchedule(Cursor data) {
+        mScheduleCursor = data;
+        mScheduleTitlePos = mScheduleCursor.getColumnIndex(PaymentProviderContract.Schedules.COLUMN_SCHEDULE_TITLE);
+        mScheduleJamaatPos = mScheduleCursor.getColumnIndex(PaymentProviderContract.Schedules.COLUMN_MEMBER_JAMAATNAME);
+        mScheduleMonthPos = mScheduleCursor.getColumnIndex(PaymentProviderContract.Schedules.COLUMN_MONTH_ID);
+
+        mScheduleCursor.moveToFirst();
+        mScheduleQueriesFinished = true;
+        displayScheduleWhenQueryFinishes();
+    }
+
+    private void displayScheduleWhenQueryFinishes() {
+        if(mJamaatListQueriesFinished && mScheduleQueriesFinished){
+            displaySchedule();
+        }
+    }
+
+    private void displaySchedule() {
+        String scheduleTitle = mScheduleCursor.getString(mScheduleTitlePos);
+        String jamaat = mScheduleCursor.getString(mScheduleJamaatPos);
+        String month = mScheduleCursor.getString(mScheduleMonthPos);
+
+        mScheduleTitle.setText(scheduleTitle);
+        int jamaatIndex = mJamaatList.indexOf(jamaat);
+        mSpinnerJamaat.setSelection(jamaatIndex);
+        String[] monthAndYear = month.split(" ");
+        String mon = monthAndYear[0];
+        int year = Integer.valueOf(monthAndYear[1]);
+        int monthIndex = mMonths.indexOf(mon);
+        int yearIndex = mYears.indexOf(year);
+        mSpinnerMonth.setSelection(monthIndex);
+        mSpinnerYear.setSelection(yearIndex);
+
+    }
+
     private void onFinishedJamaatList(Cursor data) {
-        Cursor jamaatListsCursor = data;
-        int jamaatNamePos = jamaatListsCursor.getColumnIndex(PaymentProviderContract.Members.COLUMN_MEMBER_JAMAATNAME);
-        while(jamaatListsCursor.moveToNext()){
-            String jamaatName = jamaatListsCursor.getString(jamaatNamePos);
+        mJamaatListsCursor = data;
+        int jamaatNamePos = mJamaatListsCursor.getColumnIndex(PaymentProviderContract.Members.COLUMN_MEMBER_JAMAATNAME);
+        while(mJamaatListsCursor.moveToNext()){
+            String jamaatName = mJamaatListsCursor.getString(jamaatNamePos);
             if(!mJamaatList.contains(jamaatName)){
                 mJamaatList.add(jamaatName);
             }
@@ -261,8 +329,12 @@ public class ScheduleActivity extends AppCompatActivity implements LoaderManager
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-        if(loader.getId() == LOADER_JAMAATS)
-            mJamaatList= null;
+        if(loader.getId() == LOADER_JAMAATS) {
+            mJamaatListsCursor.close();
+        } else if (loader.getId() == LOADER_SCHEDULES){
+            if(mScheduleCursor != null)
+                mScheduleCursor.close();
+        }
 
     }
 }

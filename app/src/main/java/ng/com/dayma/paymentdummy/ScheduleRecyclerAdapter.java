@@ -1,8 +1,10 @@
 package ng.com.dayma.paymentdummy;
 
+import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
@@ -20,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ng.com.dayma.paymentdummy.data.PaymentDatabaseContract.ScheduleInfoEntry;
+import ng.com.dayma.paymentdummy.data.PaymentProviderContract;
 import ng.com.dayma.paymentdummy.touchhelpers.ItemTouchHelperAdapter;
 
 /**
@@ -100,19 +103,23 @@ public class ScheduleRecyclerAdapter extends RecyclerView.Adapter<ScheduleRecycl
 
     public void removeData(int position) {
         int itemIndex = mSelectedItemsPosition.indexOfKey(position);
-        Log.i(TAG, "selection for delete is "+ position + " the cursor value is " + mSelectedItemsCursorId.keyAt(itemIndex));
         int cursorItem = mSelectedItemsCursorId.keyAt(itemIndex);
-        mListener.onDeleteSchedule(cursorItem);
+
+        Uri scheduleUri = ContentUris.withAppendedId(PaymentProviderContract.Schedules.CONTENT_URI, cursorItem);
+        Log.d(TAG, "Deleting schedule");
+        mContext.getContentResolver().delete(scheduleUri, null, null);
 
         notifyItemRemoved(position);
         resetCurrentIndex();
     }
 
     public void editData(int position) {
-//        Intent intent = new Intent(mContext, ScheduleActivity.class);
-//        intent.putExtra(ScheduleActivity.SCHEDULE_MID, mSelectedHolder.mId);
-//        mContext.startActivity(intent);
+        int itemIndex = mSelectedItemsPosition.indexOfKey(position);
+        int cursorItem = mSelectedItemsCursorId.keyAt(itemIndex);
+        Intent intent = new Intent(mContext, ScheduleActivity.class);
+        intent.putExtra(ScheduleActivity.SCHEDULE_MID, cursorItem);
         resetCurrentIndex();
+        mContext.startActivity(intent);
     }
 
     private void resetCurrentIndex(){
@@ -235,14 +242,6 @@ public class ScheduleRecyclerAdapter extends RecyclerView.Adapter<ScheduleRecycl
         View view = mSelectedHolder.parentView;
         mListener.onItemClicked(mSelectedHolder.getAdapterPosition(),mSelectedHolder.mId );
         (view).performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
-//        if(mActionMode != null){
-//            return;
-//        }
-//        mActionMode = ((AppCompatActivity)view.getContext()).startActionMode(mActionModecallbacks);
-//        int idx = mSelectedHolder.getAdapterPosition();
-//        Log.d("On Long press", "Long pressed on");
-////        onItemSelected(idx);
-//        this.onItemSelected(mSelectedHolder.getAdapterPosition());
 
     }
 
@@ -303,6 +302,5 @@ public class ScheduleRecyclerAdapter extends RecyclerView.Adapter<ScheduleRecycl
         void onItemClicked(int adapterPosition, long cursorDataId);
 
         boolean onSingleClick();
-        void onDeleteSchedule(int id);
     }
 }
