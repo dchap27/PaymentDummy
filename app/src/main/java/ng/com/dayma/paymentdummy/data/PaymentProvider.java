@@ -72,6 +72,7 @@ public class PaymentProvider extends ContentProvider {
                 rowSelectionArgs = new String[] {Long.toString(rowId)};
                 // returns the no of rows deleted
                 nRows = db.delete(PaymentDatabaseContract.PaymentInfoEntry.TABLE_NAME, rowSelection, rowSelectionArgs);
+                getContext().getContentResolver().notifyChange(uri, null);
                 break;
 
             case MONTHS_ROW:
@@ -79,6 +80,7 @@ public class PaymentProvider extends ContentProvider {
                 rowSelection = MonthInfoEntry._ID + "=?";
                 rowSelectionArgs = new String[] {Long.toString(rowId)};
                 nRows = db.delete(MonthInfoEntry.TABLE_NAME, rowSelection, rowSelectionArgs);
+                getContext().getContentResolver().notifyChange(uri, null);
                 break;
 
             case SCHEDULES_ROW:
@@ -86,6 +88,7 @@ public class PaymentProvider extends ContentProvider {
                 rowSelection = ScheduleInfoEntry._ID + "=?";
                 rowSelectionArgs = new String[] {Long.toString(rowId)};
                 nRows = db.delete(ScheduleInfoEntry.TABLE_NAME, rowSelection, rowSelectionArgs);
+                getContext().getContentResolver().notifyChange(uri, null);
                 break;
 
             case MEMBERS_ROW:
@@ -93,6 +96,7 @@ public class PaymentProvider extends ContentProvider {
                 rowSelection = MemberInfoEntry._ID + "=?";
                 rowSelectionArgs = new String[] {Long.toString(rowId)};
                 nRows = db.delete(MemberInfoEntry.TABLE_NAME, rowSelection, rowSelectionArgs);
+                getContext().getContentResolver().notifyChange(uri, null);
                 break;
 
         }
@@ -159,21 +163,26 @@ public class PaymentProvider extends ContentProvider {
             case MEMBERS:
                 cursor = db.query(MemberInfoEntry.TABLE_NAME, projection, selection,
                         selectionArgs, null, null, sortOrder);
+                // set a Notification for a change in data
+                cursor.setNotificationUri(getContext().getContentResolver(), uri);
                 break;
 
             case MONTHS:
                 cursor = db.query(MonthInfoEntry.TABLE_NAME, projection, selection,
                         selectionArgs, null, null, sortOrder);
+                cursor.setNotificationUri(getContext().getContentResolver(), uri);
                 break;
 
             case SCHEDULES:
                 cursor = db.query(ScheduleInfoEntry.TABLE_NAME, projection, selection,
                         selectionArgs, null, null, sortOrder);
+                cursor.setNotificationUri(getContext().getContentResolver(), uri);
                 break;
 
             case PAYMENTS:
                 cursor = db.query(PaymentInfoEntry.TABLE_NAME, projection, selection,
                         selectionArgs, null, null, sortOrder);
+                cursor.setNotificationUri(getContext().getContentResolver(), uri);
                 break;
 
             case MEMBERS_ROW:
@@ -182,6 +191,7 @@ public class PaymentProvider extends ContentProvider {
                 String[] rowSelectionArgs = new String[]{Long.toString(rowId)};
                 cursor = db.query(MemberInfoEntry.TABLE_NAME, projection,rowSelection,rowSelectionArgs,
                         null, null, null);
+                cursor.setNotificationUri(getContext().getContentResolver(), uri);
                 break;
 
             case MONTHS_ROW:
@@ -190,6 +200,7 @@ public class PaymentProvider extends ContentProvider {
                 String[] row_SelectionArgs = new String[]{Long.toString(row_Id)};
                 cursor = db.query(MonthInfoEntry.TABLE_NAME, projection,row_Selection,row_SelectionArgs,
                         null, null, null);
+                cursor.setNotificationUri(getContext().getContentResolver(), uri);
                 break;
 
             case SCHEDULES_ROW:
@@ -198,6 +209,7 @@ public class PaymentProvider extends ContentProvider {
                 String[] row_selectionArgs = new String[] {Long.toString(row_id)};
                 cursor = db.query(ScheduleInfoEntry.TABLE_NAME, projection, row_selection, row_selectionArgs,
                         null, null, null);
+                cursor.setNotificationUri(getContext().getContentResolver(), uri);
                 break;
 
             case PAYMENTS_ROW:
@@ -206,6 +218,7 @@ public class PaymentProvider extends ContentProvider {
                 String[] paymentSelectionArgs = new String[] {Long.toString(paymentId)};
                 cursor = db.query(PaymentInfoEntry.TABLE_NAME, projection, paymentSelection, paymentSelectionArgs,
                         null, null, null);
+                cursor.setNotificationUri(getContext().getContentResolver(), uri);
                 break;
         }
 

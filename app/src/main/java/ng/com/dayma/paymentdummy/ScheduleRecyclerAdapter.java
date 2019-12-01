@@ -104,7 +104,7 @@ public class ScheduleRecyclerAdapter extends RecyclerView.Adapter<ScheduleRecycl
         int cursorItem = mSelectedItemsCursorId.keyAt(itemIndex);
         mListener.onDeleteSchedule(cursorItem);
 
-        notifyDataSetChanged();
+        notifyItemRemoved(position);
         resetCurrentIndex();
     }
 
