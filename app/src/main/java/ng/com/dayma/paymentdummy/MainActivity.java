@@ -1,6 +1,7 @@
 package ng.com.dayma.paymentdummy;
 
 import android.app.LoaderManager;
+import android.content.ContentUris;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
@@ -20,6 +21,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.support.v7.widget.helper.ItemTouchHelper;
+import android.util.Log;
+import android.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -31,20 +35,29 @@ import ng.com.dayma.paymentdummy.data.PaymentDatabaseContract;
 import ng.com.dayma.paymentdummy.data.PaymentDatabaseContract.ScheduleInfoEntry;
 import ng.com.dayma.paymentdummy.data.PaymentOpenHelper;
 import ng.com.dayma.paymentdummy.data.PaymentProviderContract;
+import ng.com.dayma.paymentdummy.touchhelpers.ScheduleTouchHelperCallback;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, LoaderManager.LoaderCallbacks<Cursor> {
+        implements NavigationView.OnNavigationItemSelectedListener, LoaderManager.LoaderCallbacks<Cursor>,
+        ScheduleRecyclerAdapter.ClickAdapterListener {
     public static final String MONTH_POSITION = "ng.com.dayma.paymentdummy.MONTH_POSITION";
     public static final int LOADER_SCHEDULES = 0;
     private static final int LOADER_MONTHS = 1;
+    public final String TAG = getClass().getSimpleName();
     private ScheduleRecyclerAdapter mScheduleRecyclerAdapter;
     private RecyclerView mRecyclerItems;
     private GridLayoutManager mGridLayoutManager;
     private MonthRecyclerAdapter mMonthRecyclerAdapter;
     private PaymentOpenHelper mDbOpenHelper;
 
+    //
+    private ActionMode mActionMode;
+    private ActionModecallbacks mActionModecallbacks;
+    private ScheduleRecyclerAdapter.ClickAdapterListener listener;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.d(TAG, "**********onCreate*********");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -78,11 +91,13 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         initialDisplayContent();
+        mActionModecallbacks = new ActionModecallbacks();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        DataManager.loadFromDatabase(mDbOpenHelper);
         getLoaderManager().restartLoader(LOADER_SCHEDULES, null, this);
 //        loadSchedulesData();
         updateNavHeader();
@@ -127,7 +142,6 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void initialDisplayContent() {
-        DataManager.loadFromDatabase(mDbOpenHelper);
         mRecyclerItems = (RecyclerView) findViewById(R.id.list_schedules);
         mGridLayoutManager = new GridLayoutManager(this,
                 getResources().getInteger(R.integer.schedule_grid_span));
@@ -143,6 +157,12 @@ public class MainActivity extends AppCompatActivity
 
     private void displaySchedules() {
         mRecyclerItems.setLayoutManager(mGridLayoutManager);
+        ScheduleTouchHelperCallback callback = new ScheduleTouchHelperCallback(mScheduleRecyclerAdapter);
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
+        mScheduleRecyclerAdapter.setTouchHelper(itemTouchHelper);
+        itemTouchHelper.attachToRecyclerView(mRecyclerItems);
+        mScheduleRecyclerAdapter.setClickAdapter(this);
+
         mRecyclerItems.setAdapter(mScheduleRecyclerAdapter);
 
         selectNavigationMenuItem(R.id.nav_schedules);
@@ -297,4 +317,113 @@ public class MainActivity extends AppCompatActivity
             mMonthRecyclerAdapter.changeCursor(null);
         }
     }
+
+    @Override
+    public void onItemClicked(int adapterPosition, long cursorDataId) {
+        enableActionMode(adapterPosition, (int) cursorDataId);
+    }
+
+    @Override
+    public boolean onSingleClick() {
+        if (mActionMode != null){
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public void onDeleteSchedule(int id) {
+        Uri scheduleUri = ContentUris.withAppendedId(PaymentProviderContract.Schedules.CONTENT_URI, (long)id);
+        Log.d(TAG, "Deleting schedule");
+        getContentResolver().delete(scheduleUri, null, null);
+
+    }
+
+    private void enableActionMode(int position, int cursorIdPos) {
+        if(mActionMode == null ){
+            mActionMode = startActionMode(mActionModecallbacks);
+        }
+        togglePosition(position,cursorIdPos);
+    }
+
+    private void togglePosition(int position, int cursorIdPos) {
+        mScheduleRecyclerAdapter.toggleSelection(position, cursorIdPos);
+        int count = mScheduleRecyclerAdapter.getSelectedItemCount();
+
+        if(count == 0){
+            mActionMode.finish();
+            mActionMode = null;
+        } else {
+            mActionMode.setTitle(String.valueOf(count) + " " + getString(R.string.selected_item_count));
+            mActionMode.invalidate();// redraw the CAB
+        }
+    }
+
+    // code for ActionMode
+    private class ActionModecallbacks implements ActionMode.Callback {
+
+        @Override
+        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+            mode.getMenuInflater().inflate(R.menu.contextual_menu, menu);
+            return true;
+        }
+
+        @Override
+        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+            MenuItem edit_menu = menu.findItem(R.id.edit_schedule);
+            MenuItem delete_menu = menu.findItem(R.id.delete_schedule);
+            if(mScheduleRecyclerAdapter.getSelectedItemCount() == 1){
+                edit_menu.setEnabled(true);
+            } else {
+                edit_menu.setEnabled(false);
+            }
+            return false;
+        }
+
+        @Override
+        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+            switch (item.getItemId()){
+
+                case R.id.delete_schedule:
+                    Log.d(TAG, "Delete schedule menu selected");
+                    deleteSchedule();
+                    mode.finish();
+                    return true;
+                case R.id.edit_schedule:
+                    Log.d(TAG, "Edit schedule menu selected");
+                    editSchedule();
+                    mode.finish();
+                    return true;
+            }
+            return false;
+        }
+
+        @Override
+        public void onDestroyActionMode(ActionMode mode) {
+            mScheduleRecyclerAdapter.clearSelections();
+            mActionMode = null;
+
+        }
+    }
+
+    private void deleteSchedule() {
+        List selectedItemPositions =
+                mScheduleRecyclerAdapter.getSelectedItems();
+        for (int i = selectedItemPositions.size() - 1; i >= 0; i--) {
+            mScheduleRecyclerAdapter.removeData((Integer) selectedItemPositions.get(i));
+        }
+        mScheduleRecyclerAdapter.notifyDataSetChanged();
+        Log.d(TAG, "done deleting");
+        mActionMode = null;
+    }
+
+    private void editSchedule() {
+        List selectedItemPositions = mScheduleRecyclerAdapter.getSelectedItems();
+        for (int i = selectedItemPositions.size() - 1; i >= 0; i--) {
+            mScheduleRecyclerAdapter.editData((Integer) selectedItemPositions.get(i));
+        }
+        mScheduleRecyclerAdapter.notifyDataSetChanged();
+        mActionMode = null;
+    }
+
 }

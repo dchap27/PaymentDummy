@@ -3,5 +3,6 @@
     <color name="colorPrimary">#333333</color>
     <color name="colorPrimaryDark">#222222</color>
     <color name="colorAccent">@android:color/holo_green_light</color>
-    <color name="chanda_color_text">#F05A28</color>
+    <color name="chanda_color_text">#8BC34A</color>
+    <color name="row_activated">#93B36D</color>
 </resources>
