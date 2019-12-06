@@ -10,9 +10,14 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.view.ActionMode;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.support.v7.widget.helper.ItemTouchHelper;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 
@@ -20,8 +25,11 @@ import java.util.List;
 
 import ng.com.dayma.paymentdummy.data.PaymentOpenHelper;
 import ng.com.dayma.paymentdummy.data.PaymentProviderContract;
+import ng.com.dayma.paymentdummy.touchhelpers.ScheduleClickAdapterListener;
+import ng.com.dayma.paymentdummy.touchhelpers.ScheduleTouchHelperCallback;
 
-public class ScheduleListActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
+public class ScheduleListActivity extends AppCompatActivity implements
+        LoaderManager.LoaderCallbacks<Cursor>, ScheduleClickAdapterListener {
 
     public static final String MONTH_ID = "ng.com.dayma.paymentdummy.MONTH_ID";
     public static final int ID_NOT_SET = -1;
@@ -33,6 +41,9 @@ public class ScheduleListActivity extends AppCompatActivity implements LoaderMan
     private ScheduleRecyclerAdapter mMonthSchedulesAdapter;
     private String mMonID;
     private PaymentOpenHelper mDbOpenHelper;
+    private ActionMode mActionMode;
+    private ActionModecallbacks mActionModecallbacks;
+    private final String TAG = getClass().getSimpleName();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +64,8 @@ public class ScheduleListActivity extends AppCompatActivity implements LoaderMan
         });
 
         initializeDisplayContent();
+        mActionModecallbacks = new ActionModecallbacks();
+
     }
 
     @Override
@@ -96,8 +109,16 @@ public class ScheduleListActivity extends AppCompatActivity implements LoaderMan
 //        List<ScheduleInfo> schedules = DataManager.getInstance().getSchedules(month);
         mMonthSchedulesAdapter = new ScheduleRecyclerAdapter(this, null);
 
-        GridLayoutManager mMonthSchedulesLayoutManager = new GridLayoutManager(this, R.integer.schedule_grid_span);
+        GridLayoutManager mMonthSchedulesLayoutManager = new GridLayoutManager(this,
+                getResources().getInteger(R.integer.schedule_grid_span));
         mRecyclerItems.setLayoutManager(mMonthSchedulesLayoutManager);
+
+        ScheduleTouchHelperCallback callback = new ScheduleTouchHelperCallback(mMonthSchedulesAdapter);
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
+        mMonthSchedulesAdapter.setTouchHelper(itemTouchHelper);
+        itemTouchHelper.attachToRecyclerView(mRecyclerItems);
+        mMonthSchedulesAdapter.setClickAdapter(this);
+
         mRecyclerItems.setAdapter(mMonthSchedulesAdapter);
 
     }
@@ -139,5 +160,102 @@ public class ScheduleListActivity extends AppCompatActivity implements LoaderMan
     public void onLoaderReset(Loader<Cursor> loader) {
         if(loader.getId() == LOADER_SCHEDULES)
             mMonthSchedulesAdapter.changeCursor(null);
+    }
+
+    @Override
+    public void onItemClicked(int adapterPosition, long cursorDataId) {
+        enableActionMode(adapterPosition, (int) cursorDataId);
+    }
+
+    @Override
+    public boolean onSingleClick() {
+        if (mActionMode != null){
+            return true;
+        }
+        return false;
+    }
+
+    private void enableActionMode(int position, int cursorIdPos) {
+        if(mActionMode == null ){
+            mActionMode = startSupportActionMode(mActionModecallbacks);
+        }
+        togglePosition(position,cursorIdPos);
+    }
+
+    private void togglePosition(int position, int cursorIdPos) {
+        mMonthSchedulesAdapter.toggleSelection(position, cursorIdPos);
+        int count = mMonthSchedulesAdapter.getSelectedItemCount();
+        if(count == 0){
+            mActionMode.finish();
+            mActionMode = null;
+        } else {
+            mActionMode.setTitle((count) + " " + getString(R.string.selected_item_count));
+            mActionMode.invalidate();// redraw the CAB
+        }
+    }
+
+    // code for ActionMode
+    private class ActionModecallbacks implements android.support.v7.view.ActionMode.Callback {
+
+        @Override
+        public boolean onCreateActionMode(android.support.v7.view.ActionMode mode, Menu menu) {
+            mode.getMenuInflater().inflate(R.menu.contextual_menu, menu);
+            return true;
+        }
+
+        @Override
+        public boolean onPrepareActionMode(android.support.v7.view.ActionMode mode, Menu menu) {
+            MenuItem edit_menu = menu.findItem(R.id.edit_schedule);
+            if(mMonthSchedulesAdapter.getSelectedItemCount() == 1){
+                edit_menu.setEnabled(true);
+            } else {
+                edit_menu.setEnabled(false);
+            }
+            return false;
+        }
+
+        @Override
+        public boolean onActionItemClicked(android.support.v7.view.ActionMode mode, MenuItem item) {
+            switch (item.getItemId()){
+
+                case R.id.delete_schedule:
+                    Log.d(TAG, "Delete schedule menu selected");
+                    deleteSchedule();
+                    mode.finish();
+                    return true;
+                case R.id.edit_schedule:
+                    Log.d(TAG, "Edit schedule menu selected");
+                    editSchedule();
+                    mode.finish();
+                    return true;
+            }
+            return false;
+        }
+
+        @Override
+        public void onDestroyActionMode(android.support.v7.view.ActionMode mode) {
+            mMonthSchedulesAdapter.clearSelections();
+            mActionMode = null;
+        }
+    }
+
+    private void deleteSchedule() {
+        List selectedItemPositions =
+                mMonthSchedulesAdapter.getSelectedItems();
+        for (int i = selectedItemPositions.size() - 1; i >= 0; i--) {
+            mMonthSchedulesAdapter.removeData((Integer) selectedItemPositions.get(i));
+        }
+        mMonthSchedulesAdapter.notifyDataSetChanged();
+        Log.d(TAG, "done deleting");
+        mActionMode = null;
+    }
+
+    private void editSchedule() {
+        List selectedItemPositions = mMonthSchedulesAdapter.getSelectedItems();
+        for (int i = selectedItemPositions.size() - 1; i >= 0; i--) {
+            mMonthSchedulesAdapter.editData((Integer) selectedItemPositions.get(i));
+        }
+        mMonthSchedulesAdapter.notifyDataSetChanged();
+        mActionMode = null;
     }
 }

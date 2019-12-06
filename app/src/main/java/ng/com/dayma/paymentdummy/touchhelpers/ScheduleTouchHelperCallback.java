@@ -43,9 +43,8 @@ public class ScheduleTouchHelperCallback extends ItemTouchHelper.Callback {
     public void onSelectedChanged(RecyclerView.ViewHolder viewHolder, int actionState) {
         super.onSelectedChanged(viewHolder, actionState);
         if(actionState == ItemTouchHelper.ACTION_STATE_SWIPE){
-            viewHolder.itemView.setBackgroundColor(Color.BLUE);
+            viewHolder.itemView.setBackgroundColor(Color.LTGRAY);
         }
-//        mTouchHelperAdapter.onItemSelected(viewHolder.getAdapterPosition());
 
     }
 

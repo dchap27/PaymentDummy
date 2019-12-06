@@ -65,6 +65,7 @@ public final class ScheduleInfo implements Parcelable {
     }
 
     private String getCompareKey() {
+        String a = mMonth.getMonthId() + "|" + mScheduleId;
         return mMonth.getMonthId() + "|" + mScheduleId;
     }
 

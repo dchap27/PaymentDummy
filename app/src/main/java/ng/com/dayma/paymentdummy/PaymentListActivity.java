@@ -1,6 +1,7 @@
 package ng.com.dayma.paymentdummy;
 
 import android.app.LoaderManager;
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.CursorLoader;
 import android.content.Intent;
@@ -8,6 +9,7 @@ import android.content.Loader;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
@@ -20,9 +22,10 @@ import android.view.View;
 import java.util.ArrayList;
 import java.util.List;
 
-import ng.com.dayma.paymentdummy.data.PaymentDatabaseContract;
 import ng.com.dayma.paymentdummy.data.PaymentDatabaseContract.PaymentInfoEntry;
 import ng.com.dayma.paymentdummy.data.PaymentOpenHelper;
+import ng.com.dayma.paymentdummy.data.PaymentProviderContract;
+import ng.com.dayma.paymentdummy.data.PaymentProviderContract.Payments;
 
 public class PaymentListActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
@@ -38,6 +41,7 @@ public class PaymentListActivity extends AppCompatActivity implements LoaderMana
     private PaymentRecyclerAdapter mPaymentRecyclerAdapter;
     private String mScheID;
     private SQLiteOpenHelper mDbOpenHelper;
+    private int mId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,6 +79,7 @@ public class PaymentListActivity extends AppCompatActivity implements LoaderMana
             createNewSchedule();
         }else {
             mPayments = DataManager.getInstance().getPayments(mSchedule);
+            mId = mSchedule.getId();
         }
     }
 
@@ -95,19 +100,18 @@ public class PaymentListActivity extends AppCompatActivity implements LoaderMana
 
 
     private void updateTotalAmountOnSchedule() {
-        SQLiteDatabase db = mDbOpenHelper.getReadableDatabase();
         String[] projection = {
-                PaymentInfoEntry.COLUMN_SCHEDULE_ID,
-                PaymentInfoEntry.COLUMN_PAYMENT_SUBTOTAL,
-                PaymentInfoEntry.COLUMN_MEMBER_CHANDANO,
+                Payments.COLUMN_SCHEDULE_ID,
+                Payments.COLUMN_PAYMENT_SUBTOTAL,
+                Payments.COLUMN_MEMBER_CHANDANO,
         };
-        String selection = PaymentInfoEntry.COLUMN_SCHEDULE_ID + "=?";
+        String selection = Payments.COLUMN_SCHEDULE_ID + "=?";
         String[] selectionArgs = { mScheID };
-        Cursor paymentsCursor = db.query(PaymentInfoEntry.TABLE_NAME, projection,selection,selectionArgs,
-                null, null, null);
+        Cursor paymentsCursor = getContentResolver().query(Payments.CONTENT_URI, projection,
+                selection, selectionArgs, null);
 
-        int amountPos = paymentsCursor.getColumnIndex(PaymentInfoEntry.COLUMN_PAYMENT_SUBTOTAL);
-        int chandaNoPos = paymentsCursor.getColumnIndex(PaymentInfoEntry.COLUMN_MEMBER_CHANDANO);
+        int amountPos = paymentsCursor.getColumnIndex(Payments.COLUMN_PAYMENT_SUBTOTAL);
+        int chandaNoPos = paymentsCursor.getColumnIndex(Payments.COLUMN_MEMBER_CHANDANO);
 
         ArrayList<Integer> payers = new ArrayList<>();
         double totalAmount = 0;
@@ -122,15 +126,15 @@ public class PaymentListActivity extends AppCompatActivity implements LoaderMana
         }
         paymentsCursor.close();
 
-        SQLiteDatabase db1 = mDbOpenHelper.getWritableDatabase();
         // selection criteria for row to update
-        final String rowScheduleSelection = PaymentDatabaseContract.ScheduleInfoEntry.COLUMN_SCHEDULE_ID + "=?";
+        final String rowScheduleSelection = PaymentProviderContract.Schedules.COLUMN_SCHEDULE_ID + "=?";
         final String[] rowScheduleSelectionArgs = {mScheID};
 
         ContentValues values = new ContentValues();
-        values.put(PaymentDatabaseContract.ScheduleInfoEntry.COLUMN_SCHEDULE_TOTALAMOUNT, totalAmount);
-        values.put(PaymentDatabaseContract.ScheduleInfoEntry.COLUMN_SCHEDULE_TOTALPAYERS, payers.size());
-        db1.update(PaymentDatabaseContract.ScheduleInfoEntry.TABLE_NAME, values, rowScheduleSelection, rowScheduleSelectionArgs);
+        values.put(PaymentProviderContract.Schedules.COLUMN_SCHEDULE_TOTALAMOUNT, totalAmount);
+        values.put(PaymentProviderContract.Schedules.COLUMN_SCHEDULE_TOTALPAYERS, payers.size());
+        Uri scheduleUri = ContentUris.withAppendedId(PaymentProviderContract.Schedules.CONTENT_URI, mId);
+        getContentResolver().update(scheduleUri, values, rowScheduleSelection, rowScheduleSelectionArgs);
 
     }
 
@@ -188,29 +192,29 @@ public class PaymentListActivity extends AppCompatActivity implements LoaderMana
         return new CursorLoader(this){
             @Override
             public Cursor loadInBackground() {
-                SQLiteDatabase db = mDbOpenHelper.getReadableDatabase();
 
                 String[] paymentColumns = {
-                        PaymentInfoEntry._ID,
-                        PaymentInfoEntry.COLUMN_MEMBER_CHANDANO,
-                        PaymentInfoEntry.COLUMN_MEMBER_FULLNAME,
-                        PaymentInfoEntry.COLUMN_PAYMENT_LOCALRECEIPT,
-                        PaymentInfoEntry.COLUMN_PAYMENT_MONTHPAID,
-                        PaymentInfoEntry.COLUMN_PAYMENT_CHANDAAM,
-                        PaymentInfoEntry.COLUMN_PAYMENT_CHANDAWASIYYAT,
-                        PaymentInfoEntry.COLUMN_PAYMENT_JALSASALANA,
-                        PaymentInfoEntry.COLUMN_PAYMENT_TARIKIJADID,
-                        PaymentInfoEntry.COLUMN_PAYMENT_WAQFIJADID,
-                        PaymentInfoEntry.COLUMN_PAYMENT_WELFAREFUND,
-                        PaymentInfoEntry.COLUMN_PAYMENT_SCHOLARSHIP,
-                        PaymentInfoEntry.COLUMN_PAYMENT_SUBTOTAL,
-                        PaymentInfoEntry.COLUMN_SCHEDULE_ID
+                        PaymentProviderContract.Payments._ID,
+                        PaymentProviderContract.Payments.COLUMN_MEMBER_CHANDANO,
+                        PaymentProviderContract.Payments.COLUMN_MEMBER_FULLNAME,
+                        PaymentProviderContract.Payments.COLUMN_PAYMENT_LOCALRECEIPT,
+                        PaymentProviderContract.Payments.COLUMN_PAYMENT_MONTHPAID,
+                        PaymentProviderContract.Payments.COLUMN_PAYMENT_CHANDAAM,
+                        PaymentProviderContract.Payments.COLUMN_PAYMENT_CHANDAWASIYYAT,
+                        PaymentProviderContract.Payments.COLUMN_PAYMENT_JALSASALANA,
+                        PaymentProviderContract.Payments.COLUMN_PAYMENT_TARIKIJADID,
+                        PaymentProviderContract.Payments.COLUMN_PAYMENT_WAQFIJADID,
+                        PaymentProviderContract.Payments.COLUMN_PAYMENT_WELFAREFUND,
+                        PaymentProviderContract.Payments.COLUMN_PAYMENT_SCHOLARSHIP,
+                        PaymentProviderContract.Payments.COLUMN_PAYMENT_SUBTOTAL,
+                        PaymentProviderContract.Payments.COLUMN_SCHEDULE_ID
                 };
-                String selection = PaymentInfoEntry.COLUMN_SCHEDULE_ID + "=?";
+                String selection = PaymentProviderContract.Payments.COLUMN_SCHEDULE_ID + "=?";
                 String[] selectionArgs = { mScheID };
-                String paymentOrderby = PaymentInfoEntry.COLUMN_MEMBER_FULLNAME + "," + PaymentInfoEntry.COLUMN_PAYMENT_SUBTOTAL;
-                return db.query(PaymentInfoEntry.TABLE_NAME, paymentColumns, selection, selectionArgs,
-                        null, null, paymentOrderby);
+                String paymentOrderby = PaymentProviderContract.Payments.COLUMN_MEMBER_FULLNAME + "," +
+                        PaymentProviderContract.Payments.COLUMN_PAYMENT_SUBTOTAL;
+                return getContentResolver().query(Payments.CONTENT_URI, paymentColumns, selection, selectionArgs,
+                        paymentOrderby);
             }
         };
     }

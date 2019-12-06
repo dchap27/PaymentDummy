@@ -1,5 +1,6 @@
 package ng.com.dayma.paymentdummy;
 
+import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
@@ -8,10 +9,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-import ng.com.dayma.paymentdummy.data.PaymentDatabaseContract.MonthInfoEntry;
-import ng.com.dayma.paymentdummy.data.PaymentDatabaseContract.PaymentInfoEntry;
-import ng.com.dayma.paymentdummy.data.PaymentDatabaseContract.ScheduleInfoEntry;
 import ng.com.dayma.paymentdummy.data.PaymentOpenHelper;
+import ng.com.dayma.paymentdummy.data.PaymentProviderContract;
 
 /**
  * Created by Ahmad on 7/12/2019.
@@ -34,97 +33,93 @@ public class DataManager {
         return ourInstance;
     }
 
-    public static void loadFromDatabase(PaymentOpenHelper dbHelper){
+    public static void loadFromDatabase(PaymentOpenHelper dbHelper, Context context){
         SQLiteDatabase db = dbHelper.getReadableDatabase();
 
         // get the columns for the month_info table
         final String[] monthColumnsProjection = {
-                MonthInfoEntry.COLUMN_MONTH_ID
+                PaymentProviderContract.Months.COLUMN_MONTH_ID
         };
-        // query the month_info table with the specified columns
-        Cursor monthCursor = db.query(MonthInfoEntry.TABLE_NAME, monthColumnsProjection, null,
-                null, null, null, MonthInfoEntry.COLUMN_MONTH_ID + " DESC");// query returns a cursor
-
+        Cursor monthCursor = context.getContentResolver().query(PaymentProviderContract.Months.CONTENT_URI, monthColumnsProjection,
+                null,null,null);
         // extract the months from the returned cursor
         loadMonthsFromDatabase(monthCursor);
 
         // get the data for schedule_info table
         final String[] scheduleColumnsProjection = {
-                ScheduleInfoEntry.COLUMN_SCHEDULE_ID,
-                ScheduleInfoEntry.COLUMN_SCHEDULE_TITLE,
-                ScheduleInfoEntry.COLUMN_MEMBER_JAMAATNAME,
-                ScheduleInfoEntry.COLUMN_MONTH_ID,
-                ScheduleInfoEntry.COLUMN_SCHEDULE_ISCOMPLETE,
-                ScheduleInfoEntry._ID
+                PaymentProviderContract.Schedules.COLUMN_SCHEDULE_ID,
+                PaymentProviderContract.Schedules.COLUMN_SCHEDULE_TITLE,
+                PaymentProviderContract.Schedules.COLUMN_MEMBER_JAMAATNAME,
+                PaymentProviderContract.Schedules.COLUMN_MONTH_ID,
+                PaymentProviderContract.Schedules.COLUMN_SCHEDULE_ISCOMPLETE,
+                PaymentProviderContract.Schedules._ID
         };
-        String scheduleOrderby = ScheduleInfoEntry.COLUMN_MONTH_ID + "," + ScheduleInfoEntry.COLUMN_MEMBER_JAMAATNAME;
         // query the schedule_info table
-        Cursor scheduleCursor = db.query(ScheduleInfoEntry.TABLE_NAME, scheduleColumnsProjection, null,
-                null, null, null, scheduleOrderby);
+        Cursor scheduleCursor = context.getContentResolver().query(PaymentProviderContract.Schedules.CONTENT_URI, scheduleColumnsProjection, null,
+                null, null, null);
         loadSchedulesFromDatabase(scheduleCursor);
 
         //get columns for payment_info table
         final String[] paymentColumnsProjection = new String[]{
-                PaymentInfoEntry.COLUMN_SCHEDULE_ID,
-                PaymentInfoEntry._ID,
-                PaymentInfoEntry.COLUMN_MEMBER_CHANDANO,
-                PaymentInfoEntry.COLUMN_MEMBER_FULLNAME,
-                PaymentInfoEntry.COLUMN_PAYMENT_LOCALRECEIPT,
-                PaymentInfoEntry.COLUMN_PAYMENT_MONTHPAID,
-                PaymentInfoEntry.COLUMN_PAYMENT_CHANDAAM,
-                PaymentInfoEntry.COLUMN_PAYMENT_CHANDAWASIYYAT,
-                PaymentInfoEntry.COLUMN_PAYMENT_JALSASALANA,
-                PaymentInfoEntry.COLUMN_PAYMENT_TARIKIJADID,
-                PaymentInfoEntry.COLUMN_PAYMENT_WAQFIJADID,
-                PaymentInfoEntry.COLUMN_PAYMENT_WELFAREFUND,
-                PaymentInfoEntry.COLUMN_PAYMENT_SCHOLARSHIP,
-                PaymentInfoEntry.COLUMN_PAYMENT_MARYAMFUND,
-                PaymentInfoEntry.COLUMN_PAYMENT_TABLIGH,
-                PaymentInfoEntry.COLUMN_PAYMENT_ZAKAT,
-                PaymentInfoEntry.COLUMN_PAYMENT_SADAKAT,
-                PaymentInfoEntry.COLUMN_PAYMENT_FITRANA,
-                PaymentInfoEntry.COLUMN_PAYMENT_MOSQUEDONATION,
-                PaymentInfoEntry.COLUMN_PAYMENT_MTA,
-                PaymentInfoEntry.COLUMN_PAYMENT_CENTINARYKHILAFAT,
-                PaymentInfoEntry.COLUMN_PAYMENT_WASIYYATHISSANJAIDAD,
-                PaymentInfoEntry.COLUMN_PAYMENT_MISCELLANEOUS,
-                PaymentInfoEntry.COLUMN_PAYMENT_SUBTOTAL
+                PaymentProviderContract.Payments.COLUMN_SCHEDULE_ID,
+                PaymentProviderContract.Payments._ID,
+                PaymentProviderContract.Payments.COLUMN_MEMBER_CHANDANO,
+                PaymentProviderContract.Payments.COLUMN_MEMBER_FULLNAME,
+                PaymentProviderContract.Payments.COLUMN_PAYMENT_LOCALRECEIPT,
+                PaymentProviderContract.Payments.COLUMN_PAYMENT_MONTHPAID,
+                PaymentProviderContract.Payments.COLUMN_PAYMENT_CHANDAAM,
+                PaymentProviderContract.Payments.COLUMN_PAYMENT_CHANDAWASIYYAT,
+                PaymentProviderContract.Payments.COLUMN_PAYMENT_JALSASALANA,
+                PaymentProviderContract.Payments.COLUMN_PAYMENT_TARIKIJADID,
+                PaymentProviderContract.Payments.COLUMN_PAYMENT_WAQFIJADID,
+                PaymentProviderContract.Payments.COLUMN_PAYMENT_WELFAREFUND,
+                PaymentProviderContract.Payments.COLUMN_PAYMENT_SCHOLARSHIP,
+                PaymentProviderContract.Payments.COLUMN_PAYMENT_MARYAMFUND,
+                PaymentProviderContract.Payments.COLUMN_PAYMENT_TABLIGH,
+                PaymentProviderContract.Payments.COLUMN_PAYMENT_ZAKAT,
+                PaymentProviderContract.Payments.COLUMN_PAYMENT_SADAKAT,
+                PaymentProviderContract.Payments.COLUMN_PAYMENT_FITRANA,
+                PaymentProviderContract.Payments.COLUMN_PAYMENT_MOSQUEDONATION,
+                PaymentProviderContract.Payments.COLUMN_PAYMENT_MTA,
+                PaymentProviderContract.Payments.COLUMN_PAYMENT_CENTINARYKHILAFAT,
+                PaymentProviderContract.Payments.COLUMN_PAYMENT_WASIYYATHISSANJAIDAD,
+                PaymentProviderContract.Payments.COLUMN_PAYMENT_MISCELLANEOUS,
+                PaymentProviderContract.Payments.COLUMN_PAYMENT_SUBTOTAL
 
         };
 
-        Cursor cursor = db.query(PaymentInfoEntry.TABLE_NAME, paymentColumnsProjection, null, null,
-                null, null, PaymentInfoEntry.COLUMN_MEMBER_FULLNAME);
-        loadPaymentsFromDatabase(cursor);
+        Cursor paymentCursor = context.getContentResolver().query(PaymentProviderContract.Payments.CONTENT_URI, paymentColumnsProjection, null, null,null);
+        loadPaymentsFromDatabase(paymentCursor);
 
 
     }
 
     private static void loadPaymentsFromDatabase(Cursor cursor) {
         // get the positions of the columns
-        int scheduleIdPos = cursor.getColumnIndex(PaymentInfoEntry.COLUMN_SCHEDULE_ID);
-        int chandaNoPos = cursor.getColumnIndex(PaymentInfoEntry.COLUMN_MEMBER_CHANDANO);
-        int fullnamePos = cursor.getColumnIndex(PaymentInfoEntry.COLUMN_MEMBER_FULLNAME);
-        int localReceiptPos = cursor.getColumnIndex(PaymentInfoEntry.COLUMN_PAYMENT_LOCALRECEIPT);
-        int monthPaidPos = cursor.getColumnIndex(PaymentInfoEntry.COLUMN_PAYMENT_MONTHPAID);
-        int chandaPos = cursor.getColumnIndex(PaymentInfoEntry.COLUMN_PAYMENT_CHANDAAM);
-        int wasiyyatPos = cursor.getColumnIndex(PaymentInfoEntry.COLUMN_PAYMENT_CHANDAWASIYYAT);
-        int jalsaPos = cursor.getColumnIndex(PaymentInfoEntry.COLUMN_PAYMENT_JALSASALANA);
-        int tarikiPos = cursor.getColumnIndex(PaymentInfoEntry.COLUMN_PAYMENT_TARIKIJADID);
-        int waqfPos = cursor.getColumnIndex(PaymentInfoEntry.COLUMN_PAYMENT_WAQFIJADID);
-        int welfarePos = cursor.getColumnIndex(PaymentInfoEntry.COLUMN_PAYMENT_WELFAREFUND);
-        int scholarshipPos = cursor.getColumnIndex(PaymentInfoEntry.COLUMN_PAYMENT_SCHOLARSHIP);
-        int maryamPos = cursor.getColumnIndex(PaymentInfoEntry.COLUMN_PAYMENT_MARYAMFUND);
-        int tablighPos = cursor.getColumnIndex(PaymentInfoEntry.COLUMN_PAYMENT_TABLIGH);
-        int zakatPos = cursor.getColumnIndex(PaymentInfoEntry.COLUMN_PAYMENT_ZAKAT);
-        int sadakatPos = cursor.getColumnIndex(PaymentInfoEntry.COLUMN_PAYMENT_SADAKAT);
-        int fitranaPos = cursor.getColumnIndex(PaymentInfoEntry.COLUMN_PAYMENT_FITRANA);
-        int mosqueDonationPos = cursor.getColumnIndex(PaymentInfoEntry.COLUMN_PAYMENT_MOSQUEDONATION);
-        int mtaPos = cursor.getColumnIndex(PaymentInfoEntry.COLUMN_PAYMENT_MTA);
-        int centinaryPos = cursor.getColumnIndex(PaymentInfoEntry.COLUMN_PAYMENT_CENTINARYKHILAFAT);
-        int wasiyyatHissanPos = cursor.getColumnIndex(PaymentInfoEntry.COLUMN_PAYMENT_WASIYYATHISSANJAIDAD);
-        int miscellaneousPos = cursor.getColumnIndex(PaymentInfoEntry.COLUMN_PAYMENT_MISCELLANEOUS);
-        int subtotalPos = cursor.getColumnIndex(PaymentInfoEntry.COLUMN_PAYMENT_SUBTOTAL);
-        int idPos = cursor.getColumnIndex(PaymentInfoEntry._ID);
+        int scheduleIdPos = cursor.getColumnIndex(PaymentProviderContract.Payments.COLUMN_SCHEDULE_ID);
+        int chandaNoPos = cursor.getColumnIndex(PaymentProviderContract.Payments.COLUMN_MEMBER_CHANDANO);
+        int fullnamePos = cursor.getColumnIndex(PaymentProviderContract.Payments.COLUMN_MEMBER_FULLNAME);
+        int localReceiptPos = cursor.getColumnIndex(PaymentProviderContract.Payments.COLUMN_PAYMENT_LOCALRECEIPT);
+        int monthPaidPos = cursor.getColumnIndex(PaymentProviderContract.Payments.COLUMN_PAYMENT_MONTHPAID);
+        int chandaPos = cursor.getColumnIndex(PaymentProviderContract.Payments.COLUMN_PAYMENT_CHANDAAM);
+        int wasiyyatPos = cursor.getColumnIndex(PaymentProviderContract.Payments.COLUMN_PAYMENT_CHANDAWASIYYAT);
+        int jalsaPos = cursor.getColumnIndex(PaymentProviderContract.Payments.COLUMN_PAYMENT_JALSASALANA);
+        int tarikiPos = cursor.getColumnIndex(PaymentProviderContract.Payments.COLUMN_PAYMENT_TARIKIJADID);
+        int waqfPos = cursor.getColumnIndex(PaymentProviderContract.Payments.COLUMN_PAYMENT_WAQFIJADID);
+        int welfarePos = cursor.getColumnIndex(PaymentProviderContract.Payments.COLUMN_PAYMENT_WELFAREFUND);
+        int scholarshipPos = cursor.getColumnIndex(PaymentProviderContract.Payments.COLUMN_PAYMENT_SCHOLARSHIP);
+        int maryamPos = cursor.getColumnIndex(PaymentProviderContract.Payments.COLUMN_PAYMENT_MARYAMFUND);
+        int tablighPos = cursor.getColumnIndex(PaymentProviderContract.Payments.COLUMN_PAYMENT_TABLIGH);
+        int zakatPos = cursor.getColumnIndex(PaymentProviderContract.Payments.COLUMN_PAYMENT_ZAKAT);
+        int sadakatPos = cursor.getColumnIndex(PaymentProviderContract.Payments.COLUMN_PAYMENT_SADAKAT);
+        int fitranaPos = cursor.getColumnIndex(PaymentProviderContract.Payments.COLUMN_PAYMENT_FITRANA);
+        int mosqueDonationPos = cursor.getColumnIndex(PaymentProviderContract.Payments.COLUMN_PAYMENT_MOSQUEDONATION);
+        int mtaPos = cursor.getColumnIndex(PaymentProviderContract.Payments.COLUMN_PAYMENT_MTA);
+        int centinaryPos = cursor.getColumnIndex(PaymentProviderContract.Payments.COLUMN_PAYMENT_CENTINARYKHILAFAT);
+        int wasiyyatHissanPos = cursor.getColumnIndex(PaymentProviderContract.Payments.COLUMN_PAYMENT_WASIYYATHISSANJAIDAD);
+        int miscellaneousPos = cursor.getColumnIndex(PaymentProviderContract.Payments.COLUMN_PAYMENT_MISCELLANEOUS);
+        int subtotalPos = cursor.getColumnIndex(PaymentProviderContract.Payments.COLUMN_PAYMENT_SUBTOTAL);
+        int idPos = cursor.getColumnIndex(PaymentProviderContract.Payments._ID);
 
         DataManager dm = getInstance();
         dm.mPayments.clear();
@@ -169,12 +164,12 @@ public class DataManager {
 
     private static void loadSchedulesFromDatabase(Cursor cursor) {
         // get the positions of the columns
-        int scheduleIdPos = cursor.getColumnIndex(ScheduleInfoEntry.COLUMN_SCHEDULE_ID);
-        int monthIdPos = cursor.getColumnIndex(ScheduleInfoEntry.COLUMN_MONTH_ID);
-        int titlePos = cursor.getColumnIndex(ScheduleInfoEntry.COLUMN_SCHEDULE_TITLE);
-        int jamaatPos = cursor.getColumnIndex(ScheduleInfoEntry.COLUMN_MEMBER_JAMAATNAME);
-        int completionstatusPos = cursor.getColumnIndex(ScheduleInfoEntry.COLUMN_SCHEDULE_ISCOMPLETE);
-        int idPos = cursor.getColumnIndex(ScheduleInfoEntry._ID);
+        int scheduleIdPos = cursor.getColumnIndex(PaymentProviderContract.Schedules.COLUMN_SCHEDULE_ID);
+        int monthIdPos = cursor.getColumnIndex(PaymentProviderContract.Schedules.COLUMN_MONTH_ID);
+        int titlePos = cursor.getColumnIndex(PaymentProviderContract.Schedules.COLUMN_SCHEDULE_TITLE);
+        int jamaatPos = cursor.getColumnIndex(PaymentProviderContract.Schedules.COLUMN_MEMBER_JAMAATNAME);
+        int completionstatusPos = cursor.getColumnIndex(PaymentProviderContract.Schedules.COLUMN_SCHEDULE_ISCOMPLETE);
+        int idPos = cursor.getColumnIndex(PaymentProviderContract.Schedules._ID);
 
         DataManager dm = getInstance();
         dm.mSchedules.clear();
@@ -204,7 +199,7 @@ public class DataManager {
 
     private static void loadMonthsFromDatabase(Cursor cursor) {
         // get the columns position
-        int monthIdPos = cursor.getColumnIndex(MonthInfoEntry.COLUMN_MONTH_ID);
+        int monthIdPos = cursor.getColumnIndex(PaymentProviderContract.Months.COLUMN_MONTH_ID);
 
         // get reference to datamanager singleton and clear any previous month
         DataManager dm = getInstance();
@@ -219,6 +214,7 @@ public class DataManager {
         }
         // close cursor after retreiving the rows
         cursor.close();
+        // delete null months
 
     }
 

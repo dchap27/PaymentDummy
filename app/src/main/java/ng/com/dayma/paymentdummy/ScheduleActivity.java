@@ -53,6 +53,8 @@ public class ScheduleActivity extends AppCompatActivity implements LoaderManager
     private Cursor mJamaatListsCursor;
     private ArrayList<String> mMonths;
     private ArrayList<String> mYears;
+    private Uri mMonthUri;
+    private boolean mSavedNewMonth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,7 +94,6 @@ public class ScheduleActivity extends AppCompatActivity implements LoaderManager
         readDisplayStateVale();
 
         mScheduleTitle = (EditText) findViewById(R.id.schedule_title_edittext);
-
 
         if(mIsNewSchedule) {
             initializeToCurrentMonthAndYear();
@@ -195,7 +196,8 @@ public class ScheduleActivity extends AppCompatActivity implements LoaderManager
         if(id == R.id.action_save_schedule){
             mIsSaving = true;
             saveSchedule();
-            finish();
+            if (!mIsNewSchedule)
+                finish();
         } else if(id == R.id.action_delete_schedule){
             deleteScheduleFromDatabase();
             finish();
@@ -220,14 +222,52 @@ public class ScheduleActivity extends AppCompatActivity implements LoaderManager
         saveScheduleToDatabase(scheduleId, monthId, jamaat, scheduleTitle);
     }
 
-    private void saveScheduleToDatabase(String scheduleId, String month, String jamaat, String scheduleTitle) {
+    private void saveScheduleToDatabase(String scheduleId, final String month, String jamaat, String scheduleTitle) {
         final ContentValues values = new ContentValues();
-        values.put(PaymentProviderContract.Schedules.COLUMN_SCHEDULE_ID, scheduleId);
+        if(mIsNewSchedule) {
+            values.put(PaymentProviderContract.Schedules.COLUMN_SCHEDULE_ID, scheduleId);
+        }
         values.put(PaymentProviderContract.Schedules.COLUMN_MONTH_ID, month);
         values.put(PaymentProviderContract.Schedules.COLUMN_MEMBER_JAMAATNAME, jamaat);
         values.put(PaymentProviderContract.Schedules.COLUMN_SCHEDULE_TITLE, scheduleTitle);
 
         getContentResolver().update(mScheduleUri, values, null, null);
+
+        /*
+        check if Month already exist in database
+        */
+        AsyncTask<ContentValues, Void, Uri> task2 = new AsyncTask<ContentValues, Void, Uri>() {
+            @Override
+            protected Uri doInBackground(ContentValues... contentValues) {
+                ContentValues newValues = contentValues[0];
+                String[] projection = { PaymentProviderContract.Months.COLUMN_MONTH_ID,
+                        PaymentProviderContract.Months._ID };
+                String selection = PaymentProviderContract.Months.COLUMN_MONTH_ID + "=?";
+                String[] selectionArgs = { month };
+                Cursor cursor = getContentResolver().query(PaymentProviderContract.Months.CONTENT_URI,
+                        projection, selection, selectionArgs, null);
+                if (cursor.getCount() == 0) {
+                    Log.d(TAG, "Insert new month values");
+                    Uri uri = getContentResolver().insert(PaymentProviderContract.Months.CONTENT_URI, newValues);
+                    return uri;
+                }
+                Log.d(TAG, "Record already found for month "+ month);
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Uri uri) {
+                mSavedNewMonth = true;
+                Log.d(TAG, "onPostExecute called");
+                mMonthUri = uri;
+                finish();
+            }
+        };
+        if(mIsNewSchedule) {
+            final ContentValues newValues = new ContentValues();
+            newValues.put(PaymentProviderContract.Months.COLUMN_MONTH_ID, month);
+            task2.execute(newValues);
+        }
     }
 
     @Override
@@ -306,6 +346,7 @@ public class ScheduleActivity extends AppCompatActivity implements LoaderManager
         mScheduleTitle.setText(scheduleTitle);
         int jamaatIndex = mJamaatList.indexOf(jamaat);
         mSpinnerJamaat.setSelection(jamaatIndex);
+        mSpinnerJamaat.setEnabled(false);
         String[] monthAndYear = month.split(" ");
         String mon = monthAndYear[0];
         int year = Integer.valueOf(monthAndYear[1]);
@@ -330,10 +371,10 @@ public class ScheduleActivity extends AppCompatActivity implements LoaderManager
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         if(loader.getId() == LOADER_JAMAATS) {
-            mJamaatListsCursor.close();
+            mJamaatListsCursor= null;
         } else if (loader.getId() == LOADER_SCHEDULES){
             if(mScheduleCursor != null)
-                mScheduleCursor.close();
+                mScheduleCursor = null;
         }
 
     }

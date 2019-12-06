@@ -21,9 +21,9 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
-import ng.com.dayma.paymentdummy.data.PaymentDatabaseContract.ScheduleInfoEntry;
 import ng.com.dayma.paymentdummy.data.PaymentProviderContract;
 import ng.com.dayma.paymentdummy.touchhelpers.ItemTouchHelperAdapter;
+import ng.com.dayma.paymentdummy.touchhelpers.ScheduleClickAdapterListener;
 
 /**
  * Created by Ahmad on 7/31/2019.
@@ -46,8 +46,7 @@ public class ScheduleRecyclerAdapter extends RecyclerView.Adapter<ScheduleRecycl
     private ItemTouchHelper mTouchHelper;
     private GestureDetector mGestureDetector;
     private ViewHolder mSelectedHolder;
-    private ClickAdapterListener mListener;
-
+    private ScheduleClickAdapterListener mListener;
     //
     private SparseBooleanArray mSelectedItemsPosition;
     private SparseBooleanArray mSelectedItemsCursorId;
@@ -129,14 +128,14 @@ public class ScheduleRecyclerAdapter extends RecyclerView.Adapter<ScheduleRecycl
     private void populateColumnPostions() {
         if(mCursor == null)
             return;
-        mScheduleIdPos = mCursor.getColumnIndex(ScheduleInfoEntry.COLUMN_SCHEDULE_ID);
-        mMonthIdPos = mCursor.getColumnIndex(ScheduleInfoEntry.COLUMN_MONTH_ID);
-        mJamaatPos = mCursor.getColumnIndex(ScheduleInfoEntry.COLUMN_MEMBER_JAMAATNAME);
-        mTitlePos = mCursor.getColumnIndex(ScheduleInfoEntry.COLUMN_SCHEDULE_TITLE);
-        mStatusPos = mCursor.getColumnIndex(ScheduleInfoEntry.COLUMN_SCHEDULE_ISCOMPLETE);
-        mSubtotalPos = mCursor.getColumnIndex(ScheduleInfoEntry.COLUMN_SCHEDULE_TOTALAMOUNT);
-        mTotalPayersPos = mCursor.getColumnIndex(ScheduleInfoEntry.COLUMN_SCHEDULE_TOTALPAYERS);
-        mIdPos = mCursor.getColumnIndex(ScheduleInfoEntry._ID);
+        mScheduleIdPos = mCursor.getColumnIndex(PaymentProviderContract.Schedules.COLUMN_SCHEDULE_ID);
+        mMonthIdPos = mCursor.getColumnIndex(PaymentProviderContract.Schedules.COLUMN_MONTH_ID);
+        mJamaatPos = mCursor.getColumnIndex(PaymentProviderContract.Schedules.COLUMN_MEMBER_JAMAATNAME);
+        mTitlePos = mCursor.getColumnIndex(PaymentProviderContract.Schedules.COLUMN_SCHEDULE_TITLE);
+        mStatusPos = mCursor.getColumnIndex(PaymentProviderContract.Schedules.COLUMN_SCHEDULE_ISCOMPLETE);
+        mSubtotalPos = mCursor.getColumnIndex(PaymentProviderContract.Schedules.COLUMN_SCHEDULE_TOTALAMOUNT);
+        mTotalPayersPos = mCursor.getColumnIndex(PaymentProviderContract.Schedules.COLUMN_SCHEDULE_TOTALPAYERS);
+        mIdPos = mCursor.getColumnIndex(PaymentProviderContract.Schedules._ID);
     }
 
     public void changeCursor(Cursor cursor){
@@ -192,7 +191,7 @@ public class ScheduleRecyclerAdapter extends RecyclerView.Adapter<ScheduleRecycl
         ((ViewHolder)holder).parentView.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                Log.d("Action_Down", "touch press detected");
+                Log.d("Touch Event", "touch press detected");
                 mSelectedHolder = holder;
                 mGestureDetector.onTouchEvent(event);
                 return true;
@@ -219,10 +218,7 @@ public class ScheduleRecyclerAdapter extends RecyclerView.Adapter<ScheduleRecycl
 
     @Override
     public boolean onSingleTapUp(MotionEvent e) {
-        if(mListener.onSingleClick()){
-            mListener.onItemClicked(mSelectedHolder.getAdapterPosition(), mSelectedHolder.mId);
-            return false;
-        }
+
         Log.d("onSingleTapUp", "On single tap detected");
         Intent intent = new Intent(mContext, PaymentListActivity.class);
         intent.putExtra(PaymentListActivity.SCHEDULE_ID, mSelectedHolder.mScheduleId);
@@ -252,13 +248,8 @@ public class ScheduleRecyclerAdapter extends RecyclerView.Adapter<ScheduleRecycl
 
     @Override
     public void onItemSwiped(int position) {
-        Log.d("onSwiped", "on swiped notified");
-
-    }
-
-    @Override
-    public void onItemSelected(int position) {
-        Log.d("ItemSelected", "Item is selected");
+        Log.d("onSwiped", "on swiped notified position "+ position
+        + " selectedholder");
 
     }
 
@@ -266,7 +257,7 @@ public class ScheduleRecyclerAdapter extends RecyclerView.Adapter<ScheduleRecycl
         mTouchHelper = touchHelper;
     }
 
-    public void setClickAdapter(ClickAdapterListener listener){
+    public void setClickAdapter(ScheduleClickAdapterListener listener){
         mListener = listener;
     }
 
@@ -295,12 +286,5 @@ public class ScheduleRecyclerAdapter extends RecyclerView.Adapter<ScheduleRecycl
 
         }
 
-    }
-
-    public interface ClickAdapterListener {
-
-        void onItemClicked(int adapterPosition, long cursorDataId);
-
-        boolean onSingleClick();
     }
 }

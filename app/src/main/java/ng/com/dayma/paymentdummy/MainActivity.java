@@ -34,12 +34,13 @@ import ng.com.dayma.paymentdummy.data.PaymentDatabaseContract;
 import ng.com.dayma.paymentdummy.data.PaymentDatabaseContract.ScheduleInfoEntry;
 import ng.com.dayma.paymentdummy.data.PaymentOpenHelper;
 import ng.com.dayma.paymentdummy.data.PaymentProviderContract;
+import ng.com.dayma.paymentdummy.touchhelpers.ScheduleClickAdapterListener;
 import ng.com.dayma.paymentdummy.touchhelpers.ScheduleTouchHelperCallback;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, LoaderManager.LoaderCallbacks<Cursor>,
-        ScheduleRecyclerAdapter.ClickAdapterListener {
-    public static final String MONTH_POSITION = "ng.com.dayma.paymentdummy.MONTH_POSITION";
+        ScheduleClickAdapterListener {
+
     public static final int LOADER_SCHEDULES = 0;
     private static final int LOADER_MONTHS = 1;
     public final String TAG = getClass().getSimpleName();
@@ -52,7 +53,6 @@ public class MainActivity extends AppCompatActivity
     //
     private ActionMode mActionMode;
     private ActionModecallbacks mActionModecallbacks;
-    private ScheduleRecyclerAdapter.ClickAdapterListener listener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,8 +96,8 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onResume() {
         super.onResume();
-        DataManager.loadFromDatabase(mDbOpenHelper);
         getLoaderManager().restartLoader(LOADER_SCHEDULES, null, this);
+        DataManager.loadFromDatabase(mDbOpenHelper, this);
 //        loadSchedulesData();
         updateNavHeader();
     }
@@ -172,6 +172,12 @@ public class MainActivity extends AppCompatActivity
 //        loadMonthsData();
         getLoaderManager().restartLoader(LOADER_MONTHS, null, this);
         mRecyclerItems.setLayoutManager(mGridLayoutManager);
+        ScheduleTouchHelperCallback callback = new ScheduleTouchHelperCallback(mMonthRecyclerAdapter);
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
+        mMonthRecyclerAdapter.setTouchHelper(itemTouchHelper);
+        itemTouchHelper.attachToRecyclerView(mRecyclerItems);
+        mMonthRecyclerAdapter.setClickAdapter(this);
+
         mRecyclerItems.setAdapter(mMonthRecyclerAdapter);
 
         selectNavigationMenuItem(R.id.nav_months);
@@ -340,7 +346,6 @@ public class MainActivity extends AppCompatActivity
     private void togglePosition(int position, int cursorIdPos) {
         mScheduleRecyclerAdapter.toggleSelection(position, cursorIdPos);
         int count = mScheduleRecyclerAdapter.getSelectedItemCount();
-
         if(count == 0){
             mActionMode.finish();
             mActionMode = null;
@@ -413,8 +418,8 @@ public class MainActivity extends AppCompatActivity
         for (int i = selectedItemPositions.size() - 1; i >= 0; i--) {
             mScheduleRecyclerAdapter.editData((Integer) selectedItemPositions.get(i));
         }
-        mActionMode = null;
         mScheduleRecyclerAdapter.notifyDataSetChanged();
+        mActionMode = null;
     }
 
 }
