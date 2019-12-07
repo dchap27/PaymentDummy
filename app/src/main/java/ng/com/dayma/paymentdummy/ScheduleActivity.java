@@ -55,6 +55,7 @@ public class ScheduleActivity extends AppCompatActivity implements LoaderManager
     private ArrayList<String> mYears;
     private Uri mMonthUri;
     private boolean mSavedNewMonth;
+    private DataManager.LoadFromDatabase mLoadFromDatabase;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -132,8 +133,6 @@ public class ScheduleActivity extends AppCompatActivity implements LoaderManager
     private void createNewSchedule() {
 
         AsyncTask<ContentValues, Void, Uri> task = new AsyncTask<ContentValues, Void, Uri>() {
-
-            private MonthInfo mMonth;
 
             @Override
             protected void onPreExecute() {
@@ -257,9 +256,10 @@ public class ScheduleActivity extends AppCompatActivity implements LoaderManager
 
             @Override
             protected void onPostExecute(Uri uri) {
-                mSavedNewMonth = true;
                 Log.d(TAG, "onPostExecute called");
                 mMonthUri = uri;
+                mLoadFromDatabase = new DataManager.LoadFromDatabase();
+                mLoadFromDatabase.execute(ScheduleActivity.this);
                 finish();
             }
         };

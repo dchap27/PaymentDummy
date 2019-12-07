@@ -1,8 +1,10 @@
 package ng.com.dayma.paymentdummy;
 
+import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
@@ -29,10 +31,12 @@ public class MonthRecyclerAdapter extends RecyclerView.Adapter<MonthRecyclerAdap
     private final LayoutInflater mLayoutInflater;
     private int mMonthIdPos;
     private int mIdPos;
+    public final String TAG = getClass().getSimpleName();
     private ItemTouchHelper mTouchHelper;
     private ScheduleClickAdapterListener mListener;
     private ViewHolder mSelectedHolder;
     private GestureDetector mGestureDetector;
+    private DataManager.LoadFromDatabase mLoadFromDatabase;
 
     public MonthRecyclerAdapter(Context context, Cursor cursor) {
         mContext = context;
@@ -69,8 +73,7 @@ public class MonthRecyclerAdapter extends RecyclerView.Adapter<MonthRecyclerAdap
         mCursor.moveToPosition(position);
         String monthId = mCursor.getString(mMonthIdPos);
         int id = mCursor.getInt(mIdPos);
-        DataManager dm = DataManager.getInstance();
-        int totalSchedules = dm.getScheduleCount(monthId);
+        int totalSchedules = DataManager.getInstance().getScheduleCount(monthId);
         holder.mTextMonth.setText(monthId);
         holder.mTextScheduleTotal.setText(mContext.getString(R.string.text_total_schedules_for_month) + String.valueOf(totalSchedules));
         holder.mId = id;
@@ -137,8 +140,36 @@ public class MonthRecyclerAdapter extends RecyclerView.Adapter<MonthRecyclerAdap
 
     @Override
     public void onItemSwiped(int position) {
-        Log.d("ON SWIPE", "adapter position " + mSelectedHolder.getAdapterPosition() +
-                " cursor id " + position);
+        Log.d("ON SWIPE", "Delete Month and corresponding Schedules and associated payments");
+
+        String[] scheduleProjection = {
+                PaymentProviderContract.Schedules.COLUMN_MONTH_ID,
+                PaymentProviderContract.Schedules.COLUMN_SCHEDULE_ID,
+        };
+        String scheduleSelection = PaymentProviderContract.Schedules.COLUMN_MONTH_ID + "=?";
+        String[] scheduleSelectionArgs = {mSelectedHolder.mMonthId};
+        Cursor scheduleCursor = mContext.getContentResolver().query(PaymentProviderContract.Schedules.CONTENT_URI,
+                scheduleProjection, scheduleSelection, scheduleSelectionArgs, null);
+        while(scheduleCursor.moveToNext()){
+            int scheduleIdPos = scheduleCursor.getColumnIndex(PaymentProviderContract.Schedules.COLUMN_SCHEDULE_ID);
+            String scheduleId = scheduleCursor.getString(scheduleIdPos);
+            // delete payment with scheduleId
+            String paymentSelection = PaymentProviderContract.Payments.COLUMN_SCHEDULE_ID + "=?";
+            String[] paymentSelectionArgs = { scheduleId };
+            Log.d(TAG, "Deleting payment "+ scheduleId);
+            mContext.getContentResolver().delete(PaymentProviderContract.Payments.CONTENT_URI, paymentSelection,
+                    paymentSelectionArgs);
+        };
+        scheduleCursor.close();
+        // delete Schedule
+        Log.d(TAG, "Deleting schedule "+ mSelectedHolder.mMonthId);
+        mContext.getContentResolver().delete(PaymentProviderContract.Schedules.CONTENT_URI, scheduleSelection, scheduleSelectionArgs);
+        // delete Month from MONTH_TABLE
+        Uri mMonthUri = ContentUris.withAppendedId(PaymentProviderContract.Months.CONTENT_URI, mSelectedHolder.mId);
+        Log.d(TAG, "Deleting Month "+ mMonthUri);
+        mContext.getContentResolver().delete(mMonthUri, null, null);
+        mLoadFromDatabase = new DataManager.LoadFromDatabase();
+        mLoadFromDatabase.execute(mContext);
 
     }
     public void setTouchHelper(ItemTouchHelper touchHelper){

@@ -8,13 +8,11 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -26,7 +24,6 @@ import java.util.List;
 import ng.com.dayma.paymentdummy.data.PaymentOpenHelper;
 import ng.com.dayma.paymentdummy.data.PaymentProviderContract;
 import ng.com.dayma.paymentdummy.touchhelpers.ScheduleClickAdapterListener;
-import ng.com.dayma.paymentdummy.touchhelpers.ScheduleTouchHelperCallback;
 
 public class ScheduleListActivity extends AppCompatActivity implements
         LoaderManager.LoaderCallbacks<Cursor>, ScheduleClickAdapterListener {
@@ -47,6 +44,7 @@ public class ScheduleListActivity extends AppCompatActivity implements
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.d(TAG, "*********** onCreate ************");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_schedule_list);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -58,8 +56,8 @@ public class ScheduleListActivity extends AppCompatActivity implements
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                Intent intent = new Intent(ScheduleListActivity.this, ScheduleActivity.class);
+                startActivity(intent);
             }
         });
 
@@ -76,8 +74,9 @@ public class ScheduleListActivity extends AppCompatActivity implements
 
     @Override
     protected void onResume() {
-        super.onResume();
+        Log.d(TAG, "***********OnResume************");
         getLoaderManager().restartLoader(LOADER_SCHEDULES, null, this);
+        super.onResume();
     }
 
     private void loadScheduleData() {
@@ -106,17 +105,11 @@ public class ScheduleListActivity extends AppCompatActivity implements
         MonthInfo month = DataManager.getInstance().getMonth(mMonID);
 
         mRecyclerItems = (RecyclerView) findViewById(R.id.list_monthschedules);
-//        List<ScheduleInfo> schedules = DataManager.getInstance().getSchedules(month);
         mMonthSchedulesAdapter = new ScheduleRecyclerAdapter(this, null);
 
         GridLayoutManager mMonthSchedulesLayoutManager = new GridLayoutManager(this,
                 getResources().getInteger(R.integer.schedule_grid_span));
         mRecyclerItems.setLayoutManager(mMonthSchedulesLayoutManager);
-
-        ScheduleTouchHelperCallback callback = new ScheduleTouchHelperCallback(mMonthSchedulesAdapter);
-        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
-        mMonthSchedulesAdapter.setTouchHelper(itemTouchHelper);
-        itemTouchHelper.attachToRecyclerView(mRecyclerItems);
         mMonthSchedulesAdapter.setClickAdapter(this);
 
         mRecyclerItems.setAdapter(mMonthSchedulesAdapter);

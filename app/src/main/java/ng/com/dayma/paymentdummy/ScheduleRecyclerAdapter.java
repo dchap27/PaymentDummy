@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.GestureDetector;
@@ -22,7 +21,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ng.com.dayma.paymentdummy.data.PaymentProviderContract;
-import ng.com.dayma.paymentdummy.touchhelpers.ItemTouchHelperAdapter;
 import ng.com.dayma.paymentdummy.touchhelpers.ScheduleClickAdapterListener;
 
 /**
@@ -30,7 +28,7 @@ import ng.com.dayma.paymentdummy.touchhelpers.ScheduleClickAdapterListener;
  */
 
 public class ScheduleRecyclerAdapter extends RecyclerView.Adapter<ScheduleRecyclerAdapter.ViewHolder>
-        implements ItemTouchHelperAdapter, View.OnTouchListener,GestureDetector.OnGestureListener{
+        implements View.OnTouchListener,GestureDetector.OnGestureListener{
     private final Context mContext;
     private Cursor mCursor;
     private final LayoutInflater mLayoutInflater;
@@ -43,7 +41,6 @@ public class ScheduleRecyclerAdapter extends RecyclerView.Adapter<ScheduleRecycl
     private int mSubtotalPos;
     private int mTotalPayersPos;
     public final String TAG = getClass().getSimpleName();
-    private ItemTouchHelper mTouchHelper;
     private GestureDetector mGestureDetector;
     private ViewHolder mSelectedHolder;
     private ScheduleClickAdapterListener mListener;
@@ -104,8 +101,16 @@ public class ScheduleRecyclerAdapter extends RecyclerView.Adapter<ScheduleRecycl
         int itemIndex = mSelectedItemsPosition.indexOfKey(position);
         int cursorItem = mSelectedItemsCursorId.keyAt(itemIndex);
 
+        String selection = PaymentProviderContract.Payments.COLUMN_SCHEDULE_ID + "=?";
+        ScheduleInfo schedule = DataManager.getInstance().getSchedule(cursorItem);
+        String scheduleId = schedule.getScheduleId();
+        String[] selectionArgs = {scheduleId};
+        // delete associated payments
+        Log.d(TAG, "deleting payment " + scheduleId);
+        mContext.getContentResolver().delete(PaymentProviderContract.Payments.CONTENT_URI, selection, selectionArgs);
+
         Uri scheduleUri = ContentUris.withAppendedId(PaymentProviderContract.Schedules.CONTENT_URI, cursorItem);
-        Log.d(TAG, "Deleting schedule");
+        Log.d(TAG, "Deleting schedule " + scheduleUri);
         mContext.getContentResolver().delete(scheduleUri, null, null);
 
         notifyItemRemoved(position);
@@ -219,7 +224,7 @@ public class ScheduleRecyclerAdapter extends RecyclerView.Adapter<ScheduleRecycl
     @Override
     public boolean onSingleTapUp(MotionEvent e) {
 
-        Log.d("onSingleTapUp", "On single tap detected");
+        Log.d("onSingleTapUp", "create intent PaymentListActivity");
         Intent intent = new Intent(mContext, PaymentListActivity.class);
         intent.putExtra(PaymentListActivity.SCHEDULE_ID, mSelectedHolder.mScheduleId);
         mContext.startActivity(intent);
@@ -244,17 +249,6 @@ public class ScheduleRecyclerAdapter extends RecyclerView.Adapter<ScheduleRecycl
     @Override
     public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
         return false;
-    }
-
-    @Override
-    public void onItemSwiped(int position) {
-        Log.d("onSwiped", "on swiped notified position "+ position
-        + " selectedholder");
-
-    }
-
-    public void setTouchHelper(ItemTouchHelper touchHelper){
-        mTouchHelper = touchHelper;
     }
 
     public void setClickAdapter(ScheduleClickAdapterListener listener){

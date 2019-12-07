@@ -66,6 +66,14 @@ public class PaymentProvider extends ContentProvider {
         int uriMatch = sUriMatcher.match(uri);
 
         switch (uriMatch) {
+            case SCHEDULES:
+                nRows = db.delete(ScheduleInfoEntry.TABLE_NAME, rowSelection, rowSelectionArgs);
+                break;
+
+            case PAYMENTS:
+                nRows = db.delete(PaymentInfoEntry.TABLE_NAME, selection, selectionArgs);
+                break;
+
             case PAYMENTS_ROW:
                 rowId = ContentUris.parseId(uri);
                 rowSelection = PaymentInfoEntry._ID + "=?";

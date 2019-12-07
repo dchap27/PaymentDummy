@@ -53,6 +53,7 @@ public class MainActivity extends AppCompatActivity
     //
     private ActionMode mActionMode;
     private ActionModecallbacks mActionModecallbacks;
+    private DataManager.LoadFromDatabase mLoadFromDatabase;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,8 +98,9 @@ public class MainActivity extends AppCompatActivity
     protected void onResume() {
         super.onResume();
         getLoaderManager().restartLoader(LOADER_SCHEDULES, null, this);
-        DataManager.loadFromDatabase(mDbOpenHelper, this);
-//        loadSchedulesData();
+        mLoadFromDatabase = new DataManager.LoadFromDatabase();
+        mLoadFromDatabase.execute(this);
+//        DataManager.loadFromDatabase(this);
         updateNavHeader();
     }
 
@@ -156,10 +158,6 @@ public class MainActivity extends AppCompatActivity
 
     private void displaySchedules() {
         mRecyclerItems.setLayoutManager(mGridLayoutManager);
-        ScheduleTouchHelperCallback callback = new ScheduleTouchHelperCallback(mScheduleRecyclerAdapter);
-        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
-        mScheduleRecyclerAdapter.setTouchHelper(itemTouchHelper);
-        itemTouchHelper.attachToRecyclerView(mRecyclerItems);
         mScheduleRecyclerAdapter.setClickAdapter(this);
 
         mRecyclerItems.setAdapter(mScheduleRecyclerAdapter);
@@ -381,12 +379,12 @@ public class MainActivity extends AppCompatActivity
             switch (item.getItemId()){
 
                 case R.id.delete_schedule:
-                    Log.d(TAG, "Delete schedule menu selected");
+                    Log.d(TAG, "Delete Menu clicked");
                     deleteSchedule();
                     mode.finish();
                     return true;
                 case R.id.edit_schedule:
-                    Log.d(TAG, "Edit schedule menu selected");
+                    Log.d(TAG, "Edit Menu clicked");
                     editSchedule();
                     mode.finish();
                     return true;
@@ -409,6 +407,7 @@ public class MainActivity extends AppCompatActivity
             mScheduleRecyclerAdapter.removeData((Integer) selectedItemPositions.get(i));
         }
         mScheduleRecyclerAdapter.notifyDataSetChanged();
+        mLoadFromDatabase.execute(this);
         Log.d(TAG, "done deleting");
         mActionMode = null;
     }
