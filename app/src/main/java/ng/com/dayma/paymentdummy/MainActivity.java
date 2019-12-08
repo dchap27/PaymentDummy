@@ -1,6 +1,7 @@
 package ng.com.dayma.paymentdummy;
 
 import android.app.LoaderManager;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
@@ -54,6 +55,7 @@ public class MainActivity extends AppCompatActivity
     private ActionMode mActionMode;
     private ActionModecallbacks mActionModecallbacks;
     private DataManager.LoadFromDatabase mLoadFromDatabase;
+    private MainActivityViewModel mViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,6 +67,7 @@ public class MainActivity extends AppCompatActivity
 
         // create an instance of the openhelper
         mDbOpenHelper = new PaymentOpenHelper(this);
+        mViewModel = ViewModelProviders.of(this).get(MainActivityViewModel.class);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -91,6 +94,7 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         initialDisplayContent();
+        handleDisplaySelection(mViewModel.navDrawerDisplaySelection);
         mActionModecallbacks = new ActionModecallbacks();
     }
 
@@ -100,7 +104,6 @@ public class MainActivity extends AppCompatActivity
         getLoaderManager().restartLoader(LOADER_SCHEDULES, null, this);
         mLoadFromDatabase = new DataManager.LoadFromDatabase();
         mLoadFromDatabase.execute(this);
-//        DataManager.loadFromDatabase(this);
         updateNavHeader();
     }
 
@@ -147,16 +150,13 @@ public class MainActivity extends AppCompatActivity
         mGridLayoutManager = new GridLayoutManager(this,
                 getResources().getInteger(R.integer.schedule_grid_span));
 
-        List<ScheduleInfo> schedules = DataManager.getInstance().getSchedules();
         mScheduleRecyclerAdapter = new ScheduleRecyclerAdapter(this, null);
 
-//        List<MonthInfo> months = DataManager.getInstance().getMonths();
         mMonthRecyclerAdapter = new MonthRecyclerAdapter(this, null);
-        displaySchedules();
-
     }
 
     private void displaySchedules() {
+        getLoaderManager().restartLoader(LOADER_SCHEDULES, null, this);
         mRecyclerItems.setLayoutManager(mGridLayoutManager);
         mScheduleRecyclerAdapter.setClickAdapter(this);
 
@@ -241,10 +241,10 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_schedules) {
-            displaySchedules();
-        } else if (id == R.id.nav_months) {
-            displayMonths();
+        if (id == (R.id.nav_schedules) || id == R.id.nav_months ){
+            handleDisplaySelection(id);
+            // store the selection id to viewModel
+            mViewModel.navDrawerDisplaySelection = item.getItemId();
         } else if (id == R.id.nav_share) {
             handleSelection(R.string.nav_share_message);
         } else if (id == R.id.nav_send) {
@@ -261,6 +261,20 @@ public class MainActivity extends AppCompatActivity
         View view = findViewById(R.id.list_schedules);
         Snackbar.make(view, message_id, Snackbar.LENGTH_LONG).show();
 
+    }
+
+    private void handleDisplaySelection(int itemId){
+        switch (itemId){
+            case R.id.nav_months:
+                displayMonths();
+                break;
+            case R.id.nav_schedules:
+                displaySchedules();
+                break;
+            default:
+                displaySchedules();
+
+        }
     }
 
     @Override
