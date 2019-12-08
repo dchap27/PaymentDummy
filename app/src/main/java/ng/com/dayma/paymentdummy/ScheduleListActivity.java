@@ -1,6 +1,7 @@
 package ng.com.dayma.paymentdummy;
 
 import android.app.LoaderManager;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
@@ -21,6 +22,7 @@ import android.widget.ArrayAdapter;
 
 import java.util.List;
 
+import ng.com.dayma.paymentdummy.MyViewModels.ScheduleListViewModel;
 import ng.com.dayma.paymentdummy.data.PaymentOpenHelper;
 import ng.com.dayma.paymentdummy.data.PaymentProviderContract;
 import ng.com.dayma.paymentdummy.touchhelpers.ScheduleClickAdapterListener;
@@ -41,6 +43,8 @@ public class ScheduleListActivity extends AppCompatActivity implements
     private ActionMode mActionMode;
     private ActionModecallbacks mActionModecallbacks;
     private final String TAG = getClass().getSimpleName();
+    private GridLayoutManager mSchedulesLayoutManager;
+    private ScheduleListViewModel mViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +55,7 @@ public class ScheduleListActivity extends AppCompatActivity implements
         setSupportActionBar(toolbar);
 
         mDbOpenHelper = new PaymentOpenHelper(this);
+        mViewModel = ViewModelProviders.of(this).get(ScheduleListViewModel.class);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -62,8 +67,22 @@ public class ScheduleListActivity extends AppCompatActivity implements
         });
 
         initializeDisplayContent();
+        if(mViewModel.isNewlyCreated && savedInstanceState != null){
+            mViewModel.restoreState(savedInstanceState);
+        }
+        mViewModel.isNewlyCreated = false;
+        mViewModel.monthId = mMonID;
+        displaySchedules();
         mActionModecallbacks = new ActionModecallbacks();
 
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if(outState != null){
+            mViewModel.saveState(outState);
+        }
     }
 
     @Override
@@ -107,13 +126,17 @@ public class ScheduleListActivity extends AppCompatActivity implements
         mRecyclerItems = (RecyclerView) findViewById(R.id.list_monthschedules);
         mMonthSchedulesAdapter = new ScheduleRecyclerAdapter(this, null);
 
-        GridLayoutManager mMonthSchedulesLayoutManager = new GridLayoutManager(this,
+        mSchedulesLayoutManager = new GridLayoutManager(this,
                 getResources().getInteger(R.integer.schedule_grid_span));
-        mRecyclerItems.setLayoutManager(mMonthSchedulesLayoutManager);
+
+    }
+
+    private void displaySchedules(){
+        getLoaderManager().initLoader(LOADER_SCHEDULES, null, this);
+        mRecyclerItems.setLayoutManager(mSchedulesLayoutManager);
         mMonthSchedulesAdapter.setClickAdapter(this);
 
         mRecyclerItems.setAdapter(mMonthSchedulesAdapter);
-
     }
 
     @Override
