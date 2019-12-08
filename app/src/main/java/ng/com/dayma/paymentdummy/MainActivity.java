@@ -94,8 +94,20 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         initialDisplayContent();
+        if(mViewModel.isNewlyCreated && savedInstanceState != null){
+            mViewModel.restoreState(savedInstanceState);
+        }
+        mViewModel.isNewlyCreated = false;
         handleDisplaySelection(mViewModel.navDrawerDisplaySelection);
         mActionModecallbacks = new ActionModecallbacks();
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if(outState != null){
+            mViewModel.saveState(outState);
+        }
     }
 
     @Override
