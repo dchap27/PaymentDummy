@@ -1,6 +1,7 @@
 package ng.com.dayma.paymentdummy;
 
 import android.app.LoaderManager;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.CursorLoader;
@@ -22,6 +23,7 @@ import android.view.View;
 import java.util.ArrayList;
 import java.util.List;
 
+import ng.com.dayma.paymentdummy.MyViewModels.PaymentListViewModel;
 import ng.com.dayma.paymentdummy.data.PaymentDatabaseContract.PaymentInfoEntry;
 import ng.com.dayma.paymentdummy.data.PaymentOpenHelper;
 import ng.com.dayma.paymentdummy.data.PaymentProviderContract;
@@ -42,6 +44,7 @@ public class PaymentListActivity extends AppCompatActivity implements LoaderMana
     private String mScheID;
     private SQLiteOpenHelper mDbOpenHelper;
     private int mId;
+    private PaymentListViewModel mViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,8 +55,14 @@ public class PaymentListActivity extends AppCompatActivity implements LoaderMana
         setSupportActionBar(toolbar);
 
         mDbOpenHelper = new PaymentOpenHelper(this);
+        mViewModel = ViewModelProviders.of(this).get(PaymentListViewModel.class);
 
         readDisplayStateValues();
+        if(mViewModel.isNewlyCreated && savedInstanceState != null)
+            mViewModel.restoreState(savedInstanceState);
+        mViewModel.setScheduleId(mScheID);
+        mSchedule = mViewModel.getSchedule(mScheID);
+        mViewModel.setId(mSchedule.getId());
         initializeDisplayContent();
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -61,7 +70,7 @@ public class PaymentListActivity extends AppCompatActivity implements LoaderMana
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(PaymentListActivity.this, PaymentActivity.class);
-                intent.putExtra(PaymentActivity.SCHEDULE_INFO, mSchedule.getScheduleId());
+                intent.putExtra(PaymentActivity.SCHEDULE_INFO, mViewModel.getScheduleId());
                 // open PaymentActivity as intent for new payment
                 startActivity(intent);
             }
@@ -73,13 +82,15 @@ public class PaymentListActivity extends AppCompatActivity implements LoaderMana
         Intent intent = getIntent();
         //get value that was put into the intent
         mScheID = intent.getStringExtra(SCHEDULE_ID);
-        mSchedule = DataManager.getInstance().getSchedule(mScheID);
-        mIsNewSchedule = mScheID == ID_NOT_SET;
-        if(mIsNewSchedule){
-            createNewSchedule();
-        }else {
-            mPayments = DataManager.getInstance().getPayments(mSchedule);
-            mId = mSchedule.getId();
+//        mSchedule = DataManager.getInstance().getSchedule(mScheID);
+//        mId = mSchedule.getId();
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if(outState != null){
+            mViewModel.saveState(outState);
         }
     }
 
@@ -106,7 +117,7 @@ public class PaymentListActivity extends AppCompatActivity implements LoaderMana
                 Payments.COLUMN_MEMBER_CHANDANO,
         };
         String selection = Payments.COLUMN_SCHEDULE_ID + "=?";
-        String[] selectionArgs = { mScheID };
+        String[] selectionArgs = { mViewModel.getScheduleId() };
         Cursor paymentsCursor = getContentResolver().query(Payments.CONTENT_URI, projection,
                 selection, selectionArgs, null);
 
@@ -128,12 +139,12 @@ public class PaymentListActivity extends AppCompatActivity implements LoaderMana
 
         // selection criteria for row to update
         final String rowScheduleSelection = PaymentProviderContract.Schedules.COLUMN_SCHEDULE_ID + "=?";
-        final String[] rowScheduleSelectionArgs = {mScheID};
+        final String[] rowScheduleSelectionArgs = {mViewModel.getScheduleId()};
 
         ContentValues values = new ContentValues();
         values.put(PaymentProviderContract.Schedules.COLUMN_SCHEDULE_TOTALAMOUNT, totalAmount);
         values.put(PaymentProviderContract.Schedules.COLUMN_SCHEDULE_TOTALPAYERS, payers.size());
-        Uri scheduleUri = ContentUris.withAppendedId(PaymentProviderContract.Schedules.CONTENT_URI, mId);
+        Uri scheduleUri = ContentUris.withAppendedId(PaymentProviderContract.Schedules.CONTENT_URI, mViewModel.getId());
         getContentResolver().update(scheduleUri, values, rowScheduleSelection, rowScheduleSelectionArgs);
 
     }
@@ -158,7 +169,7 @@ public class PaymentListActivity extends AppCompatActivity implements LoaderMana
                 PaymentInfoEntry.COLUMN_SCHEDULE_ID
         };
         String selection = PaymentInfoEntry.COLUMN_SCHEDULE_ID + "=?";
-        String[] selectionArgs = { mScheID };
+        String[] selectionArgs = { mViewModel.getScheduleId() };
         String paymentOrderby = PaymentInfoEntry.COLUMN_MEMBER_FULLNAME;
         Cursor cursor = db.query(PaymentInfoEntry.TABLE_NAME, paymentColumns, selection, selectionArgs,
                 null, null, paymentOrderby);
@@ -166,7 +177,7 @@ public class PaymentListActivity extends AppCompatActivity implements LoaderMana
     }
 
     private void initializeDisplayContent() {
-
+        getLoaderManager().initLoader(LOADER_PAYMENTS, null, this);
         final RecyclerView recyclerPayments = (RecyclerView) findViewById(R.id.list_payments);
         final LinearLayoutManager paymentsLayoutManager = new LinearLayoutManager(this);
         recyclerPayments.setLayoutManager(paymentsLayoutManager);
@@ -174,9 +185,6 @@ public class PaymentListActivity extends AppCompatActivity implements LoaderMana
         mPaymentRecyclerAdapter = new PaymentRecyclerAdapter(this, null);
         recyclerPayments.setAdapter(mPaymentRecyclerAdapter);
 
-    }
-
-    private void createNewSchedule() {
     }
 
     @Override
@@ -210,7 +218,7 @@ public class PaymentListActivity extends AppCompatActivity implements LoaderMana
                         PaymentProviderContract.Payments.COLUMN_SCHEDULE_ID
                 };
                 String selection = PaymentProviderContract.Payments.COLUMN_SCHEDULE_ID + "=?";
-                String[] selectionArgs = { mScheID };
+                String[] selectionArgs = { mViewModel.getScheduleId() };
                 String paymentOrderby = PaymentProviderContract.Payments.COLUMN_MEMBER_FULLNAME + "," +
                         PaymentProviderContract.Payments.COLUMN_PAYMENT_SUBTOTAL;
                 return getContentResolver().query(Payments.CONTENT_URI, paymentColumns, selection, selectionArgs,
