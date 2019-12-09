@@ -30,8 +30,6 @@ import android.widget.Toast;
 import java.util.List;
 
 import ng.com.dayma.paymentdummy.MyViewModels.PaymentActivityViewModel;
-import ng.com.dayma.paymentdummy.data.PaymentDatabaseContract.MemberInfoEntry;
-import ng.com.dayma.paymentdummy.data.PaymentDatabaseContract.PaymentInfoEntry;
 import ng.com.dayma.paymentdummy.data.PaymentOpenHelper;
 import ng.com.dayma.paymentdummy.data.PaymentProviderContract;
 import ng.com.dayma.paymentdummy.data.PaymentProviderContract.Members;
@@ -150,7 +148,7 @@ public class PaymentActivity extends AppCompatActivity implements LoaderManager.
 
         Log.d(TAG,"populate the members id into spinner");
         mAdapterMemberIds = new SimpleCursorAdapter(this, android.R.layout.simple_spinner_item, null,
-                new String[] {MemberInfoEntry.COLUMN_MEMBER_ID},
+                new String[] {PaymentProviderContract.Members.COLUMN_MEMBER_ID},
                 new int[] {android.R.id.text1}, 0);
 
         mAdapterMemberIds.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -309,7 +307,7 @@ public class PaymentActivity extends AppCompatActivity implements LoaderManager.
     private int getIndexOfMemberId(int chandaNo) {
         // get cursor from the adapter
         Cursor cursor = mAdapterMemberIds.getCursor();
-        int memberChandaNoPos = cursor.getColumnIndex(MemberInfoEntry.COLUMN_MEMBER_CHANDANO);
+        int memberChandaNoPos = cursor.getColumnIndex(PaymentProviderContract.Members.COLUMN_MEMBER_CHANDANO);
         int courseRowIndex = 0;
 
         boolean more = cursor.moveToFirst();
@@ -761,7 +759,7 @@ public class PaymentActivity extends AppCompatActivity implements LoaderManager.
         int selectedPosition = mSpinnerChandaNo.getSelectedItemPosition();
         Cursor cursor = mAdapterMemberIds.getCursor();
         cursor.moveToPosition(selectedPosition);
-        int chandaNoPos = cursor.getColumnIndex(MemberInfoEntry.COLUMN_MEMBER_ID);
+        int chandaNoPos = cursor.getColumnIndex(PaymentProviderContract.Members.COLUMN_MEMBER_ID);
         int chandaNo = cursor.getInt(chandaNoPos);
         return chandaNo;
 
@@ -820,28 +818,28 @@ public class PaymentActivity extends AppCompatActivity implements LoaderManager.
         mPaymentQueriesFinished = false;
         mViewModel.mPaymentUri = ContentUris.withAppendedId(PaymentProviderContract.Payments.CONTENT_URI, mViewModel.mPaymentId);
         String[] paymentColumns = {
-                PaymentInfoEntry.COLUMN_MEMBER_CHANDANO,
-                PaymentInfoEntry.COLUMN_MEMBER_FULLNAME,
-                PaymentInfoEntry.COLUMN_PAYMENT_LOCALRECEIPT,
-                PaymentInfoEntry.COLUMN_PAYMENT_MONTHPAID,
-                PaymentInfoEntry.COLUMN_PAYMENT_CHANDAAM,
-                PaymentInfoEntry.COLUMN_PAYMENT_CHANDAWASIYYAT,
-                PaymentInfoEntry.COLUMN_PAYMENT_JALSASALANA,
-                PaymentInfoEntry.COLUMN_PAYMENT_TARIKIJADID,
-                PaymentInfoEntry.COLUMN_PAYMENT_WAQFIJADID,
-                PaymentInfoEntry.COLUMN_PAYMENT_WELFAREFUND,
-                PaymentInfoEntry.COLUMN_PAYMENT_SCHOLARSHIP,
-                PaymentInfoEntry.COLUMN_PAYMENT_MARYAMFUND,
-                PaymentInfoEntry.COLUMN_PAYMENT_TABLIGH,
-                PaymentInfoEntry.COLUMN_PAYMENT_ZAKAT,
-                PaymentInfoEntry.COLUMN_PAYMENT_SADAKAT,
-                PaymentInfoEntry.COLUMN_PAYMENT_FITRANA,
-                PaymentInfoEntry.COLUMN_PAYMENT_MOSQUEDONATION,
-                PaymentInfoEntry.COLUMN_PAYMENT_MTA,
-                PaymentInfoEntry.COLUMN_PAYMENT_CENTINARYKHILAFAT,
-                PaymentInfoEntry.COLUMN_PAYMENT_WASIYYATHISSANJAIDAD,
-                PaymentInfoEntry.COLUMN_PAYMENT_MISCELLANEOUS,
-                PaymentInfoEntry.COLUMN_PAYMENT_SUBTOTAL
+                PaymentProviderContract.Payments.COLUMN_MEMBER_CHANDANO,
+                PaymentProviderContract.Payments.COLUMN_MEMBER_FULLNAME,
+                PaymentProviderContract.Payments.COLUMN_PAYMENT_LOCALRECEIPT,
+                PaymentProviderContract.Payments.COLUMN_PAYMENT_MONTHPAID,
+                PaymentProviderContract.Payments.COLUMN_PAYMENT_CHANDAAM,
+                PaymentProviderContract.Payments.COLUMN_PAYMENT_CHANDAWASIYYAT,
+                PaymentProviderContract.Payments.COLUMN_PAYMENT_JALSASALANA,
+                PaymentProviderContract.Payments.COLUMN_PAYMENT_TARIKIJADID,
+                PaymentProviderContract.Payments.COLUMN_PAYMENT_WAQFIJADID,
+                PaymentProviderContract.Payments.COLUMN_PAYMENT_WELFAREFUND,
+                PaymentProviderContract.Payments.COLUMN_PAYMENT_SCHOLARSHIP,
+                PaymentProviderContract.Payments.COLUMN_PAYMENT_MARYAMFUND,
+                PaymentProviderContract.Payments.COLUMN_PAYMENT_TABLIGH,
+                PaymentProviderContract.Payments.COLUMN_PAYMENT_ZAKAT,
+                PaymentProviderContract.Payments.COLUMN_PAYMENT_SADAKAT,
+                PaymentProviderContract.Payments.COLUMN_PAYMENT_FITRANA,
+                PaymentProviderContract.Payments.COLUMN_PAYMENT_MOSQUEDONATION,
+                PaymentProviderContract.Payments.COLUMN_PAYMENT_MTA,
+                PaymentProviderContract.Payments.COLUMN_PAYMENT_CENTINARYKHILAFAT,
+                PaymentProviderContract.Payments.COLUMN_PAYMENT_WASIYYATHISSANJAIDAD,
+                PaymentProviderContract.Payments.COLUMN_PAYMENT_MISCELLANEOUS,
+                PaymentProviderContract.Payments.COLUMN_PAYMENT_SUBTOTAL
         };
         return new CursorLoader(this, mViewModel.mPaymentUri, paymentColumns, null, null, null);
 
@@ -862,28 +860,28 @@ public class PaymentActivity extends AppCompatActivity implements LoaderManager.
     private void loadFinishedPayments(Cursor data) {
         mPaymentCursor = data;
         // get the positions of the columns
-        mChandaNoPos = mPaymentCursor.getColumnIndex(PaymentInfoEntry.COLUMN_MEMBER_CHANDANO);
-        mFullnamePos = mPaymentCursor.getColumnIndex(PaymentInfoEntry.COLUMN_MEMBER_FULLNAME);
-        mLocalReceiptPos = mPaymentCursor.getColumnIndex(PaymentInfoEntry.COLUMN_PAYMENT_LOCALRECEIPT);
-        mMonthPaidPos = mPaymentCursor.getColumnIndex(PaymentInfoEntry.COLUMN_PAYMENT_MONTHPAID);
-        mChandaPos = mPaymentCursor.getColumnIndex(PaymentInfoEntry.COLUMN_PAYMENT_CHANDAAM);
-        mWasiyyatPos = mPaymentCursor.getColumnIndex(PaymentInfoEntry.COLUMN_PAYMENT_CHANDAWASIYYAT);
-        mJalsaPos = mPaymentCursor.getColumnIndex(PaymentInfoEntry.COLUMN_PAYMENT_JALSASALANA);
-        mTarikiPos = mPaymentCursor.getColumnIndex(PaymentInfoEntry.COLUMN_PAYMENT_TARIKIJADID);
-        mWaqfPos = mPaymentCursor.getColumnIndex(PaymentInfoEntry.COLUMN_PAYMENT_WAQFIJADID);
-        mWelfarePos = mPaymentCursor.getColumnIndex(PaymentInfoEntry.COLUMN_PAYMENT_WELFAREFUND);
-        mScholarshipPos = mPaymentCursor.getColumnIndex(PaymentInfoEntry.COLUMN_PAYMENT_SCHOLARSHIP);
-        mMaryamPos = mPaymentCursor.getColumnIndex(PaymentInfoEntry.COLUMN_PAYMENT_MARYAMFUND);
-        mTablighPos = mPaymentCursor.getColumnIndex(PaymentInfoEntry.COLUMN_PAYMENT_TABLIGH);
-        mZakatPos = mPaymentCursor.getColumnIndex(PaymentInfoEntry.COLUMN_PAYMENT_ZAKAT);
-        mSadakatPos = mPaymentCursor.getColumnIndex(PaymentInfoEntry.COLUMN_PAYMENT_SADAKAT);
-        mFitranaPos = mPaymentCursor.getColumnIndex(PaymentInfoEntry.COLUMN_PAYMENT_FITRANA);
-        mMosqueDonationPos = mPaymentCursor.getColumnIndex(PaymentInfoEntry.COLUMN_PAYMENT_MOSQUEDONATION);
-        mMtaPos = mPaymentCursor.getColumnIndex(PaymentInfoEntry.COLUMN_PAYMENT_MTA);
-        mCentinaryPos = mPaymentCursor.getColumnIndex(PaymentInfoEntry.COLUMN_PAYMENT_CENTINARYKHILAFAT);
-        mWasiyyatHissanPos = mPaymentCursor.getColumnIndex(PaymentInfoEntry.COLUMN_PAYMENT_WASIYYATHISSANJAIDAD);
-        mMiscellaneousPos = mPaymentCursor.getColumnIndex(PaymentInfoEntry.COLUMN_PAYMENT_MISCELLANEOUS);
-        mSubtotalPos = mPaymentCursor.getColumnIndex(PaymentInfoEntry.COLUMN_PAYMENT_SUBTOTAL);
+        mChandaNoPos = mPaymentCursor.getColumnIndex(PaymentProviderContract.Payments.COLUMN_MEMBER_CHANDANO);
+        mFullnamePos = mPaymentCursor.getColumnIndex(PaymentProviderContract.Payments.COLUMN_MEMBER_FULLNAME);
+        mLocalReceiptPos = mPaymentCursor.getColumnIndex(PaymentProviderContract.Payments.COLUMN_PAYMENT_LOCALRECEIPT);
+        mMonthPaidPos = mPaymentCursor.getColumnIndex(PaymentProviderContract.Payments.COLUMN_PAYMENT_MONTHPAID);
+        mChandaPos = mPaymentCursor.getColumnIndex(PaymentProviderContract.Payments.COLUMN_PAYMENT_CHANDAAM);
+        mWasiyyatPos = mPaymentCursor.getColumnIndex(PaymentProviderContract.Payments.COLUMN_PAYMENT_CHANDAWASIYYAT);
+        mJalsaPos = mPaymentCursor.getColumnIndex(PaymentProviderContract.Payments.COLUMN_PAYMENT_JALSASALANA);
+        mTarikiPos = mPaymentCursor.getColumnIndex(PaymentProviderContract.Payments.COLUMN_PAYMENT_TARIKIJADID);
+        mWaqfPos = mPaymentCursor.getColumnIndex(PaymentProviderContract.Payments.COLUMN_PAYMENT_WAQFIJADID);
+        mWelfarePos = mPaymentCursor.getColumnIndex(PaymentProviderContract.Payments.COLUMN_PAYMENT_WELFAREFUND);
+        mScholarshipPos = mPaymentCursor.getColumnIndex(PaymentProviderContract.Payments.COLUMN_PAYMENT_SCHOLARSHIP);
+        mMaryamPos = mPaymentCursor.getColumnIndex(PaymentProviderContract.Payments.COLUMN_PAYMENT_MARYAMFUND);
+        mTablighPos = mPaymentCursor.getColumnIndex(PaymentProviderContract.Payments.COLUMN_PAYMENT_TABLIGH);
+        mZakatPos = mPaymentCursor.getColumnIndex(PaymentProviderContract.Payments.COLUMN_PAYMENT_ZAKAT);
+        mSadakatPos = mPaymentCursor.getColumnIndex(PaymentProviderContract.Payments.COLUMN_PAYMENT_SADAKAT);
+        mFitranaPos = mPaymentCursor.getColumnIndex(PaymentProviderContract.Payments.COLUMN_PAYMENT_FITRANA);
+        mMosqueDonationPos = mPaymentCursor.getColumnIndex(PaymentProviderContract.Payments.COLUMN_PAYMENT_MOSQUEDONATION);
+        mMtaPos = mPaymentCursor.getColumnIndex(PaymentProviderContract.Payments.COLUMN_PAYMENT_MTA);
+        mCentinaryPos = mPaymentCursor.getColumnIndex(PaymentProviderContract.Payments.COLUMN_PAYMENT_CENTINARYKHILAFAT);
+        mWasiyyatHissanPos = mPaymentCursor.getColumnIndex(PaymentProviderContract.Payments.COLUMN_PAYMENT_WASIYYATHISSANJAIDAD);
+        mMiscellaneousPos = mPaymentCursor.getColumnIndex(PaymentProviderContract.Payments.COLUMN_PAYMENT_MISCELLANEOUS);
+        mSubtotalPos = mPaymentCursor.getColumnIndex(PaymentProviderContract.Payments.COLUMN_PAYMENT_SUBTOTAL);
 
         mPaymentCursor.moveToFirst();
         mPaymentQueriesFinished = true; // payment queries finished loading
