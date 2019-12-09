@@ -1,6 +1,7 @@
 package ng.com.dayma.paymentdummy;
 
 import android.app.LoaderManager;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.CursorLoader;
@@ -23,6 +24,7 @@ import android.widget.Spinner;
 import java.util.ArrayList;
 import java.util.Calendar;
 
+import ng.com.dayma.paymentdummy.MyViewModels.ScheduleActivityViewModel;
 import ng.com.dayma.paymentdummy.data.PaymentProviderContract;
 
 public class ScheduleActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
@@ -36,7 +38,6 @@ public class ScheduleActivity extends AppCompatActivity implements LoaderManager
     private Spinner mSpinnerYear;
     private Spinner mSpinnerJamaat;
     private boolean mJamaatListQueriesFinished;
-    private ArrayList<String> mJamaatList;
     private ArrayAdapter<String> mAdapterJamaat;
     private boolean mIsNewSchedule;
     private Uri mScheduleUri;
@@ -56,6 +57,7 @@ public class ScheduleActivity extends AppCompatActivity implements LoaderManager
     private Uri mMonthUri;
     private boolean mSavedNewMonth;
     private DataManager.LoadFromDatabase mLoadFromDatabase;
+    private ScheduleActivityViewModel mViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,36 +67,40 @@ public class ScheduleActivity extends AppCompatActivity implements LoaderManager
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        mViewModel = ViewModelProviders.of(this).get(ScheduleActivityViewModel.class);
 
+        mScheduleTitle = (EditText) findViewById(R.id.schedule_title_edittext);
         mSpinnerMonth = (Spinner) findViewById(R.id.spinner_schedule_month);
         mSpinnerYear = (Spinner) findViewById(R.id.spinner_schedule_year);
         mSpinnerJamaat = (Spinner) findViewById(R.id.spinner_jamaat_name);
 
+
         Log.d(TAG,"Populate the Months into spinner");
-        mMonths = DataManager.getInstance().getMonthsOnly();
+        mMonths = mViewModel.getMonths();
         ArrayAdapter<String> adapterMonths =
                 new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, mMonths);
         adapterMonths.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         mSpinnerMonth.setAdapter(adapterMonths);
 
         Log.d(TAG,"Populate the years into spinner");
-        mYears = DataManager.getInstance().getYearsOnly();
+        mYears = mViewModel.getYears();
         ArrayAdapter<String> adapterYears =
                 new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, mYears);
         adapterYears.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         mSpinnerYear.setAdapter(adapterYears);
 
         Log.d(TAG,"Populate the jamaats into spinner");
-        mJamaatList = new ArrayList<>();
-
         getLoaderManager().initLoader(LOADER_JAMAATS, null, this);
-        mAdapterJamaat = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, mJamaatList);
+
+        mAdapterJamaat = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, mViewModel.jamaatList);
         mAdapterJamaat.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         mSpinnerJamaat.setAdapter(mAdapterJamaat);
 
-        readDisplayStateVale();
+        if(mViewModel.isNewlyCreated && savedInstanceState != null)
+            mViewModel.restoreState(savedInstanceState);
 
-        mScheduleTitle = (EditText) findViewById(R.id.schedule_title_edittext);
+        readDisplayStateValue();
+        mViewModel.isNewlyCreated = false;
 
         if(mIsNewSchedule) {
             initializeToCurrentMonthAndYear();
@@ -117,17 +123,24 @@ public class ScheduleActivity extends AppCompatActivity implements LoaderManager
         }
     }
 
-    private void readDisplayStateVale() {
+    private void readDisplayStateValue() {
         Log.d(TAG, "Reading display state value");
         Intent intent = getIntent();
         //get value that was put into the intent
-        mId = intent.getIntExtra(SCHEDULE_MID, ID_NOT_SET);
-        mIsNewSchedule = mId == ID_NOT_SET;
+        mViewModel.mId = intent.getIntExtra(SCHEDULE_MID, ID_NOT_SET);
+        mIsNewSchedule = mViewModel.mId == ID_NOT_SET;
         if(mIsNewSchedule){
             createNewSchedule();
         } else {
-            mScheduleUri = ContentUris.withAppendedId(PaymentProviderContract.Schedules.CONTENT_URI, mId);
+            mViewModel.scheduleUri = ContentUris.withAppendedId(PaymentProviderContract.Schedules.CONTENT_URI, mViewModel.mId);
         }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if(outState != null)
+            mViewModel.saveState(outState);
     }
 
     private void createNewSchedule() {
@@ -149,7 +162,7 @@ public class ScheduleActivity extends AppCompatActivity implements LoaderManager
 
             @Override
             protected void onPostExecute(Uri uri) {
-                mScheduleUri = uri;
+                mViewModel.scheduleUri = uri;
             }
         };
         ContentValues values = new ContentValues();
@@ -206,7 +219,7 @@ public class ScheduleActivity extends AppCompatActivity implements LoaderManager
 
     private void deleteScheduleFromDatabase() {
         Log.i(TAG, "Deleting Schedule: "+ mScheduleUri);
-        getContentResolver().delete(mScheduleUri, null, null);
+        getContentResolver().delete(mViewModel.scheduleUri, null, null);
     }
 
     private void saveSchedule() {
@@ -215,8 +228,8 @@ public class ScheduleActivity extends AppCompatActivity implements LoaderManager
         String year = String.valueOf(mSpinnerYear.getSelectedItem());
         String jamaat = String.valueOf(mSpinnerJamaat.getSelectedItem());
         String monthId = month +" " + year;
-        long scheduleRowId = ContentUris.parseId(mScheduleUri);
-        String scheduleId = monthId + year + jamaat + scheduleRowId;
+        long scheduleRowId = ContentUris.parseId(mViewModel.scheduleUri);
+        String scheduleId = month + year + jamaat + scheduleRowId;
 
         saveScheduleToDatabase(scheduleId, monthId, jamaat, scheduleTitle);
     }
@@ -230,7 +243,7 @@ public class ScheduleActivity extends AppCompatActivity implements LoaderManager
         values.put(PaymentProviderContract.Schedules.COLUMN_MEMBER_JAMAATNAME, jamaat);
         values.put(PaymentProviderContract.Schedules.COLUMN_SCHEDULE_TITLE, scheduleTitle);
 
-        getContentResolver().update(mScheduleUri, values, null, null);
+        getContentResolver().update(mViewModel.scheduleUri, values, null, null);
 
         /*
         check if Month already exist in database
@@ -284,7 +297,7 @@ public class ScheduleActivity extends AppCompatActivity implements LoaderManager
 
     private CursorLoader createLoaderSchedule() {
         mScheduleQueriesFinished = false;
-        mScheduleUri = ContentUris.withAppendedId(PaymentProviderContract.Schedules.CONTENT_URI, mId);
+        mScheduleUri = ContentUris.withAppendedId(PaymentProviderContract.Schedules.CONTENT_URI, mViewModel.mId);
         final String[] scheduleColumns = {
                 PaymentProviderContract.Schedules.COLUMN_MONTH_ID,
                 PaymentProviderContract.Schedules._ID,
@@ -312,6 +325,7 @@ public class ScheduleActivity extends AppCompatActivity implements LoaderManager
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         if(loader.getId() == LOADER_JAMAATS) {
             onFinishedJamaatList(data);
+            Log.d(TAG, "Finished loading jamaat list into spinner");
             mJamaatListQueriesFinished = true;
             mSpinnerJamaat.setAdapter(mAdapterJamaat);
             displayScheduleWhenQueryFinishes();
@@ -344,7 +358,7 @@ public class ScheduleActivity extends AppCompatActivity implements LoaderManager
         String month = mScheduleCursor.getString(mScheduleMonthPos);
 
         mScheduleTitle.setText(scheduleTitle);
-        int jamaatIndex = mJamaatList.indexOf(jamaat);
+        int jamaatIndex = mViewModel.jamaatList.indexOf(jamaat);
         mSpinnerJamaat.setSelection(jamaatIndex);
         mSpinnerJamaat.setEnabled(false);
         String[] monthAndYear = month.split(" ");
@@ -362,8 +376,8 @@ public class ScheduleActivity extends AppCompatActivity implements LoaderManager
         int jamaatNamePos = mJamaatListsCursor.getColumnIndex(PaymentProviderContract.Members.COLUMN_MEMBER_JAMAATNAME);
         while(mJamaatListsCursor.moveToNext()){
             String jamaatName = mJamaatListsCursor.getString(jamaatNamePos);
-            if(!mJamaatList.contains(jamaatName)){
-                mJamaatList.add(jamaatName);
+            if(!(mViewModel.jamaatList).contains(jamaatName)){
+                mViewModel.jamaatList.add(jamaatName);
             }
         }
     }

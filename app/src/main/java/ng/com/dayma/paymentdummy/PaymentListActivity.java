@@ -60,6 +60,7 @@ public class PaymentListActivity extends AppCompatActivity implements LoaderMana
         readDisplayStateValues();
         if(mViewModel.isNewlyCreated && savedInstanceState != null)
             mViewModel.restoreState(savedInstanceState);
+        mViewModel.isNewlyCreated = false;
         mViewModel.setScheduleId(mScheID);
         mSchedule = mViewModel.getSchedule(mScheID);
         mViewModel.setId(mSchedule.getId());

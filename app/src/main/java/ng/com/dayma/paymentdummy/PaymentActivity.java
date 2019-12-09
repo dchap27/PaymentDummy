@@ -27,7 +27,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 
 import ng.com.dayma.paymentdummy.data.PaymentDatabaseContract.MemberInfoEntry;
@@ -245,10 +244,15 @@ public class PaymentActivity extends AppCompatActivity implements LoaderManager.
     }
 
     private void initializeMonthPaid() {
-        Calendar dateTime = Calendar.getInstance();
-        String presentMonth = String.format("%1$Tb", dateTime);
-        String presentYear = String.format("%1$TY", dateTime);
-        String preselectedMonth = presentMonth + presentYear;
+//        Calendar dateTime = Calendar.getInstance();
+//        String presentMonth = String.format("%1$Tb", dateTime);
+//        String presentYear = String.format("%1$TY", dateTime);
+        String preselectedMonth;
+        String[] scheduleMonth = mSchedule.getMonth().getMonthId().split(" ");
+        String month = scheduleMonth[0].toUpperCase();
+        String year = scheduleMonth[1];
+        String preselect = month.substring(0,3);
+        preselectedMonth = preselect + year;
         for(int i = 0; i<mSpinnerMonthPaid.getCount(); i++){
             if(mSpinnerMonthPaid.getItemAtPosition(i).equals(preselectedMonth)){
                 mSpinnerMonthPaid.setSelection(i);
