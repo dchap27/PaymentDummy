@@ -232,10 +232,6 @@ public class PaymentActivity extends AppCompatActivity implements LoaderManager.
         }
     }
 
-    private void restoreOriginalPaymentValues(Bundle savedInstanceState) {
-
-    }
-
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);

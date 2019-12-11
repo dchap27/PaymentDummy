@@ -258,11 +258,11 @@ public class MainActivity extends AppCompatActivity
             handleDisplaySelection(id);
             // store the selection id to viewModel
             mViewModel.navDrawerDisplaySelection = item.getItemId();
-        } else if (id == R.id.nav_share) {
-            handleSelection(R.string.nav_share_message);
         } else if (id == R.id.nav_send) {
             handleSelection(R.string.nav_send_message);
 
+        } else if (id == R.id.nav_add_new_jamaat){
+            handleSelection(R.string.nav_send_message);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

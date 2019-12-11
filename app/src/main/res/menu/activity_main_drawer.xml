@@ -15,13 +15,13 @@
     <item android:title="Communicate">
         <menu>
             <item
-                android:id="@+id/nav_share"
-                android:icon="@drawable/ic_menu_share"
-                android:title="Share"/>
-            <item
                 android:id="@+id/nav_send"
                 android:icon="@drawable/ic_menu_send"
                 android:title="Send"/>
+            <item
+                android:id="@+id/nav_add_new_jamaat"
+                android:icon="@android:drawable/ic_input_add"
+                android:title="Add New Jamaat" />
         </menu>
     </item>
 
