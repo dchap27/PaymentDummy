@@ -19,17 +19,17 @@ public class CsvUtility {
 
     }
 
-    public void readCSVToDatabase(String jamaatName){
+    public void readCSVToDatabase(String jamaatName, InputStream inputStream){
         PaymentOpenHelper mDbOpenHelper = new PaymentOpenHelper(mContext);
         SQLiteDatabase mDb = mDbOpenHelper.getWritableDatabase();
         DatabaseDataWorker databaseDataWorker = new DatabaseDataWorker(mDb);
-        InputStream inputstream = mContext.getResources().openRawResource(R.raw.felele);
-        ReadCSV csvFile = new ReadCSV(inputstream);
+//        InputStream inputstream = mContext.getResources().openRawResource(R.raw.felele);
+        ReadCSV csvFile = new ReadCSV(inputStream);
         List<String[]> jamaatInfo = csvFile.read();
         for(int i=1; i<jamaatInfo.size(); i++){
             // start from i=1 to avoid insert of the heading
             databaseDataWorker.insertMember(jamaatName, Integer.parseInt(jamaatInfo.get(i)[0]), jamaatInfo.get(i)[1]);
         }
-        Log.d("CSVUtility", "Done reading!");
+        Log.d("CSVUtility", "Done reading file!");
     }
 }

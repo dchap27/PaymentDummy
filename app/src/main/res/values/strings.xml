@@ -81,6 +81,7 @@
     <string name="jamaat_name_hint">Jamaat Name</string>
     <string name="menu_edit_item">Edit</string>
     <string name="selected_item_count"> Selected item</string>
+    <string name="runtime_permissions_txt">runtime permissions</string>
     <string-array name="pref_example_list_titles">
         <item>Always</item>
         <item>When possible</item>

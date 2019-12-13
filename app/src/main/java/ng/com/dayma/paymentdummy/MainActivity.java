@@ -1,5 +1,6 @@
 package ng.com.dayma.paymentdummy;
 
+import android.Manifest;
 import android.app.LoaderManager;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.CursorLoader;
@@ -10,6 +11,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
@@ -19,7 +21,6 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -30,10 +31,13 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.webkit.MimeTypeMap;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.List;
 
 import ng.com.dayma.paymentdummy.MyViewModels.MainActivityViewModel;
@@ -44,12 +48,16 @@ import ng.com.dayma.paymentdummy.data.PaymentProviderContract;
 import ng.com.dayma.paymentdummy.touchhelpers.ScheduleClickAdapterListener;
 import ng.com.dayma.paymentdummy.touchhelpers.ScheduleTouchHelperCallback;
 
-public class MainActivity extends AppCompatActivity
+import static android.content.Intent.EXTRA_MIME_TYPES;
+
+public class MainActivity extends RuntimePermissionsActivity
         implements NavigationView.OnNavigationItemSelectedListener, LoaderManager.LoaderCallbacks<Cursor>,
         ScheduleClickAdapterListener {
 
     public static final int LOADER_SCHEDULES = 0;
     private static final int LOADER_MONTHS = 1;
+    private static final int PERMISSION_REQUEST_READ_EXTERNAL_STORAGE = 10;
+    private static final int SCHEDULE_FILE_RESULT = 22;
     public final String TAG = getClass().getSimpleName();
     private ScheduleRecyclerAdapter mScheduleRecyclerAdapter;
     private RecyclerView mRecyclerItems;
@@ -114,6 +122,24 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
+    public void onPermissionsGranted(int requestCode) {
+        switch(requestCode){
+            case PERMISSION_REQUEST_READ_EXTERNAL_STORAGE:
+                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                intent.addCategory(intent.CATEGORY_OPENABLE);
+                intent.setType("*/*");
+                String[] mimetypes = {"text/comma-separated-values", "text/csv"};
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                    intent.putExtra(EXTRA_MIME_TYPES, mimetypes);
+                }
+                startActivityForResult(Intent.createChooser(intent, "Select a file"),
+                        SCHEDULE_FILE_RESULT);
+                break;
+        }
+
+    }
+
+    @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         if(outState != null){
@@ -128,6 +154,37 @@ public class MainActivity extends AppCompatActivity
         mLoadFromDatabase = new DataManager.LoadFromDatabase();
         mLoadFromDatabase.execute(this);
         updateNavHeader();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode == SCHEDULE_FILE_RESULT && resultCode == RESULT_OK){
+            Uri downloaddata = data.getData();
+            String fileName = downloaddata.getLastPathSegment();
+            String mime = MimeTypeMap.getSingleton().getFileExtensionFromUrl(String.valueOf(downloaddata));
+            Log.d(TAG, "selected file Uri: "+ downloaddata);
+            if(mime.toLowerCase().equals("csv")){
+                try {
+                    Log.d(TAG, "File extension being read, "+ mime);
+                    final InputStream csvFile = getContentResolver().openInputStream(downloaddata);
+                    AsyncTask task = new AsyncTask() {
+                        @Override
+                        protected Void doInBackground(Object... objects) {
+                            CsvUtility utility = new CsvUtility(MainActivity.this);
+                            Log.d(TAG, "reading into database");
+                            utility.readCSVToDatabase(mJamaatName, csvFile);
+                            return null;
+                        }
+                    };
+                    task.execute();
+
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
+            }
+
+        }
     }
 
     private void loadSchedulesData() {
@@ -294,17 +351,10 @@ public class MainActivity extends AppCompatActivity
         mSaveJamaatNameDialog.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mJamaatName = mJamaatEditText.getText().toString().trim();
-                AsyncTask task = new AsyncTask() {
-                    @Override
-                    protected Void doInBackground(Object... objects) {
-                        CsvUtility utility = new CsvUtility(MainActivity.this);
-                        Log.d(TAG, "reading into database");
-                        utility.readCSVToDatabase(mJamaatName);
-                        return null;
-                    }
-                };
-                task.execute();
+                mJamaatName = mJamaatEditText.getText().toString().trim().toUpperCase();
+                MainActivity.super.requestAppPermissions(new
+                        String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                        R.string.runtime_permissions_txt, PERMISSION_REQUEST_READ_EXTERNAL_STORAGE);
                 alertDialog.cancel();
             }
         });
