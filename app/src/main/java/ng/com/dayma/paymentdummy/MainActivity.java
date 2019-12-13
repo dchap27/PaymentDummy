@@ -25,6 +25,7 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.text.InputFilter;
 import android.util.Log;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
@@ -34,10 +35,13 @@ import android.view.View;
 import android.webkit.MimeTypeMap;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import ng.com.dayma.paymentdummy.MyViewModels.MainActivityViewModel;
@@ -168,13 +172,36 @@ public class MainActivity extends RuntimePermissionsActivity
                 try {
                     Log.d(TAG, "File extension being read, "+ mime);
                     final InputStream csvFile = getContentResolver().openInputStream(downloaddata);
-                    AsyncTask task = new AsyncTask() {
+                    AsyncTask<String, Integer, Boolean> task = new AsyncTask<String, Integer, Boolean>() {
+                        private ProgressBar mProgressBar;
                         @Override
-                        protected Void doInBackground(Object... objects) {
+                        protected void onPreExecute() {
+                            super.onPreExecute();
+                            mProgressBar = (ProgressBar) findViewById(R.id.progress_bar_main_activity);
+                            mProgressBar.setVisibility(View.VISIBLE);
+                            mProgressBar.setProgress(1);
+                        }
+
+                        @Override
+                        protected Boolean doInBackground(String... strings) {
                             CsvUtility utility = new CsvUtility(MainActivity.this);
+                            publishProgress(2);
                             Log.d(TAG, "reading into database");
-                            utility.readCSVToDatabase(mJamaatName, csvFile);
-                            return null;
+                            utility.readCSVToDatabase(mViewModel.mJamaatName, csvFile);
+                            publishProgress(3);
+                            return true;
+                        }
+
+                        @Override
+                        protected void onProgressUpdate(Integer... values) {
+                            int progressValue = values[0];
+                            mProgressBar.setProgress(progressValue,true);
+                        }
+
+                        @Override
+                        protected void onPostExecute(Boolean aBoolean) {
+                            super.onPostExecute(aBoolean);
+                            mProgressBar.setVisibility(View.GONE );
                         }
                     };
                     task.execute();
@@ -351,10 +378,15 @@ public class MainActivity extends RuntimePermissionsActivity
         mSaveJamaatNameDialog.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mJamaatName = mJamaatEditText.getText().toString().trim().toUpperCase();
-                MainActivity.super.requestAppPermissions(new
-                        String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-                        R.string.runtime_permissions_txt, PERMISSION_REQUEST_READ_EXTERNAL_STORAGE);
+                mViewModel.mJamaatName = mJamaatEditText.getText().toString().trim().toUpperCase();
+                if(!mViewModel.mJamaatName.isEmpty()) {
+                    MainActivity.super.requestAppPermissions(new
+                                    String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                            R.string.runtime_permissions_txt, PERMISSION_REQUEST_READ_EXTERNAL_STORAGE);
+                }else {
+                    View view = findViewById(R.id.list_schedules);
+                    Snackbar.make(view, R.string.jamaat_name_warning, Snackbar.LENGTH_LONG).show();
+                }
                 alertDialog.cancel();
             }
         });
@@ -392,6 +424,13 @@ public class MainActivity extends RuntimePermissionsActivity
         mJamaatEditText = (EditText) mPopupDialogView.findViewById(R.id.popup_jamaat_edit_text);
         mSaveJamaatNameDialog = (Button) mPopupDialogView.findViewById(R.id.save_input_dialog_jamaatname);
         mCancelJamaatDialogAction = (Button) mPopupDialogView.findViewById(R.id.cancel_input_dialog_jamaatname);
+
+        // Apply the filters to control the input (alphanumeric)
+        ArrayList<InputFilter> curInputFilters = new ArrayList<InputFilter>(Arrays.asList(mJamaatEditText.getFilters()));
+        curInputFilters.add(0, new AlphaNumericInputFilter());
+        curInputFilters.add(1, new InputFilter.AllCaps());
+        InputFilter[] newInputFilters = curInputFilters.toArray(new InputFilter[curInputFilters.size()]);
+        mJamaatEditText.setFilters(newInputFilters);
     }
 
     @Override

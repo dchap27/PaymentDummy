@@ -112,7 +112,7 @@ public class DatabaseDataWorker {
 
     }
 
-    public void insertMember(String jamaatName, int chandaNo, String fullname){
+    private void insertMember(String jamaatName, int chandaNo, String fullname){
         ContentValues values = new ContentValues();
         values.put(PaymentDatabaseContract.MemberInfoEntry.COLUMN_MEMBER_JAMAATNAME, jamaatName);
         values.put(PaymentDatabaseContract.MemberInfoEntry.COLUMN_MEMBER_ID, (chandaNo) + " - " + fullname);

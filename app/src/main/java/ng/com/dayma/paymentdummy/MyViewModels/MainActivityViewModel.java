@@ -11,6 +11,7 @@ public class MainActivityViewModel extends ViewModel {
 
     private static final String NAV_DRAWER_DISPLAY_SELECTION_NAME = "ng.com.dayma.paymentdummy.NAVDRAWERDISPLAYSELECTIONNAME";
     public int navDrawerDisplaySelection = R.id.nav_schedules;
+    public String mJamaatName;
 
     public void saveState(Bundle outState) {
         outState.putInt(NAV_DRAWER_DISPLAY_SELECTION_NAME, navDrawerDisplaySelection);

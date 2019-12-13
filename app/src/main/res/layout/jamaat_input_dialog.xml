@@ -30,8 +30,7 @@
                 android:layout_marginStart="8dp"
                 android:layout_weight="1"
                 android:ems="10"
-                android:hint="@string/jamaat_name_hint"
-                android:digits="ABCDEFGHIJKLMNOPQRSTUVWXYZ" />
+                android:hint="@string/jamaat_name_hint" />
         </TableRow>
 
         <TableRow
