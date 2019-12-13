@@ -9,6 +9,7 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
@@ -17,6 +18,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -24,9 +26,12 @@ import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.ActionMode;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import java.util.List;
@@ -57,6 +62,11 @@ public class MainActivity extends AppCompatActivity
     private ActionModecallbacks mActionModecallbacks;
     private DataManager.LoadFromDatabase mLoadFromDatabase;
     private MainActivityViewModel mViewModel;
+    private View mPopupDialogView;
+    private Button mSaveJamaatNameDialog;
+    private Button mCancelJamaatDialogAction;
+    private EditText mJamaatEditText;
+    private String mJamaatName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -262,12 +272,48 @@ public class MainActivity extends AppCompatActivity
             handleSelection(R.string.nav_send_message);
 
         } else if (id == R.id.nav_add_new_jamaat){
-            handleSelection(R.string.nav_send_message);
+            handleJamaatNameDialogInput();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    private void handleJamaatNameDialogInput() {
+        // Create AlertDialog Builder
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+        alertDialogBuilder.setTitle("Jamaat Name");
+        alertDialogBuilder.setCancelable(true);
+        initializePopUpDialog();
+        alertDialogBuilder.setView(mPopupDialogView);
+
+        // create alertDialog and show
+        final AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.show();
+        mSaveJamaatNameDialog.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mJamaatName = mJamaatEditText.getText().toString().trim();
+                AsyncTask task = new AsyncTask() {
+                    @Override
+                    protected Void doInBackground(Object... objects) {
+                        CsvUtility utility = new CsvUtility(MainActivity.this);
+                        Log.d(TAG, "reading into database");
+                        utility.readCSVToDatabase(mJamaatName);
+                        return null;
+                    }
+                };
+                task.execute();
+                alertDialog.cancel();
+            }
+        });
+        mCancelJamaatDialogAction.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                alertDialog.cancel();
+            }
+        });
     }
 
     private void handleSelection(int message_id) {
@@ -288,6 +334,14 @@ public class MainActivity extends AppCompatActivity
                 displaySchedules();
 
         }
+    }
+
+    private void initializePopUpDialog(){
+        LayoutInflater layoutInflater = LayoutInflater.from(MainActivity.this);
+        mPopupDialogView = layoutInflater.inflate(R.layout.jamaat_input_dialog, null);
+        mJamaatEditText = (EditText) mPopupDialogView.findViewById(R.id.popup_jamaat_edit_text);
+        mSaveJamaatNameDialog = (Button) mPopupDialogView.findViewById(R.id.save_input_dialog_jamaatname);
+        mCancelJamaatDialogAction = (Button) mPopupDialogView.findViewById(R.id.cancel_input_dialog_jamaatname);
     }
 
     @Override

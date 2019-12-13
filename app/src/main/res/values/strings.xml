@@ -78,7 +78,7 @@
     <string name="wasiyyat_hissan_jaidad_hint">WasiyatHisan Jaida</string>
     <string name="miscellaneous_hint">Miscellaneous</string>
     <string name="schedule_title_hint">Schedule Title</string>
-    <string name="jamaat_name_hint">Jamaat :</string>
+    <string name="jamaat_name_hint">Jamaat Name</string>
     <string name="menu_edit_item">Edit</string>
     <string name="selected_item_count"> Selected item</string>
     <string-array name="pref_example_list_titles">
