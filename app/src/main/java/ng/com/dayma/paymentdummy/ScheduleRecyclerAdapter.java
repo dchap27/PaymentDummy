@@ -255,6 +255,12 @@ public class ScheduleRecyclerAdapter extends RecyclerView.Adapter<ScheduleRecycl
         mListener = listener;
     }
 
+    public int getScheduleCursorID(int position) {
+        int itemIndex = mSelectedItemsPosition.indexOfKey(position);
+        int cursorItem = mSelectedItemsCursorId.keyAt(itemIndex);
+        return cursorItem;
+    }
+
     public class ViewHolder extends RecyclerView.ViewHolder {
         public final TextView mScheduleTitle;
         public final TextView mTextMonth;

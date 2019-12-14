@@ -7,6 +7,11 @@
         android:title="@string/menu_edit_item"
         app:showAsAction="always" />
     <item
+        android:id="@+id/export_schedule"
+        android:title="Export to CSV"
+        app:showAsAction="always"/>
+
+    <item
         android:id="@+id/delete_schedule"
         android:icon="@android:drawable/ic_menu_delete"
         android:title="delete"

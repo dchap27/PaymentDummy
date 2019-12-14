@@ -535,11 +535,13 @@ public class MainActivity extends RuntimePermissionsActivity
         @Override
         public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
             MenuItem edit_menu = menu.findItem(R.id.edit_schedule);
-            MenuItem delete_menu = menu.findItem(R.id.delete_schedule);
+            MenuItem export_menu = menu.findItem(R.id.export_schedule);
             if(mScheduleRecyclerAdapter.getSelectedItemCount() == 1){
                 edit_menu.setEnabled(true);
+                export_menu.setEnabled(true);
             } else {
                 edit_menu.setEnabled(false);
+                export_menu.setEnabled(false);
             }
             return false;
         }
@@ -558,6 +560,11 @@ public class MainActivity extends RuntimePermissionsActivity
                     editSchedule();
                     mode.finish();
                     return true;
+                case R.id.export_schedule:
+                    Log.d(TAG, "Exporting schedule to CSV");
+                    exportSchedule();
+                    mode.finish();
+                    return true;
             }
             return false;
         }
@@ -568,6 +575,24 @@ public class MainActivity extends RuntimePermissionsActivity
             mActionMode = null;
 
         }
+    }
+
+    private void exportSchedule() {
+        List selectedItemPositions = mScheduleRecyclerAdapter.getSelectedItems();
+        final int cursorId = mScheduleRecyclerAdapter.getScheduleCursorID((Integer) selectedItemPositions.get(0));
+        AsyncTask<String, Integer, Boolean> task = new AsyncTask<String, Integer, Boolean>() {
+            @Override
+            protected Boolean doInBackground(String... strings) {
+                CsvUtility csvUtility = new CsvUtility(MainActivity.this);
+                Log.d(TAG, "Writing to file");
+                csvUtility.writeDatabaseToCSV(cursorId);
+                return true;
+            }
+        };
+        task.execute();
+
+        mScheduleRecyclerAdapter.notifyDataSetChanged();
+        mActionMode = null;
     }
 
     private void deleteSchedule() {
