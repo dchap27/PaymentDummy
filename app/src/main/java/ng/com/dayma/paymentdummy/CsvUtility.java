@@ -9,6 +9,8 @@ import android.util.Log;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import ng.com.dayma.paymentdummy.data.CSVWriter;
@@ -95,7 +97,8 @@ public class CsvUtility {
             CSVWriter csvWrite = new CSVWriter(new FileWriter(file));
             Cursor curCSV = mContext.getContentResolver().query(PaymentProviderContract.Payments.CONTENT_URI,
                     projection, null, null, null);
-            csvWrite.writeNext(curCSV.getColumnNames());
+            String[] columnNames = changeColumnNamesToContainSpaces(curCSV.getColumnNames());
+            csvWrite.writeNext(columnNames);
             while (curCSV.moveToNext()) {
                 //Which column you want to exprort
                 String arrStr[] = new String[curCSV.getColumnCount()];
@@ -133,5 +136,23 @@ public class CsvUtility {
             mContext.getContentResolver().insert(PaymentProviderContract.Members.CONTENT_URI, values);
         }
         cursor.close();
+    }
+
+    private static String[] changeColumnNamesToContainSpaces(String[] columnNames) {
+        String[] oldColumnNames = Arrays.toString(columnNames)
+                .replace("["," ")
+                .replace("]", " ")
+                .trim()
+                .split(",");
+        ArrayList<String> newColumnNames = new ArrayList<>();
+        for(int i=0; i< oldColumnNames.length; i++){
+            if(oldColumnNames[i].contains("_") && !(oldColumnNames[i].contains("Wasiyyat_Hissan_Jaidad"))){
+                newColumnNames.add(oldColumnNames[i].replace("_", " "));
+            }else{
+                newColumnNames.add(oldColumnNames[i]);
+            }
+        }
+        String[] newNames = newColumnNames.toArray(new String[0]);
+        return newNames;
     }
 }

@@ -56,13 +56,6 @@ public class PaymentOpenHelper extends SQLiteOpenHelper {
         db.execSQL(ScheduleInfoEntry.SQL_CREATE_INDEX1);
         db.execSQL(PaymentInfoEntry.SQL_CREATE_INDEX1);
 
-        // create a dummy data
-        DatabaseDataWorker worker = new DatabaseDataWorker(db);
-        worker.insertMembers();
-        worker.insertMonths();
-        worker.insertSampleSchedules();
-        worker.insertSamplePayments();
-
     }
 
     @Override
@@ -124,9 +117,9 @@ public class PaymentOpenHelper extends SQLiteOpenHelper {
                 if (line.endsWith(";")) {
                     db.execSQL(statement.toString());
                     statement = new StringBuilder();
-                    db.setTransactionSuccessful();
                 }
             }
+            db.setTransactionSuccessful();
         } catch (IOException e){
             Log.d(TAG, "Error in database transaction");
         } finally {
