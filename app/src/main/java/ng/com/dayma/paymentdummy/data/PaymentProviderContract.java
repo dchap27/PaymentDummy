@@ -44,24 +44,24 @@ public final class PaymentProviderContract {
 
         public static final String COLUMN_PAYMENT_LOCALRECEIPT = "LocalReceipt";
         public static final String COLUMN_PAYMENT_MONTHPAID = "MonthPaidFor";
-        public static final String COLUMN_PAYMENT_CHANDAAM = "ChandaAam";
-        public static final String COLUMN_PAYMENT_CHANDAWASIYYAT = "Chanda_Wasiyyat";
-        public static final String COLUMN_PAYMENT_JALSASALANA = "Jalsa_Salana";
-        public static final String COLUMN_PAYMENT_TARIKIJADID = "Tariki_Jadid";
-        public static final String COLUMN_PAYMENT_WAQFIJADID = "Waqfi_Jadid";
-        public static final String COLUMN_PAYMENT_WELFAREFUND = "Welfare_fund";
-        public static final String COLUMN_PAYMENT_SCHOLARSHIP = "Scholarhip";
-        public static final String COLUMN_PAYMENT_MARYAMFUND = "Maryam_fund";
+        public static final String COLUMN_PAYMENT_CHANDAAM = "Chanda Aam";
+        public static final String COLUMN_PAYMENT_CHANDAWASIYYAT = "Chanda Wasiyyat";
+        public static final String COLUMN_PAYMENT_JALSASALANA = "Jalsa Salana";
+        public static final String COLUMN_PAYMENT_TARIKIJADID = "Tariki Jadid";
+        public static final String COLUMN_PAYMENT_WAQFIJADID = "Waqfi Jadid";
+        public static final String COLUMN_PAYMENT_WELFAREFUND = "Welfare Fund";
+        public static final String COLUMN_PAYMENT_SCHOLARSHIP = "Scholarship";
+        public static final String COLUMN_PAYMENT_MARYAMFUND = "Maryam Fund";
         public static final String COLUMN_PAYMENT_TABLIGH = "Tabligh";
         public static final String COLUMN_PAYMENT_ZAKAT = "Zakat";
         public static final String COLUMN_PAYMENT_SADAKAT = "Sadakat";
         public static final String COLUMN_PAYMENT_FITRANA = "Fitrana";
-        public static final String COLUMN_PAYMENT_MOSQUEDONATION = "Mosque_donation";
-        public static final String COLUMN_PAYMENT_MTA = "Mta";
-        public static final String COLUMN_PAYMENT_CENTINARYKHILAFAT = "Centinary_khilafat";
-        public static final String COLUMN_PAYMENT_WASIYYATHISSANJAIDAD = "Wasiyyat_hissan_jaidad";
+        public static final String COLUMN_PAYMENT_MOSQUEDONATION = "Moaque Donation";
+        public static final String COLUMN_PAYMENT_MTA = "MTA";
+        public static final String COLUMN_PAYMENT_CENTINARYKHILAFAT = "Centinary Khilafat";
+        public static final String COLUMN_PAYMENT_WASIYYATHISSANJAIDAD = "Wasiyyat_Hissan_Jaidad";
         public static final String COLUMN_PAYMENT_MISCELLANEOUS = "Miscellaneous";
-        public static final String COLUMN_PAYMENT_SUBTOTAL = "Subtotal";
+        public static final String COLUMN_PAYMENT_SUBTOTAL = "SubTotal";
     }
 
 

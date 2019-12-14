@@ -116,13 +116,21 @@ public class PaymentOpenHelper extends SQLiteOpenHelper {
     private void executeSQLScript(SQLiteDatabase db, BufferedReader reader) throws IOException {
         String line;
         StringBuilder statement = new StringBuilder();
-        while ((line = reader.readLine()) != null) {
-            statement.append(line);
-            statement.append("\n");
-            if (line.endsWith(";")) {
-                db.execSQL(statement.toString());
-                statement = new StringBuilder();
+        db.beginTransaction();
+        try {
+            while ((line = reader.readLine()) != null) {
+                statement.append(line);
+                statement.append("\n");
+                if (line.endsWith(";")) {
+                    db.execSQL(statement.toString());
+                    statement = new StringBuilder();
+                    db.setTransactionSuccessful();
+                }
             }
+        } catch (IOException e){
+            Log.d(TAG, "Error in database transaction");
+        } finally {
+            db.endTransaction();
         }
     }
 }
