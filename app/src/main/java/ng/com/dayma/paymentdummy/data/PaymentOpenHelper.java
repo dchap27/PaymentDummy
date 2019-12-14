@@ -113,7 +113,7 @@ public class PaymentOpenHelper extends SQLiteOpenHelper {
 
     }
 
-    private void executeSQLScript(SQLiteDatabase db, BufferedReader reader) throws IOException {
+    private void executeSQLScript(SQLiteDatabase db, BufferedReader reader) {
         String line;
         StringBuilder statement = new StringBuilder();
         db.beginTransaction();
