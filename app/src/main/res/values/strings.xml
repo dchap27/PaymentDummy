@@ -57,9 +57,9 @@
     <string name="pref_default_email_address">youremail@hostname.com</string>
 
     <!-- Example settings for Notifications -->
-    <string name="pref_title_jamaat_list">Add Jamaat</string>
+    <string name="pref_title_jamaat_list">My Jamaat</string>
 
-    <string name="pref_default_jamaat_list">kewulere_memberlist</string>
+    <string name="pref_default_jamaat_list">kewulere</string>
 
     <string name="jalsa_salana_hint">Jalsa Salana</string>
     <string name="welfare_fund_hint">welfare fund</string>
@@ -83,6 +83,12 @@
     <string name="selected_item_count"> Selected item</string>
     <string name="runtime_permissions_txt">runtime permissions</string>
     <string name="jamaat_name_warning">Please, provide Jamaat Name to update members info</string>
+    <string name="first_time_user_message">Welcome! Make sure to set your preferences in the settings
+         screen for tailored usage of the app.</string>
+    <string name="welcome_title_message">Welcome</string>
+    <string name="enable_mutiple_jamaat">Multiple Jamaat</string>
+    <string name="add_jamaat_not_enabled">You are not allowed to add new jamaat</string>
+    <string name="Jamaat_Multi_selection">Add Jamaat(s)</string>
     <string-array name="pref_example_list_titles">
         <item>Always</item>
         <item>When possible</item>
@@ -119,18 +125,24 @@
         <item>2</item>
         <item>3</item>
     </string-array>
-    <string-array name="multi_select_list_preference_default_value" />
+    <string name="multi_select_list_preference_default_value">
+        kewulere
+    </string>
+    <string name="message_warning_update_jamaat">Are you sure you want to update list for %s</string>
+    <string name="loading_message">please wait ...</string>
     <string-array name="pref_entries_jamaat_list">
+        <item>Ashipa</item>
         <item>Oke-Ado</item>
         <item>Kewulere</item>
         <item>Felele</item>
         <item>Liberty</item>
     </string-array>
     <string-array name="pref_values_jamaat_list">
-        <item>Oke-Ado_memberlist</item>
-        <item>Kewulere_memberlist</item>
-        <item>Felele_memberlist</item>
-        <item>Liberty_memberlist</item>
+        <item>ashipa</item>
+        <item>oke-ado</item>
+        <item>kewulere</item>
+        <item>felele</item>
+        <item>liberty</item>
     </string-array>
 
 </resources>

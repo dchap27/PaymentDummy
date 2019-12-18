@@ -3,7 +3,6 @@
     <!-- NOTE: EditTextPreference accepts EditText attributes. -->
     <!-- NOTE: EditTextPreference's summary should be set to its value by the activity code. -->
     <EditTextPreference
-        android:capitalize="words"
         android:defaultValue="@string/pref_default_display_name"
         android:inputType="textCapWords"
         android:key="user_display_name"
@@ -22,13 +21,25 @@
         android:selectAllOnFocus="true"
         android:singleLine="true"
         android:title="@string/pref_title_email_address"/>
+
     <ListPreference
         android:defaultValue="@string/pref_default_jamaat_list"
         android:entries="@array/pref_entries_jamaat_list"
         android:entryValues="@array/pref_values_jamaat_list"
-        android:key="user_jamaat_list"
-        android:negativeButtonText="@null"
-        android:positiveButtonText="@null"
-        android:title="@string/pref_title_jamaat_list"/>
+        android:key="key_jamaat_list"
+        android:title="@string/pref_title_jamaat_list" />
+
+    <SwitchPreference
+        android:defaultValue="false"
+        android:key="key_enable_multiple_jamaat"
+        android:title="@string/enable_mutiple_jamaat" />
+
+    <MultiSelectListPreference
+        android:defaultValue="@string/multi_select_list_preference_default_value"
+        android:dependency="key_enable_multiple_jamaat"
+        android:entries="@array/pref_entries_jamaat_list"
+        android:entryValues="@array/pref_values_jamaat_list"
+        android:key="multi_select_memberlist_pref"
+        android:title="@string/Jamaat_Multi_selection" />
 
 </PreferenceScreen>

@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.LoaderManager;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.CursorLoader;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.Loader;
 import android.content.SharedPreferences;
@@ -43,6 +44,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 import ng.com.dayma.paymentdummy.MyViewModels.MainActivityViewModel;
 import ng.com.dayma.paymentdummy.data.PaymentDatabaseContract;
@@ -51,6 +53,8 @@ import ng.com.dayma.paymentdummy.data.PaymentOpenHelper;
 import ng.com.dayma.paymentdummy.data.PaymentProviderContract;
 import ng.com.dayma.paymentdummy.touchhelpers.ScheduleClickAdapterListener;
 import ng.com.dayma.paymentdummy.touchhelpers.ScheduleTouchHelperCallback;
+import ng.com.dayma.paymentdummy.utils.CsvUtility;
+import ng.com.dayma.paymentdummy.utils.PreferenceKeys;
 
 import static android.content.Intent.EXTRA_MIME_TYPES;
 
@@ -79,6 +83,9 @@ public class MainActivity extends RuntimePermissionsActivity
     private Button mCancelJamaatDialogAction;
     private EditText mJamaatEditText;
     private String mJamaatName;
+    private SharedPreferences mSharedPref;
+    private View mProgressView;
+    private ProgressBar mProgressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -123,6 +130,34 @@ public class MainActivity extends RuntimePermissionsActivity
         mViewModel.isNewlyCreated = false;
         handleDisplaySelection(mViewModel.navDrawerDisplaySelection);
         mActionModecallbacks = new ActionModecallbacks();
+        isFirstUsage();
+    }
+
+    private void isFirstUsage(){
+        Log.d(TAG, "Checking if this is user's first usage");
+
+        mSharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+        boolean isFirstUsage = mSharedPref.getBoolean(PreferenceKeys.FIRST_TIME_USAGE, true);
+
+        if(isFirstUsage){
+            Log.d(TAG, "IsFirstUsage: launching alert dialog");
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+            alertDialogBuilder.setMessage(R.string.first_time_user_message);
+            alertDialogBuilder.setTitle(R.string.welcome_title_message);
+            alertDialogBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    Log.d(TAG, "Onclick: launching settings screen");
+                    SharedPreferences.Editor editor = mSharedPref.edit();
+                    editor.putBoolean(PreferenceKeys.FIRST_TIME_USAGE, false);
+                    editor.commit();
+                    dialog.dismiss();
+                    startActivity(new Intent(MainActivity.this, SettingsActivity.class));
+                }
+            });
+            AlertDialog alertDialog = alertDialogBuilder.create();
+            alertDialog.show();
+        }
     }
 
     @Override
@@ -173,11 +208,19 @@ public class MainActivity extends RuntimePermissionsActivity
                     Log.d(TAG, "File extension being read, "+ mime);
                     final InputStream csvFile = getContentResolver().openInputStream(downloaddata);
                     AsyncTask<String, Integer, Boolean> task = new AsyncTask<String, Integer, Boolean>() {
-                        private ProgressBar mProgressBar;
+
+                        private AlertDialog mDialog;
+
                         @Override
                         protected void onPreExecute() {
                             super.onPreExecute();
-                            mProgressBar = (ProgressBar) findViewById(R.id.progress_bar_main_activity);
+
+                            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(MainActivity.this);
+                            alertDialogBuilder.setCancelable(false);
+                            initialiseProgressDialog(R.id.progress_bar_main_activity);
+                            alertDialogBuilder.setView(mProgressView);
+                            mDialog = alertDialogBuilder.create();
+                            mDialog.show();
                             mProgressBar.setVisibility(View.VISIBLE);
                             mProgressBar.setProgress(1);
                         }
@@ -187,7 +230,7 @@ public class MainActivity extends RuntimePermissionsActivity
                             CsvUtility utility = new CsvUtility(MainActivity.this);
                             publishProgress(2);
                             Log.d(TAG, "reading into database");
-                            utility.readCSVToDatabase(mViewModel.mJamaatName, csvFile);
+                            utility.readCSVToDatabase(mViewModel.mJamaatName.toUpperCase(), csvFile);
                             publishProgress(3);
                             return true;
                         }
@@ -202,6 +245,11 @@ public class MainActivity extends RuntimePermissionsActivity
                         protected void onPostExecute(Boolean aBoolean) {
                             super.onPostExecute(aBoolean);
                             mProgressBar.setVisibility(View.GONE );
+                            mDialog.dismiss();
+                            View v = findViewById(R.id.list_schedules);
+                            Snackbar.make(v, String.format(
+                                    "%s member list added successfully!",mViewModel.mJamaatName.toUpperCase()),
+                                    Snackbar.LENGTH_LONG).show();
                         }
                     };
                     task.execute();
@@ -355,8 +403,8 @@ public class MainActivity extends RuntimePermissionsActivity
         } else if (id == R.id.nav_send) {
             handleSelection(R.string.nav_send_message);
 
-        } else if (id == R.id.nav_add_new_jamaat){
-            handleJamaatNameDialogInput();
+        } else if (id == R.id.nav_add_new_jamaat_info){
+            handleAddorUpdateJamaatInfo();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -364,38 +412,79 @@ public class MainActivity extends RuntimePermissionsActivity
         return true;
     }
 
-    private void handleJamaatNameDialogInput() {
+    private void handleAddorUpdateJamaatInfo() {
         // Create AlertDialog Builder
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
-        alertDialogBuilder.setTitle("Jamaat Name");
-        alertDialogBuilder.setCancelable(true);
-        initializePopUpDialog();
-        alertDialogBuilder.setView(mPopupDialogView);
-
-        // create alertDialog and show
-        final AlertDialog alertDialog = alertDialogBuilder.create();
-        alertDialog.show();
-        mSaveJamaatNameDialog.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mViewModel.mJamaatName = mJamaatEditText.getText().toString().trim().toUpperCase();
-                if(!mViewModel.mJamaatName.isEmpty()) {
+        alertDialogBuilder.setCancelable(false);
+        boolean isMultipleJamaat = mSharedPref.getBoolean("key_enable_multiple_jamaat", false);
+        final AlertDialog alertDialog;
+        String dialogTitle = "Add New Jamaat";
+        if(!isMultipleJamaat){
+            View view = findViewById(R.id.list_schedules);
+            Snackbar.make(view, R.string.add_jamaat_not_enabled, Snackbar.LENGTH_LONG).show();
+            dialogTitle = "Update Members Info";
+            mViewModel.mJamaatName = mSharedPref.getString("key_jamaat_list", "");
+            if(mViewModel.mJamaatName.isEmpty()){
+                Snackbar.make(view, "You've not set your jamaat in th preference settings", Snackbar.LENGTH_LONG).show();
+                return;
+            }
+            alertDialogBuilder.setMessage(
+                    String.format(getString(R.string.message_warning_update_jamaat),mViewModel.mJamaatName.toUpperCase()));
+            alertDialogBuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
                     MainActivity.super.requestAppPermissions(new
                                     String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
                             R.string.runtime_permissions_txt, PERMISSION_REQUEST_READ_EXTERNAL_STORAGE);
-                }else {
-                    View view = findViewById(R.id.list_schedules);
-                    Snackbar.make(view, R.string.jamaat_name_warning, Snackbar.LENGTH_LONG).show();
+                    dialog.dismiss();
                 }
-                alertDialog.cancel();
-            }
-        });
-        mCancelJamaatDialogAction.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                alertDialog.cancel();
-            }
-        });
+            });
+            alertDialogBuilder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                }
+            });
+            alertDialog = alertDialogBuilder.create();
+            alertDialog.show();
+        }
+        else {
+            initializePopUpDialog();
+            alertDialogBuilder.setView(mPopupDialogView);
+            alertDialogBuilder.setTitle(dialogTitle);
+            alertDialog = alertDialogBuilder.create();
+            alertDialog.show();
+            final View view = findViewById(R.id.list_schedules);
+
+            mSaveJamaatNameDialog.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mViewModel.mJamaatName = mJamaatEditText.getText().toString().trim().toUpperCase();
+                    if(!mViewModel.mJamaatName.isEmpty()) {
+                        Set<String> allowedJamaats = mSharedPref.getStringSet("multi_select_memberlist_pref",null);
+                        if(!allowedJamaats.contains(mViewModel.mJamaatName.toLowerCase())){
+                            Snackbar.make(view,
+                                    String.format("%s is not among your lists of Jamaats",mViewModel.mJamaatName.toUpperCase()), Snackbar.LENGTH_LONG).show();
+                            return;
+                        }
+                        MainActivity.super.requestAppPermissions(new
+                                        String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                                R.string.runtime_permissions_txt, PERMISSION_REQUEST_READ_EXTERNAL_STORAGE);
+                    }else {
+                        Snackbar.make(view, R.string.jamaat_name_warning, Snackbar.LENGTH_LONG).show();
+                        return;
+                    }
+                    alertDialog.cancel();
+                }
+            });
+            mCancelJamaatDialogAction.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    alertDialog.cancel();
+                }
+            });
+        }
+
     }
 
     private void handleSelection(int message_id) {
@@ -431,6 +520,11 @@ public class MainActivity extends RuntimePermissionsActivity
         curInputFilters.add(1, new InputFilter.AllCaps());
         InputFilter[] newInputFilters = curInputFilters.toArray(new InputFilter[curInputFilters.size()]);
         mJamaatEditText.setFilters(newInputFilters);
+    }
+    private void initialiseProgressDialog(int progressBarId){
+        LayoutInflater layoutInflater = LayoutInflater.from(MainActivity.this);
+        mProgressView = layoutInflater.inflate(R.layout.progress_view_dialog, null);
+        mProgressBar = (ProgressBar) mProgressView.findViewById(progressBarId);
     }
 
     @Override
@@ -581,12 +675,83 @@ public class MainActivity extends RuntimePermissionsActivity
         List selectedItemPositions = mScheduleRecyclerAdapter.getSelectedItems();
         final int cursorId = mScheduleRecyclerAdapter.getScheduleCursorID((Integer) selectedItemPositions.get(0));
         AsyncTask<String, Integer, Boolean> task = new AsyncTask<String, Integer, Boolean>() {
+            private String mScheduleId;
+            private String mFileName;
+            private AlertDialog mDialog;
+            private Boolean mSuccess;
+
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(MainActivity.this);
+                initialiseProgressDialog(R.id.progress_bar_main_horizontal);
+                alertDialogBuilder.setView(mProgressView);
+                alertDialogBuilder.setCancelable(false);
+                mDialog = alertDialogBuilder.create();
+                mDialog.show();
+                mProgressBar.setVisibility(View.VISIBLE);
+                mProgressBar.setProgress(1);
+            }
+
             @Override
             protected Boolean doInBackground(String... strings) {
+                String[] scheduleProjection = {
+                        PaymentProviderContract.Schedules._ID,
+                        PaymentProviderContract.Schedules.COLUMN_SCHEDULE_ID,
+                        PaymentProviderContract.Schedules.COLUMN_MEMBER_JAMAATNAME,
+                };
+                // publish progress
+                publishProgress(2);
+                String scheduleSelection = PaymentProviderContract.Schedules._ID + "=?";
+                String[] scheduleArgs = { String.valueOf(cursorId)};
+                Cursor scheduleCursor = getContentResolver().query(PaymentProviderContract.Schedules.CONTENT_URI,
+                        scheduleProjection,scheduleSelection,scheduleArgs, null);
+
+                int scheduleIdPos = scheduleCursor.getColumnIndex(
+                        PaymentProviderContract.Schedules.COLUMN_SCHEDULE_ID);
+                int jamaatNamePos = scheduleCursor.getColumnIndex(
+                        PaymentProviderContract.Schedules.COLUMN_MEMBER_JAMAATNAME);
+                mFileName = null;
+                if(scheduleCursor.moveToNext()) {
+
+                    mScheduleId = scheduleCursor.getString(scheduleIdPos);
+                    String jamaatName = scheduleCursor.getString(jamaatNamePos);
+                    mFileName = mScheduleId;
+                    mSuccess = true;
+                    Log.d("CSVUtility", "File name reading... " + mFileName);
+                }
+                publishProgress(3);
+                scheduleCursor.close();
+                if(!mSuccess)
+                    return mSuccess;
+
                 CsvUtility csvUtility = new CsvUtility(MainActivity.this);
                 Log.d(TAG, "Writing to file");
-                csvUtility.writeDatabaseToCSV(cursorId);
-                return true;
+                mSuccess = csvUtility.writeDatabaseToCSV(mFileName, mScheduleId);
+                publishProgress(4);
+                return mSuccess;
+            }
+
+            @Override
+            protected void onProgressUpdate(Integer... values) {
+                int progressValue = values[0];
+                mProgressBar.setProgress(progressValue,true);
+
+            }
+
+            @Override
+            protected void onPostExecute(Boolean aBoolean) {
+                super.onPostExecute(aBoolean);
+                View v = findViewById(R.id.list_schedules);
+                mProgressBar.setVisibility(View.GONE);
+                mDialog.cancel();
+                if(aBoolean) {
+                    Snackbar.make(v, "Schedule successfully exported to /ChandaPay/"+mFileName,
+                            Snackbar.LENGTH_LONG).show();
+                } else {
+                    Snackbar.make(v, "Something went wrong! Try again later!",
+                            Snackbar.LENGTH_LONG).show();
+                }
             }
         };
         task.execute();

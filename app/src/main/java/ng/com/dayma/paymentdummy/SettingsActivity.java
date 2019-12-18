@@ -13,13 +13,13 @@ import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
-import android.support.v7.app.ActionBar;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.preference.RingtonePreference;
+import android.support.v4.app.NavUtils;
+import android.support.v7.app.ActionBar;
 import android.text.TextUtils;
 import android.view.MenuItem;
-import android.support.v4.app.NavUtils;
 
 import java.util.List;
 
@@ -192,7 +192,8 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             // guidelines.
             bindPreferenceSummaryToValue(findPreference("user_display_name"));
             bindPreferenceSummaryToValue(findPreference("user_email_address"));
-            bindPreferenceSummaryToValue(findPreference("user_jamaat_list"));
+            bindPreferenceSummaryToValue(findPreference("key_jamaat_list"));
+//            bindPreferenceSummaryToValue(findPreference("multi_select_memberlist_pref"));
         }
 
         @Override

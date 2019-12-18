@@ -1,4 +1,4 @@
-package ng.com.dayma.paymentdummy;
+package ng.com.dayma.paymentdummy.utils;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -37,30 +37,7 @@ public class CsvUtility {
         Log.d("CSVUtility", "Done reading file!");
     }
 
-    public void writeDatabaseToCSV(int scheduleCursorPosition){
-        String[] scheduleProjection = {
-                PaymentProviderContract.Schedules._ID,
-                PaymentProviderContract.Schedules.COLUMN_SCHEDULE_ID,
-                PaymentProviderContract.Schedules.COLUMN_MEMBER_JAMAATNAME,
-        };
-        String scheduleSelection = PaymentProviderContract.Schedules._ID + "=?";
-        String[] scheduleArgs = { String.valueOf(scheduleCursorPosition)};
-        Cursor scheduleCursor = mContext.getContentResolver().query(PaymentProviderContract.Schedules.CONTENT_URI,
-                scheduleProjection,scheduleSelection,scheduleArgs, null);
-        int scheduleIdPos = scheduleCursor.getColumnIndex(
-                PaymentProviderContract.Schedules.COLUMN_SCHEDULE_ID);
-        int jamaatNamePos = scheduleCursor.getColumnIndex(
-                PaymentProviderContract.Schedules.COLUMN_MEMBER_JAMAATNAME);
-        String fileName = "";
-        if(scheduleCursor.moveToNext()) {
-
-            String scheduleId = scheduleCursor.getString(scheduleIdPos);
-            String jamaatName = scheduleCursor.getString(jamaatNamePos);
-            fileName = scheduleId;
-            Log.d("CSVUtility", "File name reading... " + fileName);
-        }
-
-        scheduleCursor.close();
+    public boolean writeDatabaseToCSV(String fileName, String scheduleId){
 
         final String[] projection = {
                 PaymentProviderContract.Payments.COLUMN_MEMBER_CHANDANO,
@@ -86,6 +63,8 @@ public class CsvUtility {
                 PaymentProviderContract.Payments.COLUMN_PAYMENT_MISCELLANEOUS,
                 PaymentProviderContract.Payments.COLUMN_PAYMENT_SUBTOTAL
         };
+        String selection = PaymentProviderContract.Payments.COLUMN_SCHEDULE_ID + "=?";
+        String[] selectionArgs = { scheduleId };
         File exportDir = new File(Environment.getExternalStorageDirectory(), "/ChandaPay");
         if (!exportDir.exists()) {
             exportDir.mkdirs();
@@ -96,7 +75,7 @@ public class CsvUtility {
             file.createNewFile();
             CSVWriter csvWrite = new CSVWriter(new FileWriter(file));
             Cursor curCSV = mContext.getContentResolver().query(PaymentProviderContract.Payments.CONTENT_URI,
-                    projection, null, null, null);
+                    projection, selection, selectionArgs, null);
             String[] columnNames = changeColumnNamesToContainSpaces(curCSV.getColumnNames());
             csvWrite.writeNext(columnNames);
             while (curCSV.moveToNext()) {
@@ -109,8 +88,10 @@ public class CsvUtility {
             csvWrite.close();
             curCSV.close();
             Log.d("MainActivity-CSVUtility", "Database exported successfully");
+            return true;
         } catch (Exception sqlEx) {
             Log.e("MainActivity", sqlEx.getMessage(), sqlEx);
+            return false;
         }
     }
 
@@ -147,9 +128,9 @@ public class CsvUtility {
         ArrayList<String> newColumnNames = new ArrayList<>();
         for(int i=0; i< oldColumnNames.length; i++){
             if(oldColumnNames[i].contains("_") && !(oldColumnNames[i].contains("Wasiyyat_Hissan_Jaidad"))){
-                newColumnNames.add(oldColumnNames[i].replace("_", " "));
+                newColumnNames.add(oldColumnNames[i].replace("_", " ").trim());
             }else{
-                newColumnNames.add(oldColumnNames[i]);
+                newColumnNames.add(oldColumnNames[i].trim());
             }
         }
         String[] newNames = newColumnNames.toArray(new String[0]);
