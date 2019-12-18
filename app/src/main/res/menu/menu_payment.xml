@@ -7,7 +7,7 @@
         android:icon="@android:drawable/ic_menu_save"
         android:orderInCategory="101"
         android:title="Save"
-        app:showAsAction="always"/>
+        app:showAsAction="always|withText" />
     <item
         android:id="@+id/action_previous"
         android:icon="@android:drawable/ic_media_previous"
