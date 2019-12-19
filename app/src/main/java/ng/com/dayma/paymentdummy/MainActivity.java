@@ -3,6 +3,8 @@ package ng.com.dayma.paymentdummy;
 import android.Manifest;
 import android.app.LoaderManager;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.ContentUris;
+import android.content.ContentValues;
 import android.content.CursorLoader;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -729,6 +731,19 @@ public class MainActivity extends RuntimePermissionsActivity
                 Log.d(TAG, "Writing to file");
                 mSuccess = csvUtility.writeDatabaseToCSV(mFileName, mScheduleId);
                 publishProgress(4);
+                if(mSuccess){
+                    Uri uri = ContentUris.withAppendedId(PaymentProviderContract.Schedules.CONTENT_URI, cursorId);
+                    String[] projectionSchedule ={
+                            PaymentProviderContract.Schedules.COLUMN_SCHEDULE_ID,
+                            PaymentProviderContract.Schedules.COLUMN_SCHEDULE_ISCOMPLETE,
+                            PaymentProviderContract.Schedules._ID
+                    };
+                    ContentValues values = new ContentValues();
+                    values.put(PaymentProviderContract.Schedules._ID, cursorId);
+                    values.put(PaymentProviderContract.Schedules.COLUMN_SCHEDULE_ISCOMPLETE, 1);
+                    getContentResolver().update(uri, values, null, null);
+                    publishProgress(5);
+                }
                 return mSuccess;
             }
 
