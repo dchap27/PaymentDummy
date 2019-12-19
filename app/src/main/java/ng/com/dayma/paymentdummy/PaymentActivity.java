@@ -423,10 +423,6 @@ public class PaymentActivity extends AppCompatActivity implements LoaderManager.
         } else if(id == R.id.action_cancel){
             mIsCancelling = true;
             finish(); // Exit the Activity
-        } else if(id == R.id.action_next){
-            moveNext();
-        } else if(id == R.id.action_previous){
-            movePrevious();
         } else if(id == R.id.action_save) {
             if (validatePaymentInputs()){
                 mIsSaving = true;
@@ -453,6 +449,7 @@ public class PaymentActivity extends AppCompatActivity implements LoaderManager.
             String receiptNo = mTextReceiptNo.getText().toString().trim();
             Log.d(TAG, "Checking for duplicate receipt number");
             Cursor cursor = checkForDuplicatereceiptNo(receiptNo);
+            int count = cursor.getCount();
 
             int receiptNoPos = cursor.getColumnIndex(PaymentProviderContract.Payments.COLUMN_PAYMENT_LOCALRECEIPT);
             int payerNamePos = cursor.getColumnIndex(PaymentProviderContract.Payments.COLUMN_MEMBER_FULLNAME);
@@ -506,55 +503,14 @@ public class PaymentActivity extends AppCompatActivity implements LoaderManager.
                 PaymentProviderContract.Payments.COLUMN_PAYMENT_LOCALRECEIPT,
 
         };
-        String selection = PaymentProviderContract.Payments.COLUMN_PAYMENT_LOCALRECEIPT + "=?";
-        String[] selectionArgs = { receiptNo };
+        int integerReceipt = Integer.valueOf(receiptNo);
+        String selection = PaymentProviderContract.Payments.COLUMN_PAYMENT_LOCALRECEIPT + "= ? OR " +
+                PaymentProviderContract.Payments.COLUMN_PAYMENT_LOCALRECEIPT + " LIKE ?";
+        String[] selectionArgs = { receiptNo, "%" +integerReceipt+"%" };
         Cursor cursor = getContentResolver().query(uri,projection,selection,selectionArgs,null);
 
         return cursor;
 
-    }
-
-
-    private void movePrevious() {
-        savePayment();
-        --mPaymentId;
-//        mPayment = mViewModel.mPayment;
-//        saveOriginalPaymentValues();
-        displayPayments(
-        );
-        invalidateOptionsMenu(); // to enable calling of onPrepareOptionsMenu again and check for
-        // possible conditions to re-enable the menu item
-    }
-
-    private void moveNext() {
-        createNewPayment(); // insert dummy data
-        createEmptyEditTextViews();
-
-        invalidateOptionsMenu(); // to enable calling of onPrepareOptionsMenu again and check for
-        // possible conditions to re-enable the menu item
-    }
-
-    private void createEmptyEditTextViews() {
-        mTextChandaNo.setText("");
-
-        mTextReceiptNo.setText("");
-        mTextChandaAm.setText(String.valueOf(0.0));
-        mTextWasiyyat.setText(String.valueOf(0.0));
-        mTextJalsaSalana.setText(String.valueOf(0.0));
-        mTextTahrikJadid.setText(String.valueOf(0.0));
-        mTextWaqfJadid.setText(String.valueOf(0.0));
-        mTextWelfare.setText(String.valueOf(0.0));
-        mTextScholarship.setText(String.valueOf(0.0));
-        mTextMaryam.setText(String.valueOf(0.0));
-        mTextTabligh.setText(String.valueOf(0.0));
-        mTextZakat.setText(String.valueOf(0.0));
-        mTextSadakat.setText(String.valueOf(0.0));
-        mTextFitrana.setText(String.valueOf(0.0));
-        mTextMosqueDonation.setText(String.valueOf(0.0));
-        mTextMta.setText(String.valueOf(0.0));
-        mTextCentinary.setText(String.valueOf(0.0));
-        mTextWasiyatHissan.setText(String.valueOf(0.0));
-        mTextMiscellaneous.setText(String.valueOf(0.0));
     }
 
     @Override
@@ -569,7 +525,7 @@ public class PaymentActivity extends AppCompatActivity implements LoaderManager.
                 deletePaymentFromDatabase();
             } else {
                 Log.d(TAG, "Existing editing of payment "+ mViewModel.mPaymentUri);
-                storePreviousPaymentValues();
+//                storePreviousPaymentValues();
             }
         } else if(!mIsSaving && mIsNewPayment) {
             Log.d(TAG, "user cancelling creation of new payment clicking back button");
