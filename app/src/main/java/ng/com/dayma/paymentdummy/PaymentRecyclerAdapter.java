@@ -75,10 +75,9 @@ public class PaymentRecyclerAdapter extends RecyclerView.Adapter<PaymentRecycler
         holder.mTextChandaNo.setText(String.format("%s: %s", String.valueOf(chandaNo), fullname));
         holder.mTextMonthPaid.setText(monthPaid);
         holder.mTextReceiptNo.setText(String.format(mContext.getString(R.string.text_receipt_number_string), receiptNo));
-        holder.mTextAmountPaid.setText(String.format(mContext.getString(R.string.text_amount_paid), String.valueOf(amountPaid)));
+        holder.mTextAmountPaid.setText(String.format(mContext.getString(R.string.text_amount_paid), amountPaid));
         holder.mScheduleId = scheduleId;
         holder.mId = id;
-
     }
 
     @Override

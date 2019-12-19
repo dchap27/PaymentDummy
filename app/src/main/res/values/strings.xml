@@ -18,10 +18,10 @@
     <string name="nav_send_message">Send to chanda portal</string>
     <string name="text_total_schedules_for_month">No of Schedules: </string>
     <string name="text_no_of_payers">No of Payers: </string>
-    <string name="text_total_amount_for_schedule">Total Amount: %s </string>
+    <string name="text_total_amount_for_schedule">Total Amount: %.2f </string>
     <string name="text_receipt_number">Receipt No</string>
     <string name="text_receipt_number_string">Receipt No: %s</string>
-    <string name="text_amount_paid">Paid: %s</string>
+    <string name="text_amount_paid">Paid: %.2f</string>
     <string name="title_activity_settings">Settings</string>
 
     <!-- Strings related to Settings -->

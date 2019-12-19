@@ -185,7 +185,7 @@ public class ScheduleRecyclerAdapter extends RecyclerView.Adapter<ScheduleRecycl
         holder.mTextJamaatName.setText("Jamaat: " + jamaat);
         holder.mTextTotalPayers.setText(mContext.getString(R.string.text_no_of_payers) + String.valueOf(payers));
         holder.mTextScheduleTotalAmount.setText(String.format(
-                mContext.getString(R.string.text_total_amount_for_schedule), String.valueOf(subtotal)));
+                mContext.getString(R.string.text_total_amount_for_schedule), subtotal));
         holder.mTextCompletionStatus.setText(String.format("Status: %s", completion));
         holder.mId = id;
         holder.mScheduleId = scheduleId;
