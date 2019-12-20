@@ -71,6 +71,7 @@ public final class PaymentDatabaseContract {
         public static final String COLUMN_MONTH_ID = "month_id";
         public static final String COLUMN_SCHEDULE_TOTALAMOUNT = "total_amount";
         public static final String COLUMN_SCHEDULE_TOTALPAYERS = "total_payers";
+        public static final String COLUMN_SCHEDULE_INVOICE = "schedule_invoice";
 
         // CREATE TABLE
         public static final String SQL_CREATE_TABLE =
@@ -82,14 +83,16 @@ public final class PaymentDatabaseContract {
                         COLUMN_SCHEDULE_ISCOMPLETE + " INTEGER DEFAULT 0, " +
                         COLUMN_SCHEDULE_TOTALAMOUNT + " REAL DEFAULT 0, " +
                         COLUMN_SCHEDULE_TOTALPAYERS + " INTEGER DEFAULT 0, " +
-                        COLUMN_MONTH_ID + " TEXT NOT NULL)";
+                        COLUMN_MONTH_ID + " TEXT NOT NULL, "+
+                        COLUMN_SCHEDULE_INVOICE + " TEXT NULL)";
 
         // CREATE INDEX member_info_index1 ON member_info (columns)
         public static final String INDEX1 = TABLE_NAME + "_index1";
         public static final String SQL_CREATE_INDEX1 =
                 "CREATE INDEX " + INDEX1 + " ON " + TABLE_NAME +
                         "(" + COLUMN_SCHEDULE_ID + "," + COLUMN_SCHEDULE_TOTALAMOUNT + "," +
-                        COLUMN_SCHEDULE_TOTALPAYERS + "," + COLUMN_MONTH_ID + ")";
+                        COLUMN_SCHEDULE_TOTALPAYERS + "," + COLUMN_MONTH_ID + "," +
+                        COLUMN_SCHEDULE_INVOICE + ")";
 
         public static final String getQName(String columnName){
             return TABLE_NAME + "." + columnName;

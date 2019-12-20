@@ -38,6 +38,7 @@ public final class PaymentProviderContract {
         public static final String COLUMN_SCHEDULE_ISCOMPLETE = "completion_status";
         public static final String COLUMN_SCHEDULE_TOTALAMOUNT = "total_amount";
         public static final String COLUMN_SCHEDULE_TOTALPAYERS = "total_payers";
+        public static final String COLUMN_SCHEDULE_INVOICE = "schedule_invoice";
     }
 
     protected interface PaymentsColumns {
