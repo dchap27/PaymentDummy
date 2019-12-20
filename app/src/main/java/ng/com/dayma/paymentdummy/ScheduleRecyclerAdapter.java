@@ -178,6 +178,8 @@ public class ScheduleRecyclerAdapter extends RecyclerView.Adapter<ScheduleRecycl
             completion = "Draft";
         } else {
             completion = "completed";
+            holder.mTextCompletionStatus.setTextColor(
+                    mContext.getColor(R.color.chanda_color_text));
         }
 
         holder.mScheduleTitle.setText(title);
