@@ -449,7 +449,6 @@ public class PaymentActivity extends AppCompatActivity implements LoaderManager.
             String receiptNo = mTextReceiptNo.getText().toString().trim();
             Log.d(TAG, "Checking for duplicate receipt number");
             Cursor cursor = checkForDuplicatereceiptNo(receiptNo);
-            int count = cursor.getCount();
 
             int receiptNoPos = cursor.getColumnIndex(PaymentProviderContract.Payments.COLUMN_PAYMENT_LOCALRECEIPT);
             int payerNamePos = cursor.getColumnIndex(PaymentProviderContract.Payments.COLUMN_MEMBER_FULLNAME);
@@ -468,7 +467,6 @@ public class PaymentActivity extends AppCompatActivity implements LoaderManager.
                             payerName.toUpperCase() + " at " +
                             jamaatName + " Jamaat for " + monthPaid, Snackbar.LENGTH_LONG).show();
                     mTextReceiptNo.requestFocus();
-                    Log.v(TAG, "Duplicate receipt detected");
                     return false;
                 }
 

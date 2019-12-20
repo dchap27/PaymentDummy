@@ -234,6 +234,7 @@ public class MainActivity extends RuntimePermissionsActivity
                     Log.d("CSVUtility", "File name reading... " + mFileName);
                 }
                 publishProgress(3);
+                simulateLongRunningWork();
                 scheduleCursor.close();
                 if(!mSuccess)
                     return mSuccess;
@@ -283,6 +284,12 @@ public class MainActivity extends RuntimePermissionsActivity
         task.execute();
     }
 
+    private void simulateLongRunningWork() {
+        try {
+            Thread.sleep(2000);
+        } catch(Exception ex) {}
+    }
+
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -309,61 +316,65 @@ public class MainActivity extends RuntimePermissionsActivity
             String mime = MimeTypeMap.getSingleton().getFileExtensionFromUrl(String.valueOf(downloaddata));
             Log.d(TAG, "selected file Uri: "+ downloaddata);
             if(mime.toLowerCase().equals("csv")){
-                try {
-                    Log.d(TAG, "File extension being read, "+ mime);
-                    final InputStream csvFile = getContentResolver().openInputStream(downloaddata);
-                    AsyncTask<String, Integer, Boolean> task = new AsyncTask<String, Integer, Boolean>() {
-
-                        private AlertDialog mDialog;
-
-                        @Override
-                        protected void onPreExecute() {
-                            super.onPreExecute();
-
-                            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(MainActivity.this);
-                            alertDialogBuilder.setCancelable(false);
-                            initialiseProgressDialog(R.id.progress_bar_main_activity);
-                            alertDialogBuilder.setView(mProgressView);
-                            mDialog = alertDialogBuilder.create();
-                            mDialog.show();
-                            mProgressBar.setVisibility(View.VISIBLE);
-                            mProgressBar.setProgress(1);
-                        }
-
-                        @Override
-                        protected Boolean doInBackground(String... strings) {
-                            CsvUtility utility = new CsvUtility(MainActivity.this);
-                            publishProgress(2);
-                            Log.d(TAG, "reading into database");
-                            utility.readCSVToDatabase(mViewModel.mJamaatName.toUpperCase(), csvFile);
-                            publishProgress(3);
-                            return true;
-                        }
-
-                        @Override
-                        protected void onProgressUpdate(Integer... values) {
-                            int progressValue = values[0];
-                            mProgressBar.setProgress(progressValue,true);
-                        }
-
-                        @Override
-                        protected void onPostExecute(Boolean aBoolean) {
-                            super.onPostExecute(aBoolean);
-                            mProgressBar.setVisibility(View.GONE );
-                            mDialog.dismiss();
-                            View v = findViewById(R.id.list_schedules);
-                            Snackbar.make(v, String.format(
-                                    "%s member list added successfully!",mViewModel.mJamaatName.toUpperCase()),
-                                    Snackbar.LENGTH_LONG).show();
-                        }
-                    };
-                    task.execute();
-
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                }
+                Log.d(TAG, "File extension being read, "+ mime);
+                readDataToDatabase(downloaddata);
             }
 
+        }
+    }
+
+    private void readDataToDatabase(Uri downloaddata) {
+        try {
+            final InputStream csvFile = getContentResolver().openInputStream(downloaddata);
+            AsyncTask<String, Integer, Boolean> task = new AsyncTask<String, Integer, Boolean>() {
+
+                private AlertDialog mDialog;
+
+                @Override
+                protected void onPreExecute() {
+                    super.onPreExecute();
+
+                    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(MainActivity.this);
+                    alertDialogBuilder.setCancelable(false);
+                    initialiseProgressDialog(R.id.progress_bar_main_activity);
+                    alertDialogBuilder.setView(mProgressView);
+                    mDialog = alertDialogBuilder.create();
+                    mDialog.show();
+                    mProgressBar.setVisibility(View.VISIBLE);
+                    mProgressBar.setProgress(1);
+                }
+
+                @Override
+                protected Boolean doInBackground(String... strings) {
+                    CsvUtility utility = new CsvUtility(MainActivity.this);
+                    publishProgress(2);
+                    Log.d(TAG, "reading into database");
+                    utility.readCSVToDatabase(mViewModel.mJamaatName.toUpperCase(), csvFile);
+                    publishProgress(3);
+                    return true;
+                }
+
+                @Override
+                protected void onProgressUpdate(Integer... values) {
+                    int progressValue = values[0];
+                    mProgressBar.setProgress(progressValue, true);
+                }
+
+                @Override
+                protected void onPostExecute(Boolean aBoolean) {
+                    super.onPostExecute(aBoolean);
+                    mProgressBar.setVisibility(View.GONE);
+                    mDialog.dismiss();
+                    View v = findViewById(R.id.list_schedules);
+                    Snackbar.make(v, String.format(
+                            "%s member list added successfully!", mViewModel.mJamaatName.toUpperCase()),
+                            Snackbar.LENGTH_LONG).show();
+                }
+            };
+            task.execute();
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
         }
     }
 
