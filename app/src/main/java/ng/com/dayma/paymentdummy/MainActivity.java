@@ -245,11 +245,6 @@ public class MainActivity extends RuntimePermissionsActivity
                 publishProgress(4);
                 if(mSuccess){
                     Uri uri = ContentUris.withAppendedId(PaymentProviderContract.Schedules.CONTENT_URI, mScheduleIdToWriteToCSV);
-                    String[] projectionSchedule ={
-                            PaymentProviderContract.Schedules.COLUMN_SCHEDULE_ID,
-                            PaymentProviderContract.Schedules.COLUMN_SCHEDULE_ISCOMPLETE,
-                            PaymentProviderContract.Schedules._ID
-                    };
                     ContentValues values = new ContentValues();
                     values.put(PaymentProviderContract.Schedules._ID, mScheduleIdToWriteToCSV);
                     values.put(PaymentProviderContract.Schedules.COLUMN_SCHEDULE_ISCOMPLETE, 1);

@@ -4,6 +4,7 @@ import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -176,19 +177,21 @@ public class ScheduleRecyclerAdapter extends RecyclerView.Adapter<ScheduleRecycl
         String completion;
         if(status == 0){
             completion = "Draft";
-        } else {
-            completion = "completed";
-            holder.mTextCompletionStatus.setTextColor(
-                    mContext.getColor(R.color.chanda_color_text));
+        } else if (status == 1) {
+            completion = "Exported";
+            holder.mTextCompletionStatus.setTextColor(Color.BLUE);
+        } else{
+            completion = "Completed";
+            holder.mTextCompletionStatus.setTextColor(Color.GREEN);
         }
 
         holder.mScheduleTitle.setText(title);
         holder.mTextMonth.setText(monthId);
         holder.mTextJamaatName.setText("Jamaat: " + jamaat);
-        holder.mTextTotalPayers.setText(mContext.getString(R.string.text_no_of_payers) + String.valueOf(payers));
+        holder.mTextTotalPayers.setText(mContext.getString(R.string.text_no_of_payers) + (payers));
         holder.mTextScheduleTotalAmount.setText(String.format(
                 mContext.getString(R.string.text_total_amount_for_schedule), subtotal));
-        holder.mTextCompletionStatus.setText(String.format("Status: %s", completion));
+        holder.mTextCompletionStatus.setText(completion);
         holder.mId = id;
         holder.mScheduleId = scheduleId;
 
