@@ -31,9 +31,20 @@ android {
     }
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
+            useProguard true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.paymentRelease
+        }
+    }
+    flavorDimensions "api"
+
+    productFlavors {
+        demo {
+            dimension "api"
+            applicationIdSuffix ".demo"
+            versionNameSuffix ".beta"
+            minSdkVersion 18
         }
     }
 }
