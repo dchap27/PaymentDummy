@@ -170,7 +170,7 @@ public class MainActivity extends RuntimePermissionsActivity
             case PERMISSION_REQUEST_READ_EXTERNAL_STORAGE:
                 Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
                 intent.addCategory(intent.CATEGORY_OPENABLE);
-                intent.setType("*/*");
+                intent.setType("application/csv");
                 String[] mimetypes = {"text/comma-separated-values", "text/csv"};
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
                     intent.putExtra(EXTRA_MIME_TYPES, mimetypes);
@@ -257,7 +257,10 @@ public class MainActivity extends RuntimePermissionsActivity
             @Override
             protected void onProgressUpdate(Integer... values) {
                 int progressValue = values[0];
-                mProgressBar.setProgress(progressValue,true);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    mProgressBar.setProgress(progressValue,true);
+                } else
+                    mProgressBar.setProgress(progressValue);
 
             }
 
@@ -352,7 +355,11 @@ public class MainActivity extends RuntimePermissionsActivity
                 @Override
                 protected void onProgressUpdate(Integer... values) {
                     int progressValue = values[0];
-                    mProgressBar.setProgress(progressValue, true);
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                        mProgressBar.setProgress(progressValue,true);
+                    } else
+                        mProgressBar.setProgress(progressValue);
+
                 }
 
                 @Override

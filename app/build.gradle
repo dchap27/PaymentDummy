@@ -23,7 +23,7 @@ android {
     buildToolsVersion "28.0.3"
     defaultConfig {
         applicationId "ng.com.dayma.paymentdummy"
-        minSdkVersion 24
+        minSdkVersion 23
         targetSdkVersion 25
         versionCode 1
         versionName "1.0"
@@ -31,8 +31,7 @@ android {
     }
     buildTypes {
         release {
-            minifyEnabled true
-            useProguard true
+            minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.paymentRelease
         }
@@ -40,10 +39,10 @@ android {
     flavorDimensions "api"
 
     productFlavors {
-        demo {
+        beta {
             dimension "api"
             applicationIdSuffix ".demo"
-            versionNameSuffix ".beta"
+            versionNameSuffix ".1.beta"
             minSdkVersion 18
         }
     }

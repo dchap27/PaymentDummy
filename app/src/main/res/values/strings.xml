@@ -125,9 +125,8 @@
         <item>2</item>
         <item>3</item>
     </string-array>
-    <string name="multi_select_list_preference_default_value">
-        kewulere
-    </string>
+    <string-array name="multi_select_list_preference_default_value">
+    </string-array>
     <string name="message_warning_update_jamaat">Are you sure you want to update list for %s</string>
     <string name="loading_message">please wait ...</string>
     <string-array name="pref_entries_jamaat_list">
