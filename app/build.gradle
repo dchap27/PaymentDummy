@@ -36,14 +36,22 @@ android {
             signingConfig signingConfigs.paymentRelease
         }
     }
-    flavorDimensions "api"
+    flavorDimensions "version"
 
     productFlavors {
-        beta {
-            dimension "api"
-            applicationIdSuffix ".demo"
-            versionNameSuffix ".1.beta"
+        regular {
+            dimension "version"
+            applicationIdSuffix ".regular"
+            versionNameSuffix ".1"
             minSdkVersion 18
+            resValue "string", "content_provider", applicationId + ".provider"
+        }
+        advanced {
+            dimension "version"
+            applicationIdSuffix ".advanced"
+            versionNameSuffix ".1"
+            minSdkVersion 18
+            resValue "string", "content_provider", applicationId + ".provider"
         }
     }
 }

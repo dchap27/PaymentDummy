@@ -3,11 +3,13 @@ package ng.com.dayma.paymentdummy.data;
 import android.net.Uri;
 import android.provider.BaseColumns;
 
+import ng.com.dayma.paymentdummy.BuildConfig;
+
 public final class PaymentProviderContract {
 
     private PaymentProviderContract () {}
 
-    public static final String AUTHORITY = "ng.com.dayma.paymentdummy.provider";
+    public static final String AUTHORITY = BuildConfig.APPLICATION_ID + ".provider";
     public static final Uri AUTHORITY_URI = Uri.parse("content://" + AUTHORITY);
 
     // create columns common among the tables
