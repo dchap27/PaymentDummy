@@ -9,6 +9,15 @@ def keystoreProperties = new Properties()
 // Load your keystore.properties file into the keystoreProperties object.
 keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 
+// create versioning formula
+ext {
+    versionMajor = 1
+    versionMinor = 0
+    patch = 0
+    screenSize = 0
+    version_Code = (int) versionMajor + screenSize + versionMinor + patch
+    version_Name = String.valueOf(versionMajor)+ "." + String.valueOf(versionMinor) + "." + String.valueOf(patch)
+}
 
 android {
     signingConfigs {
@@ -25,15 +34,19 @@ android {
         applicationId "ng.com.dayma.paymentdummy"
         minSdkVersion 23
         targetSdkVersion 25
-        versionCode 1
-        versionName "1.0"
+        versionCode = (int) 23 + version_Code
+        versionName version_Name
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.paymentRelease
+        }
+        debug {
+            minifyEnabled false
+            applicationIdSuffix ".debug"
         }
     }
     flavorDimensions "version"
@@ -42,16 +55,16 @@ android {
         regular {
             dimension "version"
             applicationIdSuffix ".regular"
-            versionNameSuffix ".1"
             minSdkVersion 18
             resValue "string", "content_provider", applicationId + ".provider"
+            versionCode = (int) 18 + version_Code
         }
         advanced {
             dimension "version"
             applicationIdSuffix ".advanced"
-            versionNameSuffix ".1"
             minSdkVersion 18
             resValue "string", "content_provider", applicationId + ".provider"
+            versionCode = (int) 18 + version_Code
         }
     }
 }
