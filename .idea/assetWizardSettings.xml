@@ -157,7 +157,7 @@
                                             <option name="values">
                                               <map>
                                                 <entry key="fontFamily" value="Gloucester MT Extra Condensed" />
-                                                <entry key="text" value="CHANDA" />
+                                                <entry key="text" value="CHANDA " />
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -172,7 +172,7 @@
                                       <entry key="cropped" value="true" />
                                       <entry key="dogEared" value="true" />
                                       <entry key="iconShape" value="CIRCLE" />
-                                      <entry key="outputName" value="ic_myapp_launcher_round" />
+                                      <entry key="outputName" value="ic_launcher_pro_round" />
                                     </map>
                                   </option>
                                 </PersistentState>

@@ -394,7 +394,7 @@ public class ScheduleActivity extends AppCompatActivity implements LoaderManager
         } else {
             while (mJamaatListsCursor.moveToNext()) {
                 String jamaatName = mJamaatListsCursor.getString(jamaatNamePos);
-                if (prefJamaat.toUpperCase().equals(jamaatName)) {
+                if (prefJamaat.toUpperCase().equals(jamaatName) && !(mViewModel.jamaatList).contains(jamaatName)) {
                     mViewModel.jamaatList.add(jamaatName);
                 }
             }
