@@ -103,20 +103,26 @@ public class MainActivity extends RuntimePermissionsActivity
         mDbOpenHelper = new PaymentOpenHelper(this);
         mViewModel = ViewModelProviders.of(this).get(MainActivityViewModel.class);
 
+        // passing false means if the settings already has a value, don't pass the default into it
+        PreferenceManager.setDefaultValues(this, R.xml.pref_general, false);
+        PreferenceManager.setDefaultValues(this, R.xml.pref_data_sync, false);
+        PreferenceManager.setDefaultValues(this, R.xml.pref_notification, false);
+
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                String user_jamaat = mSharedPref.getString("key_jamaat_list", "");
+                if(user_jamaat.length() <= 1) {
+                    Snackbar.make(view, "You haven't set your jamaat in the preference settings",
+                            Snackbar.LENGTH_LONG).show();
+                    return;
+                }
                 Intent intent = new Intent(MainActivity.this, ScheduleActivity.class);
                 // open ScheduleActivity for new entry
                 startActivity(intent);
             }
         });
-
-        // passing false means if the settings already has a value, don't pass the default into it
-        PreferenceManager.setDefaultValues(this, R.xml.pref_general, false);
-        PreferenceManager.setDefaultValues(this, R.xml.pref_data_sync, false);
-        PreferenceManager.setDefaultValues(this, R.xml.pref_notification, false);
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
