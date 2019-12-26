@@ -7,10 +7,12 @@ import android.content.ContentValues;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -58,6 +60,7 @@ public class ScheduleActivity extends AppCompatActivity implements LoaderManager
     private boolean mSavedNewMonth;
     private DataManager.LoadFromDatabase mLoadFromDatabase;
     private ScheduleActivityViewModel mViewModel;
+    private boolean mPrefMultipleJamaat;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -328,6 +331,8 @@ public class ScheduleActivity extends AppCompatActivity implements LoaderManager
             Log.d(TAG, "Finished loading jamaat list into spinner");
             mJamaatListQueriesFinished = true;
             mSpinnerJamaat.setAdapter(mAdapterJamaat);
+            if(mPrefMultipleJamaat)
+                mSpinnerJamaat.setEnabled(false);
             displayScheduleWhenQueryFinishes();
         } else if (loader.getId() == LOADER_SCHEDULES){
             onFinishedSchedule(data);
@@ -374,11 +379,25 @@ public class ScheduleActivity extends AppCompatActivity implements LoaderManager
     private void onFinishedJamaatList(Cursor data) {
         mJamaatListsCursor = data;
         int jamaatNamePos = mJamaatListsCursor.getColumnIndex(PaymentProviderContract.Members.COLUMN_MEMBER_JAMAATNAME);
-        while(mJamaatListsCursor.moveToNext()){
-            String jamaatName = mJamaatListsCursor.getString(jamaatNamePos);
-            if(!(mViewModel.jamaatList).contains(jamaatName)){
-                mViewModel.jamaatList.add(jamaatName);
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+        String prefJamaat = sharedPref.getString("key_jamaat_list", "");
+        mPrefMultipleJamaat = sharedPref.getBoolean("key_enable_multiple_jamaat", false);
+        if(mPrefMultipleJamaat) {
+            while (mJamaatListsCursor.moveToNext()) {
+                String jamaatName = mJamaatListsCursor.getString(jamaatNamePos);
+                if (!(mViewModel.jamaatList).contains(jamaatName)) {
+                    mViewModel.jamaatList.add(jamaatName);
+                }
             }
+            Log.d(TAG, "Multiple jamaat lists loaded into spinner");
+        } else {
+            while (mJamaatListsCursor.moveToNext()) {
+                String jamaatName = mJamaatListsCursor.getString(jamaatNamePos);
+                if (prefJamaat.toUpperCase().equals(jamaatName)) {
+                    mViewModel.jamaatList.add(jamaatName);
+                }
+            }
+            Log.d(TAG, prefJamaat + " loaded into spinner");
         }
     }
 
