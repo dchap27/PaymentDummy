@@ -455,14 +455,14 @@ public class MainActivity extends RuntimePermissionsActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         View headerView = navigationView.getHeaderView(0);
         TextView textUserName = (TextView) headerView.findViewById(R.id.text_user_name);
-        TextView textEmailAddress = (TextView) headerView.findViewById(R.id.text_user_email_address);
+        TextView textMemberId = (TextView) headerView.findViewById(R.id.text_member_id_display);
 
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
         String userName = pref.getString(PreferenceKeys.USER_DISPLAY_NAME, "");
         String memberId = pref.getString(PreferenceKeys.MEMBER_ID, "");
 
         textUserName.setText(userName);
-        textEmailAddress.setText(memberId);
+        textMemberId.setText("Member ID " + memberId);
     }
 
     private void initialDisplayContent() {
