@@ -130,18 +130,38 @@
     <string name="message_warning_update_jamaat">Are you sure you want to update list for %s</string>
     <string name="loading_message">please wait ...</string>
     <string-array name="pref_entries_jamaat_list">
-        <item>Ashipa</item>
-        <item>Oke-Ado</item>
-        <item>Kewulere</item>
+        <item>Agbokojo</item>
+        <item>Anfani</item>
+        <item>Asaka</item>
+        <item>Asipa</item>
+        <item>Ehin Grammar</item>
         <item>Felele</item>
+        <item>Imalenfalafia</item>
+        <item>Kewulere</item>
+        <item>Kobomoje</item>
         <item>Liberty</item>
+        <item>Odo-Oba</item>
+        <item>Odo-Ona Elewe</item>
+        <item>Oke-Ado</item>
+        <item>Oke-Oluokun</item>
+        <item>Oke-Seni</item>
     </string-array>
     <string-array name="pref_values_jamaat_list">
-        <item>ashipa</item>
-        <item>oke-ado</item>
-        <item>kewulere</item>
+        <item>agbokojo</item>
+        <item>anfani</item>
+        <item>asaka</item>
+        <item>asipa</item>
+        <item>ehin_grammar</item>
         <item>felele</item>
+        <item>imalenfalafia</item>
+        <item>kewulere</item>
+        <item>kobomoje</item>
         <item>liberty</item>
+        <item>odo_oba</item>
+        <item>odo_ona_elewe</item>
+        <item>oke_ado</item>
+        <item>oke_oluokun</item>
+        <item>oke_seni</item>
     </string-array>
 
 </resources>

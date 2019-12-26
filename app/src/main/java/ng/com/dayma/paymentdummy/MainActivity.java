@@ -315,69 +315,70 @@ public class MainActivity extends RuntimePermissionsActivity
             Log.d(TAG, "selected file Uri: "+ downloaddata);
             if(mime.toLowerCase().equals("csv")){
                 Log.d(TAG, "File extension being read, "+ mime);
-                readDataToDatabase(downloaddata);
+                try {
+                    final InputStream csvFile = getContentResolver().openInputStream(downloaddata);
+                    readDataToDatabase(csvFile);
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
             }
 
         }
     }
 
-    private void readDataToDatabase(Uri downloaddata) {
-        try {
-            final InputStream csvFile = getContentResolver().openInputStream(downloaddata);
-            AsyncTask<String, Integer, Boolean> task = new AsyncTask<String, Integer, Boolean>() {
+    private void readDataToDatabase(final InputStream inputStream) throws FileNotFoundException {
 
-                private AlertDialog mDialog;
+        AsyncTask<String, Integer, Boolean> task = new AsyncTask<String, Integer, Boolean>() {
 
-                @Override
-                protected void onPreExecute() {
-                    super.onPreExecute();
+            private AlertDialog mDialog;
 
-                    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(MainActivity.this);
-                    alertDialogBuilder.setCancelable(false);
-                    initialiseProgressDialog(R.id.progress_bar_main_activity);
-                    alertDialogBuilder.setView(mProgressView);
-                    mDialog = alertDialogBuilder.create();
-                    mDialog.show();
-                    mProgressBar.setVisibility(View.VISIBLE);
-                    mProgressBar.setProgress(1);
-                }
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
 
-                @Override
-                protected Boolean doInBackground(String... strings) {
-                    CsvUtility utility = new CsvUtility(MainActivity.this);
-                    publishProgress(2);
-                    Log.d(TAG, "reading into database");
-                    utility.readCSVToDatabase(mViewModel.mJamaatName.toUpperCase(), csvFile);
-                    publishProgress(3);
-                    return true;
-                }
+                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(MainActivity.this);
+                alertDialogBuilder.setCancelable(false);
+                initialiseProgressDialog(R.id.progress_bar_main_activity);
+                alertDialogBuilder.setView(mProgressView);
+                mDialog = alertDialogBuilder.create();
+                mDialog.show();
+                mProgressBar.setVisibility(View.VISIBLE);
+                mProgressBar.setProgress(1);
+            }
 
-                @Override
-                protected void onProgressUpdate(Integer... values) {
-                    int progressValue = values[0];
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                        mProgressBar.setProgress(progressValue,true);
-                    } else
-                        mProgressBar.setProgress(progressValue);
+            @Override
+            protected Boolean doInBackground(String... strings) {
+                CsvUtility utility = new CsvUtility(MainActivity.this);
+                publishProgress(2);
+                Log.d(TAG, "reading into database");
+                utility.readCSVToDatabase(mViewModel.mJamaatName.toUpperCase(), inputStream);
+                publishProgress(3);
+                return true;
+            }
 
-                }
+            @Override
+            protected void onProgressUpdate(Integer... values) {
+                int progressValue = values[0];
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    mProgressBar.setProgress(progressValue,true);
+                } else
+                    mProgressBar.setProgress(progressValue);
 
-                @Override
-                protected void onPostExecute(Boolean aBoolean) {
-                    super.onPostExecute(aBoolean);
-                    mProgressBar.setVisibility(View.GONE);
-                    mDialog.dismiss();
-                    View v = findViewById(R.id.list_schedules);
-                    Snackbar.make(v, String.format(
-                            "%s member list added successfully!", mViewModel.mJamaatName.toUpperCase()),
-                            Snackbar.LENGTH_LONG).show();
-                }
-            };
-            task.execute();
+            }
 
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
+            @Override
+            protected void onPostExecute(Boolean aBoolean) {
+                super.onPostExecute(aBoolean);
+                mProgressBar.setVisibility(View.GONE);
+                mDialog.dismiss();
+                View v = findViewById(R.id.list_schedules);
+                Snackbar.make(v, String.format(
+                        "%s member list added successfully!", mViewModel.mJamaatName.toUpperCase()),
+                        Snackbar.LENGTH_LONG).show();
+            }
+        };
+        task.execute();
+
     }
 
     private void loadSchedulesData() {
@@ -545,7 +546,7 @@ public class MainActivity extends RuntimePermissionsActivity
             View view = findViewById(R.id.list_schedules);
             dialogTitle = "Update Members Info";
             mViewModel.mJamaatName = mSharedPref.getString("key_jamaat_list", "");
-            if(mViewModel.mJamaatName.isEmpty()){
+            if(mViewModel.mJamaatName.length()<=1){
                 Snackbar.make(view, "You've not set your jamaat in the preference settings", Snackbar.LENGTH_LONG).show();
                 return;
             }
@@ -571,9 +572,14 @@ public class MainActivity extends RuntimePermissionsActivity
                 alertDialog = alertDialogBuilder.create();
                 alertDialog.show();
             } else{
-                MainActivity.super.requestAppPermissions(new
-                                String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-                        R.string.runtime_permissions_txt, PERMISSION_REQUEST_READ_EXTERNAL_STORAGE);
+                try {
+                    int fileIdentifier = getResources().getIdentifier(mViewModel.mJamaatName, "raw", this.getPackageName());
+                    InputStream inputstream = getResources().openRawResource(fileIdentifier);
+                    readDataToDatabase(inputstream);
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
+
             }
         }
         else {

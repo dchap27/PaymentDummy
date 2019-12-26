@@ -27,7 +27,7 @@ public class CsvUtility {
     }
 
     public void readCSVToDatabase(String jamaatName, InputStream inputStream){
-        // InputStream inputstream = mContext.getResources().openRawResource(R.raw.felele);
+        // InputStream inputstream = mContext.getResources().openRawResource(R.raw.schedule_felele);
         ReadCSV csvFile = new ReadCSV(inputStream);
         List<String[]> jamaatInfo = csvFile.read();
         for(int i=1; i<jamaatInfo.size(); i++){
