@@ -1,0 +1,45 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- NOTE: EditTextPreference accepts EditText attributes. -->
+    <!-- NOTE: EditTextPreference's summary should be set to its value by the activity code. -->
+    <EditTextPreference
+        android:defaultValue="@string/pref_default_display_name"
+        android:inputType="textCapWords"
+        android:key="user_display_name"
+        android:maxLines="1"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:title="@string/pref_title_display_name"/>
+
+    <!-- NOTE: Hide buttons to simplify the UI. Users can touch outside the dialog to
+         dismiss it. -->
+    <!-- NOTE: ListPreference's summary should be set to its value by the activity code. -->
+    <EditTextPreference
+        android:defaultValue="0"
+        android:inputType="number"
+        android:key="pref_key_member_id"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:title="@string/pref_member_id" />
+
+    <ListPreference
+        android:defaultValue="@string/pref_default_jamaat_list"
+        android:entries="@array/pref_entries_jamaat_list"
+        android:entryValues="@array/pref_values_jamaat_list"
+        android:key="key_jamaat_list"
+        android:title="@string/pref_title_jamaat_list" />
+
+    <SwitchPreference
+        android:defaultValue="false"
+        android:key="key_enable_multiple_jamaat"
+        android:title="@string/enable_mutiple_jamaat" />
+
+    <MultiSelectListPreference
+        android:defaultValue="@array/multi_select_list_preference_default_value"
+        android:dependency="key_enable_multiple_jamaat"
+        android:entries="@array/pref_entries_jamaat_list"
+        android:entryValues="@array/pref_values_jamaat_list"
+        android:key="multi_select_jamaat_pref"
+        android:title="@string/Jamaat_Multi_selection" />
+
+</PreferenceScreen>

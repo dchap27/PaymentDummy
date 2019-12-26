@@ -28,6 +28,7 @@ import java.util.Calendar;
 
 import ng.com.dayma.paymentdummy.MyViewModels.ScheduleActivityViewModel;
 import ng.com.dayma.paymentdummy.data.PaymentProviderContract;
+import ng.com.dayma.paymentdummy.utils.PreferenceKeys;
 
 public class ScheduleActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
@@ -169,10 +170,10 @@ public class ScheduleActivity extends AppCompatActivity implements LoaderManager
             }
         };
         ContentValues values = new ContentValues();
-        values.put(PaymentProviderContract.Schedules.COLUMN_SCHEDULE_TITLE, "Null-");
-        values.put(PaymentProviderContract.Schedules.COLUMN_MONTH_ID, "Null-");
-        values.put(PaymentProviderContract.Schedules.COLUMN_SCHEDULE_ID, "Null-");
-        values.put(PaymentProviderContract.Schedules.COLUMN_MEMBER_JAMAATNAME, "Null-");
+        values.put(PaymentProviderContract.Schedules.COLUMN_SCHEDULE_TITLE, "Null");
+        values.put(PaymentProviderContract.Schedules.COLUMN_MONTH_ID, "Null");
+        values.put(PaymentProviderContract.Schedules.COLUMN_SCHEDULE_ID, "Null");
+        values.put(PaymentProviderContract.Schedules.COLUMN_MEMBER_JAMAATNAME, "Null");
 
         task.execute(values);
 
@@ -380,8 +381,8 @@ public class ScheduleActivity extends AppCompatActivity implements LoaderManager
         mJamaatListsCursor = data;
         int jamaatNamePos = mJamaatListsCursor.getColumnIndex(PaymentProviderContract.Members.COLUMN_MEMBER_JAMAATNAME);
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
-        String prefJamaat = sharedPref.getString("key_jamaat_list", "");
-        mPrefMultipleJamaat = sharedPref.getBoolean("key_enable_multiple_jamaat", false);
+        String prefJamaat = sharedPref.getString(PreferenceKeys.JAMAAT_NAME_PREF, "");
+        mPrefMultipleJamaat = sharedPref.getBoolean(PreferenceKeys.KEY_ENABLE_MULTIPLE_JAMAAT, false);
         if(mPrefMultipleJamaat) {
             while (mJamaatListsCursor.moveToNext()) {
                 String jamaatName = mJamaatListsCursor.getString(jamaatNamePos);
