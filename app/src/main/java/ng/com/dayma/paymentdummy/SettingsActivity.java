@@ -193,7 +193,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             bindPreferenceSummaryToValue(findPreference("user_display_name"));
             bindPreferenceSummaryToValue(findPreference("pref_key_member_id"));
             bindPreferenceSummaryToValue(findPreference("key_jamaat_list"));
-//            bindPreferenceSummaryToValue(findPreference("multi_select_memberlist_pref"));
         }
 
         @Override

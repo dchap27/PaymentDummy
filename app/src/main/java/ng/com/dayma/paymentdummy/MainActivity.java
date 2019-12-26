@@ -458,11 +458,11 @@ public class MainActivity extends RuntimePermissionsActivity
         TextView textEmailAddress = (TextView) headerView.findViewById(R.id.text_user_email_address);
 
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
-        String userName = pref.getString("user_display_name", "");
-        String emailAddress = pref.getString("user_email_address", "");
+        String userName = pref.getString(PreferenceKeys.USER_DISPLAY_NAME, "");
+        String memberId = pref.getString(PreferenceKeys.MEMBER_ID, "");
 
         textUserName.setText(userName);
-        textEmailAddress.setText(emailAddress);
+        textEmailAddress.setText(memberId);
     }
 
     private void initialDisplayContent() {
@@ -586,7 +586,7 @@ public class MainActivity extends RuntimePermissionsActivity
         final View view = findViewById(R.id.list_schedules);
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
         alertDialogBuilder.setCancelable(false);
-        boolean isMultipleJamaat = mSharedPref.getBoolean("key_enable_multiple_jamaat", false);
+        boolean isMultipleJamaat = mSharedPref.getBoolean(PreferenceKeys.KEY_ENABLE_MULTIPLE_JAMAAT, false);
         final AlertDialog alertDialog;
         String dialogTitle = "Add New Jamaat";
         if(!isMultipleJamaat){
@@ -631,7 +631,7 @@ public class MainActivity extends RuntimePermissionsActivity
                 public void onClick(View v) {
                     mViewModel.mJamaatName = mJamaatEditText.getText().toString().trim().toUpperCase();
                     if(!mViewModel.mJamaatName.isEmpty()) {
-                        Set<String> allowedJamaats = mSharedPref.getStringSet("multi_select_memberlist_pref",null);
+                        Set<String> allowedJamaats = mSharedPref.getStringSet(PreferenceKeys.MULTI_SELECT_JAMAAT_PREF,null);
                         if(!allowedJamaats.contains(mViewModel.mJamaatName.toLowerCase())){
                             Snackbar.make(view,
                                     String.format("%s is not among your lists of Jamaats",mViewModel.mJamaatName.toUpperCase()), Snackbar.LENGTH_LONG).show();
@@ -702,12 +702,6 @@ public class MainActivity extends RuntimePermissionsActivity
             }
         };
         return alreadyExist[0];
-    }
-
-    private void handleSelection(int message_id) {
-        View view = findViewById(R.id.list_schedules);
-        Snackbar.make(view, message_id, Snackbar.LENGTH_LONG).show();
-
     }
 
     private void handleDisplaySelection(int itemId){

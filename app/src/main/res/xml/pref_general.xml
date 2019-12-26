@@ -15,12 +15,12 @@
          dismiss it. -->
     <!-- NOTE: ListPreference's summary should be set to its value by the activity code. -->
     <EditTextPreference
-        android:defaultValue="@string/pref_default_email_address"
-        android:inputType="textEmailAddress"
-        android:key="user_email_address"
+        android:defaultValue="0"
+        android:inputType="number"
+        android:key="pref_key_member_id"
         android:selectAllOnFocus="true"
         android:singleLine="true"
-        android:title="@string/pref_title_email_address"/>
+        android:title="@string/pref_member_id" />
 
     <ListPreference
         android:defaultValue="@string/pref_default_jamaat_list"
@@ -39,7 +39,7 @@
         android:dependency="key_enable_multiple_jamaat"
         android:entries="@array/pref_entries_jamaat_list"
         android:entryValues="@array/pref_values_jamaat_list"
-        android:key="multi_select_memberlist_pref"
+        android:key="multi_select_jamaat_pref"
         android:title="@string/Jamaat_Multi_selection" />
 
 </PreferenceScreen>

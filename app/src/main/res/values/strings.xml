@@ -59,7 +59,7 @@
     <!-- Example settings for Notifications -->
     <string name="pref_title_jamaat_list">My Jamaat</string>
 
-    <string name="pref_default_jamaat_list">kewulere</string>
+    <string name="pref_default_jamaat_list"></string>
 
     <string name="jalsa_salana_hint">Jalsa Salana</string>
     <string name="welfare_fund_hint">welfare fund</string>
