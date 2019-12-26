@@ -15,12 +15,12 @@
          dismiss it. -->
     <!-- NOTE: ListPreference's summary should be set to its value by the activity code. -->
     <EditTextPreference
-        android:defaultValue="@string/pref_default_email_address"
-        android:inputType="textEmailAddress"
-        android:key="user_email_address"
+        android:defaultValue="0"
+        android:inputType="number"
+        android:key="pref_key_member_id"
         android:selectAllOnFocus="true"
         android:singleLine="true"
-        android:title="@string/pref_title_email_address"/>
+        android:title="@string/pref_member_id" />
 
     <ListPreference
         android:defaultValue=" "

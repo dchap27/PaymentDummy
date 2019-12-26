@@ -90,6 +90,7 @@ public class MainActivity extends RuntimePermissionsActivity
     private View mProgressView;
     private ProgressBar mProgressBar;
     private int mScheduleIdToWriteToCSV;
+    private boolean mIsAMember;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -112,15 +113,16 @@ public class MainActivity extends RuntimePermissionsActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String user_jamaat = mSharedPref.getString("key_jamaat_list", "");
-                if(user_jamaat.length() <= 1) {
+                String isFirstLoad = mSharedPref.getString(PreferenceKeys.JAMAAT_INFO_FIRST_LOAD, null);
+                if(isFirstLoad != null) {
+                    Intent intent = new Intent(MainActivity.this, ScheduleActivity.class);
+                    // open ScheduleActivity for new entry
+                    startActivity(intent);
+                } else {
                     Snackbar.make(view, "You haven't set your jamaat in the preference settings",
                             Snackbar.LENGTH_LONG).show();
                     return;
                 }
-                Intent intent = new Intent(MainActivity.this, ScheduleActivity.class);
-                // open ScheduleActivity for new entry
-                startActivity(intent);
             }
         });
 
@@ -141,6 +143,7 @@ public class MainActivity extends RuntimePermissionsActivity
         handleDisplaySelection(mViewModel.navDrawerDisplaySelection);
         mActionModecallbacks = new ActionModecallbacks();
         isFirstUsage();
+
     }
 
     private void isFirstUsage(){
@@ -148,6 +151,9 @@ public class MainActivity extends RuntimePermissionsActivity
 
         mSharedPref = PreferenceManager.getDefaultSharedPreferences(this);
         boolean isFirstUsage = mSharedPref.getBoolean(PreferenceKeys.FIRST_TIME_USAGE, true);
+        String isFirstLoad = mSharedPref.getString(PreferenceKeys.JAMAAT_INFO_FIRST_LOAD, null);
+        mViewModel.mJamaatName = mSharedPref.getString(PreferenceKeys.JAMAAT_NAME_PREF, "");
+        mViewModel.memberId = mSharedPref.getString(PreferenceKeys.MEMBER_ID, "0");
 
         if(isFirstUsage){
             Log.d(TAG, "IsFirstUsage: launching alert dialog");
@@ -162,12 +168,46 @@ public class MainActivity extends RuntimePermissionsActivity
                     editor.putBoolean(PreferenceKeys.FIRST_TIME_USAGE, false);
                     editor.commit();
                     dialog.dismiss();
+                    if(mViewModel.mJamaatName.length() <= 1 || mViewModel.memberId.length() <= 1)
+                        startActivity(new Intent(MainActivity.this, SettingsActivity.class));
+                }
+            });
+            AlertDialog alertDialog = alertDialogBuilder.create();
+            alertDialog.show();
+        }
+        if(!isFirstUsage && mViewModel.mJamaatName.length() <= 1){
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+            alertDialogBuilder.setMessage(R.string.warning_message_jamaat_not_set);
+            alertDialogBuilder.setTitle(R.string.warning_title_firstusage);
+            alertDialogBuilder.setPositiveButton("CONTINUE", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
                     startActivity(new Intent(MainActivity.this, SettingsActivity.class));
                 }
             });
             AlertDialog alertDialog = alertDialogBuilder.create();
             alertDialog.show();
         }
+        if(!isFirstUsage && mViewModel.mJamaatName.length() > 1){
+            if(isFirstLoad == null) {
+                loadJamaatInfoToDatabase(mViewModel.mJamaatName);
+                SharedPreferences.Editor editor = mSharedPref.edit();
+                editor.putString(PreferenceKeys.JAMAAT_INFO_FIRST_LOAD, mViewModel.mJamaatName);
+                editor.commit();
+            }
+        }
+    }
+
+    private void loadJamaatInfoToDatabase(String jamaatName) {
+        final int fileIdentifier = getResources().getIdentifier(jamaatName, "raw", this.getPackageName());
+        try {
+            InputStream inputstream = getResources().openRawResource(fileIdentifier);
+            readDataToDatabase(inputstream);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+
     }
 
     @Override
@@ -543,20 +583,16 @@ public class MainActivity extends RuntimePermissionsActivity
 
     private void handleAddorUpdateJamaatInfo() {
         // Create AlertDialog Builder
+        final View view = findViewById(R.id.list_schedules);
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
         alertDialogBuilder.setCancelable(false);
         boolean isMultipleJamaat = mSharedPref.getBoolean("key_enable_multiple_jamaat", false);
         final AlertDialog alertDialog;
         String dialogTitle = "Add New Jamaat";
         if(!isMultipleJamaat){
-            View view = findViewById(R.id.list_schedules);
             dialogTitle = "Update Members Info";
-            mViewModel.mJamaatName = mSharedPref.getString("key_jamaat_list", "");
-            if(mViewModel.mJamaatName.length()<=1){
-                Snackbar.make(view, "You've not set your jamaat in the preference settings", Snackbar.LENGTH_LONG).show();
-                return;
-            }
-            if(checkJamaatInfoExist(mViewModel.mJamaatName)) {
+            String memberId = mSharedPref.getString(PreferenceKeys.MEMBER_ID, "0");
+            if(checkUserIsJamaatMember(memberId, mViewModel.mJamaatName)) {
                 alertDialogBuilder.setMessage(
                         String.format(getString(R.string.message_warning_update_jamaat), mViewModel.mJamaatName.toUpperCase()));
                 alertDialogBuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
@@ -577,15 +613,10 @@ public class MainActivity extends RuntimePermissionsActivity
                 alertDialogBuilder.setTitle(dialogTitle);
                 alertDialog = alertDialogBuilder.create();
                 alertDialog.show();
-            } else{
-                try {
-                    int fileIdentifier = getResources().getIdentifier(mViewModel.mJamaatName, "raw", this.getPackageName());
-                    InputStream inputstream = getResources().openRawResource(fileIdentifier);
-                    readDataToDatabase(inputstream);
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                }
-
+            }
+            else{
+                Snackbar.make(view,"You are not allowed to update " + mViewModel.mJamaatName,
+                        Snackbar.LENGTH_LONG).show();
             }
         }
         else {
@@ -594,7 +625,6 @@ public class MainActivity extends RuntimePermissionsActivity
             alertDialogBuilder.setTitle(dialogTitle);
             alertDialog = alertDialogBuilder.create();
             alertDialog.show();
-            final View view = findViewById(R.id.list_schedules);
 
             mSaveJamaatNameDialog.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -627,6 +657,23 @@ public class MainActivity extends RuntimePermissionsActivity
 
     }
 
+    private boolean checkUserIsJamaatMember(String memberId, String jamaatName) {
+
+        String[] projection = {
+                PaymentProviderContract.Members.COLUMN_MEMBER_JAMAATNAME,
+                PaymentProviderContract.Members.COLUMN_MEMBER_CHANDANO
+        };
+        String selection = PaymentProviderContract.Members.COLUMN_MEMBER_JAMAATNAME + " = ? AND " +
+                PaymentProviderContract.Members.COLUMN_MEMBER_CHANDANO + " = ?";
+        String[] selectionArgs = { jamaatName.toUpperCase(), memberId };
+        Cursor cursor = getContentResolver().query(PaymentProviderContract.Members.CONTENT_URI,
+                projection, selection, selectionArgs,null);
+        if(cursor.getCount() > 0){
+            return true;
+        }
+        return false;
+    }
+
     private boolean checkJamaatInfoExist(final String jamaatName) {
         final boolean[] alreadyExist = new boolean[1];
         AsyncTask<String, Void, Boolean> task = new AsyncTask<String, Void, Boolean>() {
@@ -641,8 +688,10 @@ public class MainActivity extends RuntimePermissionsActivity
                 Cursor cursor = getContentResolver().query(PaymentProviderContract.Members.CONTENT_URI,
                         projection, selection, selectionArgs,null);
                 if(cursor.getCount() > 0){
+                    cursor.close();
                     return true;
                 }
+                cursor.close();
                 return false;
             }
 

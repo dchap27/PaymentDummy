@@ -191,7 +191,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             // updated to reflect the new value, per the Android Design
             // guidelines.
             bindPreferenceSummaryToValue(findPreference("user_display_name"));
-            bindPreferenceSummaryToValue(findPreference("user_email_address"));
+            bindPreferenceSummaryToValue(findPreference("pref_key_member_id"));
             bindPreferenceSummaryToValue(findPreference("key_jamaat_list"));
 //            bindPreferenceSummaryToValue(findPreference("multi_select_memberlist_pref"));
         }
