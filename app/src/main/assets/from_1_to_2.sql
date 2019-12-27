@@ -1,1 +1,0 @@
-ALTER TABLE schedule_info ADD COLUMN schedule_invoice TEXT NULL;
