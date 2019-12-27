@@ -14,6 +14,9 @@ public class AlphaNumericInputFilter implements InputFilter {
             char c = source.charAt(i);
             if(Character.isLetter(c)){
                 builder.append(c);
+            } else if(Character.isJavaIdentifierPart(c)){
+                if(!Character.isDigit(c))
+                    builder.append(c);
             }
         }
         // if all characters are valid return null, otherwise return filtered characters
