@@ -33,6 +33,21 @@
                 android:hint="@string/jamaat_name_hint" />
         </TableRow>
 
+        <TextView
+            android:id="@+id/help_text_message_input_dialog"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            android:clickable="false"
+            android:ems="10"
+            android:paddingBottom="0dp"
+            android:paddingLeft="24dp"
+            android:paddingTop="0dp"
+            android:selectAllOnFocus="false"
+            android:text="@string/input_type_help"
+            android:textSize="12sp" />
+
         <TableRow
             android:gravity="center_horizontal">
 
