@@ -29,8 +29,9 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".MainActivity"
-            android:label="@string/title_activity_main"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:label="@string/title_activity_main_regular"
+            android:theme="@style/AppTheme.NoActionBar"
+            tools:replace="android:label">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

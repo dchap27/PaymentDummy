@@ -15,7 +15,9 @@ ext {
     versionMinor = 0
     patch = 0
     screenSize = 0
-    version_Code = (int) versionMajor + screenSize + versionMinor + patch
+    version_Code = String.valueOf(versionMajor) +
+            String.valueOf(screenSize) +
+            String.valueOf(versionMinor) + patch
     version_Name = String.valueOf(versionMajor)+ "." + String.valueOf(versionMinor) + "." + String.valueOf(patch)
 }
 
@@ -34,7 +36,7 @@ android {
         applicationId "ng.com.dayma.paymentdummy"
         minSdkVersion 23
         targetSdkVersion 25
-        versionCode = (int) 23 + version_Code
+        versionCode = Integer.valueOf(23 + version_Code)
         versionName version_Name
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
@@ -57,14 +59,14 @@ android {
             applicationIdSuffix ".regular"
             minSdkVersion 18
             resValue "string", "content_provider", applicationId + ".provider"
-            versionCode = (int) 18 + version_Code
+            versionCode = Integer.valueOf(18 + version_Code)
         }
         advanced {
             dimension "version"
             applicationIdSuffix ".advanced"
             minSdkVersion 18
             resValue "string", "content_provider", applicationId + ".provider"
-            versionCode = (int) 18 + version_Code
+            versionCode = Integer.valueOf(18 + version_Code)
         }
     }
 }
