@@ -22,6 +22,7 @@ import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.GridLayoutManager;
@@ -62,7 +63,8 @@ import static android.content.Intent.EXTRA_MIME_TYPES;
 
 public class MainActivity extends RuntimePermissionsActivity
         implements NavigationView.OnNavigationItemSelectedListener, LoaderManager.LoaderCallbacks<Cursor>,
-        ScheduleClickAdapterListener {
+        ScheduleClickAdapterListener,
+        SwipeRefreshLayout.OnRefreshListener {
 
     public static final int LOADER_SCHEDULES = 0;
     private static final int LOADER_MONTHS = 1;
@@ -75,6 +77,7 @@ public class MainActivity extends RuntimePermissionsActivity
     private GridLayoutManager mGridLayoutManager;
     private MonthRecyclerAdapter mMonthRecyclerAdapter;
     private PaymentOpenHelper mDbOpenHelper;
+    private SwipeRefreshLayout mSwipeRefreshLayout;
 
     //
     private ActionMode mActionMode;
@@ -90,7 +93,6 @@ public class MainActivity extends RuntimePermissionsActivity
     private View mProgressView;
     private ProgressBar mProgressBar;
     private int mScheduleIdToWriteToCSV;
-    private boolean mIsAMember;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,6 +105,9 @@ public class MainActivity extends RuntimePermissionsActivity
         // create an instance of the openhelper
         mDbOpenHelper = new PaymentOpenHelper(this);
         mViewModel = ViewModelProviders.of(this).get(MainActivityViewModel.class);
+
+        mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_main);
+        mSwipeRefreshLayout.setOnRefreshListener(this);
 
         // passing false means if the settings already has a value, don't pass the default into it
         PreferenceManager.setDefaultValues(this, R.xml.pref_general, false);
@@ -826,6 +831,27 @@ public class MainActivity extends RuntimePermissionsActivity
             mActionMode.setTitle(String.valueOf(count) + " " + getString(R.string.selected_item_count));
             mActionMode.invalidate();// redraw the CAB
         }
+    }
+
+    @Override
+    public void onRefresh() {
+        loadInitialData();
+    }
+
+    private void loadInitialData() {
+        mViewModel.mJamaatName = mSharedPref.getString(PreferenceKeys.JAMAAT_NAME_PREF, "");
+        if(mViewModel.mJamaatName.length() > 1){
+            String isFirstLoad = mSharedPref.getString(PreferenceKeys.JAMAAT_INFO_FIRST_LOAD, null);
+            if(isFirstLoad == null) {
+                Log.d(TAG, "Initial loading of jamaat info into database");
+                loadJamaatInfoToDatabase(mViewModel.mJamaatName);
+                SharedPreferences.Editor editor = mSharedPref.edit();
+                editor.putString(PreferenceKeys.JAMAAT_INFO_FIRST_LOAD, mViewModel.mJamaatName);
+                editor.commit();
+            }
+        }
+        (mRecyclerItems.getAdapter()).notifyDataSetChanged();
+        mSwipeRefreshLayout.setRefreshing(false);
     }
 
     // code for ActionMode
