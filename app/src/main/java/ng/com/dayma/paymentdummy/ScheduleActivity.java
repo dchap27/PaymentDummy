@@ -332,7 +332,7 @@ public class ScheduleActivity extends AppCompatActivity implements LoaderManager
             Log.d(TAG, "Finished loading jamaat list into spinner");
             mJamaatListQueriesFinished = true;
             mSpinnerJamaat.setAdapter(mAdapterJamaat);
-            if(mPrefMultipleJamaat)
+            if(!mPrefMultipleJamaat)
                 mSpinnerJamaat.setEnabled(false);
             displayScheduleWhenQueryFinishes();
         } else if (loader.getId() == LOADER_SCHEDULES){

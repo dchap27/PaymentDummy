@@ -196,7 +196,15 @@ public class MainActivity extends RuntimePermissionsActivity
         }
         if(!isFirstUsage && mViewModel.mJamaatName.length() > 1){
             if(isFirstLoad == null) {
-                loadJamaatInfoToDatabase(mViewModel.mJamaatName);
+                boolean isMultipleJamaat = mSharedPref.getBoolean(PreferenceKeys.KEY_ENABLE_MULTIPLE_JAMAAT, false);
+                if(isMultipleJamaat){
+                    String[] jamaats = mSharedPref.getStringSet(PreferenceKeys.MULTI_SELECT_JAMAAT_PREF, null).toArray(new String[0]);
+                    for(int i=0; i<jamaats.length; i++){
+                        loadJamaatInfoToDatabase(jamaats[i]);
+                    }
+                } else {
+                    loadJamaatInfoToDatabase(mViewModel.mJamaatName);
+                }
                 SharedPreferences.Editor editor = mSharedPref.edit();
                 editor.putString(PreferenceKeys.JAMAAT_INFO_FIRST_LOAD, mViewModel.mJamaatName);
                 editor.commit();
@@ -208,7 +216,7 @@ public class MainActivity extends RuntimePermissionsActivity
         final int fileIdentifier = getResources().getIdentifier(jamaatName, "raw", this.getPackageName());
         try {
             InputStream inputstream = getResources().openRawResource(fileIdentifier);
-            readDataToDatabase(inputstream);
+            readDataToDatabase(inputstream, jamaatName);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
@@ -368,7 +376,7 @@ public class MainActivity extends RuntimePermissionsActivity
                 Log.d(TAG, "File extension being read, "+ mime);
                 try {
                     final InputStream csvFile = getContentResolver().openInputStream(downloaddata);
-                    readDataToDatabase(csvFile);
+                    readDataToDatabaseFromIntent(csvFile);
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
                 }
@@ -377,7 +385,7 @@ public class MainActivity extends RuntimePermissionsActivity
         }
     }
 
-    private void readDataToDatabase(final InputStream inputStream) throws FileNotFoundException {
+    private void readDataToDatabaseFromIntent(final InputStream inputStream) {
 
         AsyncTask<String, Integer, Boolean> task = new AsyncTask<String, Integer, Boolean>() {
 
@@ -425,6 +433,60 @@ public class MainActivity extends RuntimePermissionsActivity
                 View v = findViewById(R.id.list_schedules);
                 Snackbar.make(v, String.format(
                         "%s member list added successfully!", mViewModel.mJamaatName.toUpperCase()),
+                        Snackbar.LENGTH_LONG).show();
+            }
+        };
+        task.execute();
+    }
+
+    private void readDataToDatabase(final InputStream inputStream, final String jamaatName) throws FileNotFoundException {
+
+        AsyncTask<String, Integer, Boolean> task = new AsyncTask<String, Integer, Boolean>() {
+
+            private AlertDialog mDialog;
+
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+
+                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(MainActivity.this);
+                alertDialogBuilder.setCancelable(false);
+                initialiseProgressDialog(R.id.progress_bar_main_activity);
+                alertDialogBuilder.setView(mProgressView);
+                mDialog = alertDialogBuilder.create();
+                mDialog.show();
+                mProgressBar.setVisibility(View.VISIBLE);
+                mProgressBar.setProgress(1);
+            }
+
+            @Override
+            protected Boolean doInBackground(String... strings) {
+                CsvUtility utility = new CsvUtility(MainActivity.this);
+                publishProgress(2);
+                Log.d(TAG, "reading into database");
+                utility.readCSVToDatabase(jamaatName.toUpperCase(), inputStream);
+                publishProgress(3);
+                return true;
+            }
+
+            @Override
+            protected void onProgressUpdate(Integer... values) {
+                int progressValue = values[0];
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    mProgressBar.setProgress(progressValue,true);
+                } else
+                    mProgressBar.setProgress(progressValue);
+
+            }
+
+            @Override
+            protected void onPostExecute(Boolean aBoolean) {
+                super.onPostExecute(aBoolean);
+                mProgressBar.setVisibility(View.GONE);
+                mDialog.dismiss();
+                View v = findViewById(R.id.list_schedules);
+                Snackbar.make(v, String.format(
+                        "%s member list added successfully!", jamaatName.toUpperCase()),
                         Snackbar.LENGTH_LONG).show();
             }
         };
@@ -844,7 +906,15 @@ public class MainActivity extends RuntimePermissionsActivity
             String isFirstLoad = mSharedPref.getString(PreferenceKeys.JAMAAT_INFO_FIRST_LOAD, null);
             if(isFirstLoad == null) {
                 Log.d(TAG, "Initial loading of jamaat info into database");
-                loadJamaatInfoToDatabase(mViewModel.mJamaatName);
+                boolean isMultipleJamaat = mSharedPref.getBoolean(PreferenceKeys.KEY_ENABLE_MULTIPLE_JAMAAT, false);
+                if (isMultipleJamaat) {
+                    String[] jamaats = mSharedPref.getStringSet(PreferenceKeys.MULTI_SELECT_JAMAAT_PREF, null).toArray(new String[0]);
+                    for (int i = 0; i < jamaats.length; i++) {
+                        loadJamaatInfoToDatabase(jamaats[i]);
+                    }
+                } else {
+                    loadJamaatInfoToDatabase(mViewModel.mJamaatName);
+                }
                 SharedPreferences.Editor editor = mSharedPref.edit();
                 editor.putString(PreferenceKeys.JAMAAT_INFO_FIRST_LOAD, mViewModel.mJamaatName);
                 editor.commit();
