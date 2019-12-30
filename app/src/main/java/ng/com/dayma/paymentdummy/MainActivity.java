@@ -202,9 +202,8 @@ public class MainActivity extends RuntimePermissionsActivity
                     for(int i=0; i<jamaats.length; i++){
                         loadJamaatInfoToDatabase(jamaats[i]);
                     }
-                } else {
-                    loadJamaatInfoToDatabase(mViewModel.mJamaatName);
                 }
+                loadJamaatInfoToDatabase(mViewModel.mJamaatName);
                 SharedPreferences.Editor editor = mSharedPref.edit();
                 editor.putString(PreferenceKeys.JAMAAT_INFO_FIRST_LOAD, mViewModel.mJamaatName);
                 editor.commit();
@@ -912,9 +911,8 @@ public class MainActivity extends RuntimePermissionsActivity
                     for (int i = 0; i < jamaats.length; i++) {
                         loadJamaatInfoToDatabase(jamaats[i]);
                     }
-                } else {
-                    loadJamaatInfoToDatabase(mViewModel.mJamaatName);
                 }
+                loadJamaatInfoToDatabase(mViewModel.mJamaatName);
                 SharedPreferences.Editor editor = mSharedPref.edit();
                 editor.putString(PreferenceKeys.JAMAAT_INFO_FIRST_LOAD, mViewModel.mJamaatName);
                 editor.commit();
