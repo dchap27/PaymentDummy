@@ -13,7 +13,7 @@ keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 ext {
     versionMajor = 1
     versionMinor = 0
-    patch = 0
+    patch = 1
     screenSize = 0
     version_Code = String.valueOf(versionMajor) +
             String.valueOf(screenSize) +
@@ -67,6 +67,7 @@ android {
             minSdkVersion 18
             resValue "string", "content_provider", applicationId + ".provider"
             versionCode = Integer.valueOf(18 + version_Code)
+            versionName = version_Name
         }
     }
 }
