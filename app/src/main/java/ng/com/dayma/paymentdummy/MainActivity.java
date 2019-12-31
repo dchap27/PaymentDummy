@@ -468,7 +468,6 @@ public class MainActivity extends RuntimePermissionsActivity
 
             @Override
             protected void onPostExecute(Boolean aBoolean) {
-                super.onPostExecute(aBoolean);
                 mDialog.dismiss();
                 View v = findViewById(R.id.list_schedules);
                 Snackbar.make(v, String.format(
@@ -902,10 +901,10 @@ public class MainActivity extends RuntimePermissionsActivity
     }
 
     private void loadAdditionalJamaatRecords() {
-        String[] selectedPrefJamaats = mSharedPref.getStringSet(
-                PreferenceKeys.MULTI_SELECT_JAMAAT_PREF, null).toArray(new String[0]);
         boolean isMultiple = mSharedPref.getBoolean(PreferenceKeys.KEY_ENABLE_MULTIPLE_JAMAAT, false);
         if(isMultiple){
+            String[] selectedPrefJamaats = mSharedPref.getStringSet(
+                    PreferenceKeys.MULTI_SELECT_JAMAAT_PREF, null).toArray(new String[0]);
             for(int i =0; i< selectedPrefJamaats.length; i++){
                 checkJamaatInfoExist(selectedPrefJamaats[i]);
             }
