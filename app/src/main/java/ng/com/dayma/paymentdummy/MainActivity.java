@@ -234,6 +234,7 @@ public class MainActivity extends RuntimePermissionsActivity
     private void writeDataToCsV() {
 
         AsyncTask<String, Integer, Boolean> task = new AsyncTask<String, Integer, Boolean>() {
+            private String mMonthId;
             private String mScheduleId;
             private String mFileName;
             private AlertDialog mDialog;
@@ -257,6 +258,7 @@ public class MainActivity extends RuntimePermissionsActivity
                 String[] scheduleProjection = {
                         PaymentProviderContract.Schedules._ID,
                         PaymentProviderContract.Schedules.COLUMN_SCHEDULE_ID,
+                        PaymentProviderContract.Schedules.COLUMN_MONTH_ID,
                         PaymentProviderContract.Schedules.COLUMN_MEMBER_JAMAATNAME,
                 };
                 // publish progress
@@ -268,13 +270,15 @@ public class MainActivity extends RuntimePermissionsActivity
 
                 int scheduleIdPos = scheduleCursor.getColumnIndex(
                         PaymentProviderContract.Schedules.COLUMN_SCHEDULE_ID);
-                int jamaatNamePos = scheduleCursor.getColumnIndex(
-                        PaymentProviderContract.Schedules.COLUMN_MEMBER_JAMAATNAME);
+                int monthIdPos = scheduleCursor.getColumnIndex(
+                        PaymentProviderContract.Schedules.COLUMN_MONTH_ID);
                 mFileName = null;
                 if(scheduleCursor.moveToNext()) {
 
                     mScheduleId = scheduleCursor.getString(scheduleIdPos);
-                    String jamaatName = scheduleCursor.getString(jamaatNamePos);
+                    String monthId = scheduleCursor.getString(monthIdPos);
+                    String[] monthSplit = monthId.split(" ");
+                    mMonthId = monthSplit[0].trim();
                     mFileName = mScheduleId;
                     mSuccess = true;
                     Log.d("CSVUtility", "File name reading... " + mFileName);
@@ -287,8 +291,9 @@ public class MainActivity extends RuntimePermissionsActivity
 
                 CsvUtility csvUtility = new CsvUtility(MainActivity.this);
                 Log.d(TAG, "Writing to file");
-                mSuccess = csvUtility.writeDatabaseToCSV(mFileName, mScheduleId);
+                mSuccess = csvUtility.writeDatabaseToCSV(mFileName, mScheduleId, mMonthId);
                 publishProgress(4);
+                simulateLongRunningWork();
                 if(mSuccess){
                     Uri uri = ContentUris.withAppendedId(PaymentProviderContract.Schedules.CONTENT_URI, mScheduleIdToWriteToCSV);
                     ContentValues values = new ContentValues();
@@ -317,7 +322,7 @@ public class MainActivity extends RuntimePermissionsActivity
                 mProgressBar.setVisibility(View.GONE);
                 mDialog.cancel();
                 if(aBoolean) {
-                    Snackbar.make(v, "Schedule successfully exported to /ChandaPay/"+mFileName,
+                    Snackbar.make(v, "Schedule successfully exported to /ChandaPay/"+mMonthId +"/"+mFileName,
                             Snackbar.LENGTH_LONG).show();
                 } else {
                     Snackbar.make(v, "Something went wrong! Try again later!",

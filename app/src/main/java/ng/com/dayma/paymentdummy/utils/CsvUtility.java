@@ -37,7 +37,7 @@ public class CsvUtility {
         Log.d("CSVUtility", "Done reading file!");
     }
 
-    public boolean writeDatabaseToCSV(String fileName, String scheduleId){
+    public boolean writeDatabaseToCSV(String fileName, String scheduleId, String monthId){
 
         final String[] projection = {
                 PaymentProviderContract.Payments.COLUMN_MEMBER_CHANDANO,
@@ -65,7 +65,7 @@ public class CsvUtility {
         };
         String selection = PaymentProviderContract.Payments.COLUMN_SCHEDULE_ID + "=?";
         String[] selectionArgs = { scheduleId };
-        File exportDir = new File(Environment.getExternalStorageDirectory(), "/ChandaPay");
+        File exportDir = new File(Environment.getExternalStorageDirectory(), "/ChandaPay/"+monthId);
         if (!exportDir.exists()) {
             exportDir.mkdirs();
         }
