@@ -13,12 +13,11 @@ keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 ext {
     versionMajor = 1
     versionMinor = 0
-    patch = 1
+    versionPatch = 1
     screenSize = 0
-    version_Code = String.valueOf(versionMajor) +
-            String.valueOf(screenSize) +
-            String.valueOf(versionMinor) + patch
-    version_Name = String.valueOf(versionMajor)+ "." + String.valueOf(versionMinor) + "." + String.valueOf(patch)
+    minimumSdkVersion = 18
+    versionClassifier = null
+    isSnapShot = true;
 }
 
 android {
@@ -34,10 +33,10 @@ android {
     buildToolsVersion "28.0.3"
     defaultConfig {
         applicationId "ng.com.dayma.paymentdummy"
-        minSdkVersion 23
+        minSdkVersion minimumSdkVersion
         targetSdkVersion 25
-        versionCode = Integer.valueOf(23 + version_Code)
-        versionName version_Name
+        versionCode generateVersionCode()
+        versionName generateVersionName()
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -57,19 +56,30 @@ android {
         regular {
             dimension "version"
             applicationIdSuffix ".regular"
-            minSdkVersion 18
             resValue "string", "content_provider", applicationId + ".provider"
-            versionCode = Integer.valueOf(18 + version_Code)
+
         }
         advanced {
             dimension "version"
             applicationIdSuffix ".advanced"
-            minSdkVersion 18
             resValue "string", "content_provider", applicationId + ".provider"
-            versionCode = Integer.valueOf(18 + version_Code)
-            versionName = version_Name
         }
     }
+}
+
+private Integer generateVersionCode(){
+    return minimumSdkVersion * 10000000 + versionMajor * 10000 + versionMinor * 100 + versionPatch
+}
+
+private String generateVersionName(){
+    String version_Name = "${versionMajor}.${versionMinor}.${versionPatch}"
+    if(versionClassifier == null & isSnapShot){
+        versionClassifier = "SNAPSHOT"
+    }
+    if(versionClassifier != null){
+        version_Name += "-" + versionClassifier
+    }
+    return version_Name
 }
 
 dependencies {
