@@ -397,7 +397,7 @@ public class MainActivity extends RuntimePermissionsActivity
                 CsvUtility utility = new CsvUtility(MainActivity.this);
                 publishProgress(2);
                 Log.d(TAG, "reading into database");
-                utility.readCSVToDatabase(mViewModel.mJamaatName.toUpperCase(), inputStream);
+                utility.readCSVToDatabase(mViewModel.jamaatToUpdate.toUpperCase(), inputStream);
                 publishProgress(3);
                 return true;
             }
@@ -415,11 +415,11 @@ public class MainActivity extends RuntimePermissionsActivity
             @Override
             protected void onPostExecute(Boolean aBoolean) {
                 super.onPostExecute(aBoolean);
-                mProgressBar.setVisibility(View.GONE);
                 mDialog.dismiss();
+                mProgressBar.setVisibility(View.GONE);
                 View v = findViewById(R.id.list_schedules);
                 Snackbar.make(v, String.format(
-                        "%s member list added successfully!", mViewModel.mJamaatName.toUpperCase()),
+                        "%s member list added successfully!", mViewModel.jamaatToUpdate.toUpperCase()),
                         Snackbar.LENGTH_LONG).show();
             }
         };
@@ -469,7 +469,6 @@ public class MainActivity extends RuntimePermissionsActivity
             @Override
             protected void onPostExecute(Boolean aBoolean) {
                 super.onPostExecute(aBoolean);
-                mProgressBar.setVisibility(View.GONE);
                 mDialog.dismiss();
                 View v = findViewById(R.id.list_schedules);
                 Snackbar.make(v, String.format(
@@ -683,17 +682,20 @@ public class MainActivity extends RuntimePermissionsActivity
             mSaveJamaatNameDialog.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    mViewModel.mJamaatName = mJamaatEditText.getText().toString().trim().toUpperCase();
-                    if(!mViewModel.mJamaatName.isEmpty()) {
+                    String jamaatName = mJamaatEditText.getText().toString().trim().toUpperCase();
+                    if(!jamaatName.isEmpty()) {
                         Set<String> allowedJamaats = mSharedPref.getStringSet(PreferenceKeys.MULTI_SELECT_JAMAAT_PREF,null);
-                        if(!allowedJamaats.contains(mViewModel.mJamaatName.toLowerCase())){
+                        String baseJamaat = mSharedPref.getString(PreferenceKeys.JAMAAT_NAME_PREF, "");
+                        if(allowedJamaats.contains(jamaatName.toLowerCase()) || baseJamaat.equals(jamaatName.toLowerCase())) {
+                            mViewModel.jamaatToUpdate = jamaatName;
+                            MainActivity.super.requestAppPermissions(new
+                                            String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                                    R.string.runtime_permissions_txt, PERMISSION_REQUEST_READ_EXTERNAL_STORAGE);
+                        } else {
                             Snackbar.make(view,
-                                    String.format("%s is not among your lists of Jamaats",mViewModel.mJamaatName.toUpperCase()), Snackbar.LENGTH_LONG).show();
+                                    String.format("%s is not among your lists of Jamaats", jamaatName.toUpperCase()), Snackbar.LENGTH_LONG).show();
                             return;
                         }
-                        MainActivity.super.requestAppPermissions(new
-                                        String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-                                R.string.runtime_permissions_txt, PERMISSION_REQUEST_READ_EXTERNAL_STORAGE);
                     }else {
                         Snackbar.make(view, R.string.jamaat_name_warning, Snackbar.LENGTH_LONG).show();
                         return;
@@ -728,17 +730,19 @@ public class MainActivity extends RuntimePermissionsActivity
         return false;
     }
 
-    private boolean checkJamaatInfoExist(final String jamaatName) {
-        final boolean[] alreadyExist = new boolean[1];
+    private void checkJamaatInfoExist(final String jamaatName) {
+
         AsyncTask<String, Void, Boolean> task = new AsyncTask<String, Void, Boolean>() {
+
             @Override
             protected Boolean doInBackground(String... strings) {
+                String jamaat = strings[0];
                 String[] projection = {
                         PaymentProviderContract.Members.COLUMN_MEMBER_JAMAATNAME,
                         PaymentProviderContract.Members.COLUMN_MEMBER_FULLNAME
                 };
                 String selection = PaymentProviderContract.Members.COLUMN_MEMBER_JAMAATNAME + " LIKE ?";
-                String[] selectionArgs = { jamaatName };
+                String[] selectionArgs = { jamaat };
                 Cursor cursor = getContentResolver().query(PaymentProviderContract.Members.CONTENT_URI,
                         projection, selection, selectionArgs,null);
                 if(cursor.getCount() > 0){
@@ -751,11 +755,11 @@ public class MainActivity extends RuntimePermissionsActivity
 
             @Override
             protected void onPostExecute(Boolean aBoolean) {
-                super.onPostExecute(aBoolean);
-                alreadyExist[0] = aBoolean;
+                if(!aBoolean)
+                    loadJamaatInfoToDatabase(jamaatName);
             }
         };
-        return alreadyExist[0];
+        task.execute(jamaatName);
     }
 
     private void handleDisplaySelection(int itemId){
@@ -891,9 +895,21 @@ public class MainActivity extends RuntimePermissionsActivity
         mViewModel.mJamaatName = mSharedPref.getString(PreferenceKeys.JAMAAT_NAME_PREF, "");
         if(mViewModel.mJamaatName.length() > 1){
             firstDataLoading();
+            loadAdditionalJamaatRecords();
         }
         (mRecyclerItems.getAdapter()).notifyDataSetChanged();
         mSwipeRefreshLayout.setRefreshing(false);
+    }
+
+    private void loadAdditionalJamaatRecords() {
+        String[] selectedPrefJamaats = mSharedPref.getStringSet(
+                PreferenceKeys.MULTI_SELECT_JAMAAT_PREF, null).toArray(new String[0]);
+        boolean isMultiple = mSharedPref.getBoolean(PreferenceKeys.KEY_ENABLE_MULTIPLE_JAMAAT, false);
+        if(isMultiple){
+            for(int i =0; i< selectedPrefJamaats.length; i++){
+                checkJamaatInfoExist(selectedPrefJamaats[i]);
+            }
+        }
     }
 
     private void firstDataLoading() {
@@ -905,6 +921,8 @@ public class MainActivity extends RuntimePermissionsActivity
                 String[] jamaats = mSharedPref.getStringSet(PreferenceKeys.MULTI_SELECT_JAMAAT_PREF, null).toArray(new String[0]);
                 for (int i = 0; i < jamaats.length; i++) {
                     loadJamaatInfoToDatabase(jamaats[i]);
+                    mViewModel.loadedJamaats = new ArrayList<>();
+                    mViewModel.loadedJamaats.add(jamaats[i]);
                 }
             }
             loadJamaatInfoToDatabase(mViewModel.mJamaatName);
