@@ -657,7 +657,7 @@ public class MainActivity extends RuntimePermissionsActivity
                     public void onClick(DialogInterface dialog, int which) {
                         MainActivity.super.requestAppPermissions(new
                                         String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-                                R.string.runtime_permissions_txt, PERMISSION_REQUEST_READ_EXTERNAL_STORAGE);
+                                R.string.runtime_permissions_read_storage, PERMISSION_REQUEST_READ_EXTERNAL_STORAGE);
                         dialog.dismiss();
                     }
                 });
@@ -694,7 +694,7 @@ public class MainActivity extends RuntimePermissionsActivity
                             mViewModel.jamaatToUpdate = jamaatName;
                             MainActivity.super.requestAppPermissions(new
                                             String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-                                    R.string.runtime_permissions_txt, PERMISSION_REQUEST_READ_EXTERNAL_STORAGE);
+                                    R.string.runtime_permissions_read_storage, PERMISSION_REQUEST_READ_EXTERNAL_STORAGE);
                         } else {
                             Snackbar.make(view,
                                     String.format("%s is not among your lists of Jamaats", jamaatName.toUpperCase()), Snackbar.LENGTH_LONG).show();
@@ -999,7 +999,7 @@ public class MainActivity extends RuntimePermissionsActivity
 
         MainActivity.super.requestAppPermissions(new
                         String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                R.string.runtime_permissions_txt, PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE);
+                R.string.runtime_permissions_write_storage, PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE);
 
     }
 

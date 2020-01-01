@@ -83,7 +83,10 @@
     <string name="jamaat_name_hint">Jamaat Name</string>
     <string name="menu_edit_item">Edit</string>
     <string name="selected_item_count"> Selected item</string>
-    <string name="runtime_permissions_txt">runtime permissions</string>
+    <string name="runtime_permissions_read_storage">
+        Chanda App needs storage access permissions to update members list/info</string>
+    <string name="runtime_permissions_write_storage">
+        Chanda App needs storage access permissions to export your schedule</string>
     <string name="jamaat_name_warning">Please, provide Jamaat Name to update members info</string>
     <string name="first_time_user_message">Welcome! Make sure to set your preferences in the settings
          screen for tailored usage of the app.</string>
