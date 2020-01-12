@@ -13,11 +13,11 @@ keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 ext {
     versionMajor = 1
     versionMinor = 0
-    versionPatch = 2
+    versionPatch = 3
     screenSize = 0
     minimumSdkVersion = 18
     versionClassifier = null
-    isSnapShot = true;
+    isSnapShot = false;
 }
 
 android {
