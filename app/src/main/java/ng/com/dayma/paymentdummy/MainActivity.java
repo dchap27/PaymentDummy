@@ -16,6 +16,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -354,6 +355,19 @@ public class MainActivity extends RuntimePermissionsActivity
         mLoadFromDatabase = new DataManager.LoadFromDatabase();
         mLoadFromDatabase.execute(this);
         updateNavHeader();
+
+        openDrawer();
+    }
+
+    private void openDrawer() {
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                DrawerLayout drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+                drawerLayout.openDrawer(GravityCompat.START);
+            }
+        }, 1000);
     }
 
     @Override
