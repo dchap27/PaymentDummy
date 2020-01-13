@@ -149,6 +149,7 @@ public class MainActivity extends RuntimePermissionsActivity
         handleDisplaySelection(mViewModel.navDrawerDisplaySelection);
         mActionModecallbacks = new ActionModecallbacks();
         isFirstUsage();
+        openDrawer();
 
     }
 
@@ -356,7 +357,6 @@ public class MainActivity extends RuntimePermissionsActivity
         mLoadFromDatabase.execute(this);
         updateNavHeader();
 
-        openDrawer();
     }
 
     private void openDrawer() {
