@@ -19,7 +19,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.SimpleCursorAdapter;
@@ -34,14 +33,15 @@ import ng.com.dayma.paymentdummy.data.PaymentOpenHelper;
 import ng.com.dayma.paymentdummy.data.PaymentProviderContract;
 import ng.com.dayma.paymentdummy.data.PaymentProviderContract.Members;
 
-public class PaymentActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
+public class PaymentActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>,
+        MultiSelectSpinner.MultiSpinnerListener {
     public static final String PAYMENT_ID = "ng.com.dayma.paymentdummy.PAYMENT_ID";
     public static final int ID_NOT_SET = -1;
     private final String TAG = getClass().getSimpleName();
     public static final String SCHEDULE_INFO = "ng.com.dayma.paymentdummy.SCHEDULE_INFO";
     public static final int LOADER_PAYMENTS = 0;
     public static final int LOADER_MEMBERS = 1;
-    private Spinner mSpinnerMonthPaid;
+    private MultiSelectSpinner mSpinnerMonthPaid;
     private boolean mIsNewPayment;
     private EditText mTextReceiptNo;
     private EditText mTextChandaAm;
@@ -143,7 +143,7 @@ public class PaymentActivity extends AppCompatActivity implements LoaderManager.
         mDbOpenHelper = new PaymentOpenHelper(this);
         mViewModel = ViewModelProviders.of(this).get(PaymentActivityViewModel.class);
 
-        mSpinnerMonthPaid = (Spinner) findViewById(R.id.spinner_monthpaid);
+        mSpinnerMonthPaid = (MultiSelectSpinner) findViewById(R.id.spinner_monthpaid);
         mSpinnerChandaNo = (Spinner) findViewById(R.id.spinner_payment_text);
 
         Log.d(TAG,"populate the members id into spinner");
@@ -155,10 +155,11 @@ public class PaymentActivity extends AppCompatActivity implements LoaderManager.
         mSpinnerChandaNo.setAdapter(mAdapterMemberIds);
 
         Log.d(TAG,"populate months into spinner");
-        ArrayAdapter<String> adapterMonths =
-                new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, mViewModel.monthsYear);
-        adapterMonths.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        mSpinnerMonthPaid.setAdapter(adapterMonths);
+//        ArrayAdapter<String> adapterMonths =
+//                new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, mViewModel.monthsYear);
+//        adapterMonths.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+//        mSpinnerMonthPaid.setAdapter(adapterMonths);
+        mSpinnerMonthPaid.setItems(mViewModel.monthsYear, getString(R.string.for_all), this);;
 
 
         readDisplayStateValue();
@@ -854,6 +855,11 @@ public class PaymentActivity extends AppCompatActivity implements LoaderManager.
             }
         else if(loader.getId() == LOADER_MEMBERS)
             mAdapterMemberIds.changeCursor(null);
+
+    }
+
+    @Override
+    public void onItemsSelected(boolean[] selected) {
 
     }
 }
