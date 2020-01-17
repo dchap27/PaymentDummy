@@ -160,7 +160,7 @@ public class PaymentActivity extends AppCompatActivity implements LoaderManager.
 //                new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, mViewModel.monthsYear);
 //        adapterMonths.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 //        mSpinnerMonthPaid.setAdapter(adapterMonths);
-        mSpinnerMonthPaid.setItems(mViewModel.monthsYear, getString(R.string.for_all), this);;
+        mSpinnerMonthPaid.setItems(mViewModel.monthsYear, getString(R.string.for_all), this);
 
 
         readDisplayStateValue();
@@ -273,8 +273,13 @@ public class PaymentActivity extends AppCompatActivity implements LoaderManager.
             mTextChandaNo.setVisibility(View.INVISIBLE); // show textview if not a new payment
             mSpinnerChandaNo.setVisibility(View.VISIBLE); // hide spinner
         }
+        String[] monthPaidList = monthPaid.split(",");
+        ArrayList<String> monthsPaid = new ArrayList<>();
+        for(int i = 0; i< monthPaidList.length; i++){
+            monthsPaid.add(monthPaidList[i].trim());
+        }
         int monthIndex = monthsYear.indexOf(monthPaid);
-        mSpinnerMonthPaid.setSelection(monthIndex);
+        mSpinnerMonthPaid.setSelection(monthsPaid);
 
         mTextChandaNo.setText(String.valueOf(mChandaNo) + " - " + fullname);
 
@@ -550,7 +555,7 @@ public class PaymentActivity extends AppCompatActivity implements LoaderManager.
     private void savePayment() {
         int chandaNo = selectedChandaNo();
         String fullname = getNameOfPayer(chandaNo);
-        String monthPaid = String.valueOf(mSpinnerMonthPaid.getSelectedItem());
+        String monthPaid = String.valueOf(mSpinnerMonthPaid.getSelectedItemsString());
         String receiptNo = mTextReceiptNo.getText().toString();
         double chandaAm;
         double wasiyyat;

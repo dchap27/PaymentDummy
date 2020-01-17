@@ -37,7 +37,7 @@ public class MultiSelectSpinner extends android.support.v7.widget.AppCompatSpinn
         for (int i = 0; i < items.size(); i++) {
             if (selected[i] == true) {
                 spinnerBuffer.append(items.get(i));
-                spinnerBuffer.append(", ");
+                spinnerBuffer.append(",");
             } else {
                 someUnselected = true;
             }
@@ -102,10 +102,6 @@ public class MultiSelectSpinner extends android.support.v7.widget.AppCompatSpinn
         setAdapter(adapter);
     }
 
-    public int getItemsCount(){
-        return items.size();
-    }
-
     public void setSelection(List<String> selection) {
         // uncheck any previous selection
         for (int i = 0; i < this.selected.length; i++) {
@@ -125,7 +121,7 @@ public class MultiSelectSpinner extends android.support.v7.widget.AppCompatSpinn
 
     }
 
-    public ArrayList<String> getSelectedItems() {
+    public ArrayList<String> getSelectedItemsArray() {
         ArrayList<String> selectedItems = new ArrayList<>();
 
         for (int i = 0; i < items.size(); ++i) {
@@ -137,6 +133,10 @@ public class MultiSelectSpinner extends android.support.v7.widget.AppCompatSpinn
         return selectedItems;
     }
 
+    public String getSelectedItemsString(){
+        return buildSelectedItemString();
+    }
+
     private String buildSelectedItemString() {
         StringBuilder sb = new StringBuilder();
         boolean foundOne = false;
@@ -144,7 +144,7 @@ public class MultiSelectSpinner extends android.support.v7.widget.AppCompatSpinn
         for (int i = 0; i < items.size(); ++i) {
             if (selected[i]) {
                 if (foundOne) {
-                    sb.append(", ");
+                    sb.append(",");
                 }
 
                 foundOne = true;

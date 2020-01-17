@@ -138,7 +138,7 @@
     <string name="loading_message">please wait ...</string>
     <string name="pref_member_id">Member ID</string>
     <string name="input_type_help">Hint: use underscore ( _ ) for spaces or hyphen</string>
-    <string name="for_all">select month(s) paid for</string>
+    <string name="for_all">Payment month(s)</string>
     <string-array name="pref_entries_jamaat_list">
         <item>Agbokojo</item>
         <item>Anfani</item>
