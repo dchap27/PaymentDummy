@@ -6,6 +6,7 @@ import android.support.v7.app.AlertDialog;
 import android.util.AttributeSet;
 import android.widget.ArrayAdapter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class MultiSelectSpinner extends android.support.v7.widget.AppCompatSpinner implements
@@ -93,12 +94,66 @@ public class MultiSelectSpinner extends android.support.v7.widget.AppCompatSpinn
         // all selected by default
         selected = new boolean[items.size()];
         for (int i = 0; i < selected.length; i++)
-            selected[i] = true;
+            selected[i] = false;
 
         // all text on the spinner
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(getContext(),
                 android.R.layout.simple_spinner_item, new String[] { allText });
         setAdapter(adapter);
+    }
+
+    public int getItemsCount(){
+        return items.size();
+    }
+
+    public void setSelection(List<String> selection) {
+        // uncheck any previous selection
+        for (int i = 0; i < this.selected.length; i++) {
+            this.selected[i] = false;
+        }
+        // check passed selection as true
+        for (String sel : selection) {
+            for (int j = 0; j < items.size(); ++j) {
+                if (items.get(j).equals(sel)) {
+                    this.selected[j] = true;
+                }
+            }
+        }
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getContext(),
+                android.R.layout.simple_spinner_item, new String[] { buildSelectedItemString()});
+        setAdapter(adapter);
+
+    }
+
+    public ArrayList<String> getSelectedItems() {
+        ArrayList<String> selectedItems = new ArrayList<>();
+
+        for (int i = 0; i < items.size(); ++i) {
+            if (selected[i]) {
+                selectedItems.add(items.get(i));
+            }
+        }
+
+        return selectedItems;
+    }
+
+    private String buildSelectedItemString() {
+        StringBuilder sb = new StringBuilder();
+        boolean foundOne = false;
+
+        for (int i = 0; i < items.size(); ++i) {
+            if (selected[i]) {
+                if (foundOne) {
+                    sb.append(", ");
+                }
+
+                foundOne = true;
+
+                sb.append(items.get(i));
+            }
+        }
+
+        return sb.toString();
     }
 
     public interface MultiSpinnerListener {
