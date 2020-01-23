@@ -122,5 +122,5 @@ public final class ScheduleInfo implements Parcelable {
                 }
             };
 
-    public int getId() { return mId; }
+    public long getId() { return mId; }
 }

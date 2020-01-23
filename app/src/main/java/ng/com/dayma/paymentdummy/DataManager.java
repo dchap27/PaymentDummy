@@ -186,7 +186,7 @@ public class DataManager {
             String jamaat = cursor.getString(jamaatPos);
             int completionStatus = cursor.getInt(completionstatusPos);
             int id = cursor.getInt(idPos);
-            if (completionStatus == 1){
+            if (completionStatus >= 1){
                 status = true;
             }
 

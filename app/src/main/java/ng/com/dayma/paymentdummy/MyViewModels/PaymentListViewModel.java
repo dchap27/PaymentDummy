@@ -15,17 +15,17 @@ public class PaymentListViewModel extends ViewModel {
     private static String ORIGINAL_SCHEDULE_INFO = "ng.com.dayma.paymentdummy.MyViewModels.ORIGINAL_SCHEDULE_INFO";
     private String scheduleId;
     private ScheduleInfo schedule;
-    private int mId;
+    private long mId;
 
     public String getScheduleId(){ return scheduleId;}
     public void setScheduleId(String id){
         scheduleId = id;
     }
-    public void setId(int id){
+    public void setId(long id){
         mId = id;
     }
 
-    public int getId(){ return mId; }
+    public long getId(){ return mId; }
     public ScheduleInfo getSchedule(String scheduleId) {
         schedule = DataManager.getInstance().getSchedule(scheduleId);
         return schedule;

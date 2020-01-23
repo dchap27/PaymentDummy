@@ -324,6 +324,8 @@ public class MainActivity extends RuntimePermissionsActivity
                 mProgressBar.setVisibility(View.GONE);
                 mDialog.cancel();
                 if(aBoolean) {
+                    ScheduleInfo schedule = DataManager.getInstance().getSchedule(mScheduleId);
+                    schedule.setComplete(true);
                     Snackbar.make(v, "Schedule successfully exported to /ChandaPay/"+mMonthId +"/"+mFileName,
                             Snackbar.LENGTH_LONG).show();
                 } else {
