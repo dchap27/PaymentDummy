@@ -34,12 +34,12 @@ public class PaymentListViewModel extends ViewModel {
     public void saveState(Bundle outState) {
         outState.putString(ORIGINAL_SCHEDULE_ID, scheduleId);
         outState.putParcelable(ORIGINAL_SCHEDULE_INFO, schedule);
-        outState.putInt(ORIGINAL_MID, mId);
+        outState.putLong(ORIGINAL_MID, mId);
     }
 
     public void restoreState(Bundle savedInstanceState) {
         savedInstanceState.getString(ORIGINAL_SCHEDULE_ID);
         savedInstanceState.getParcelable(ORIGINAL_SCHEDULE_INFO);
-        savedInstanceState.getInt(ORIGINAL_MID);
+        savedInstanceState.getLong(ORIGINAL_MID);
     }
 }

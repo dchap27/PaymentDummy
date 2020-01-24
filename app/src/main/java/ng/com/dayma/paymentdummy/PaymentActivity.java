@@ -706,16 +706,20 @@ public class PaymentActivity extends AppCompatActivity implements LoaderManager.
         Log.i(TAG, "Saving " + mViewModel.mPaymentUri + " to the database");
         getContentResolver().update(mViewModel.mPaymentUri, values, null, null);
         if(mViewModel.mSchedule.isComplete()){
-            mViewModel.mSchedule.setComplete(false);
-            long idSchedule = mViewModel.mSchedule.getId();
-            ContentValues values2 = new ContentValues();
-            values2.put(PaymentProviderContract.Schedules.COLUMN_SCHEDULE_ISCOMPLETE, 0);
-            Uri scheduleUri = ContentUris.withAppendedId(PaymentProviderContract.Schedules.CONTENT_URI,
-                    idSchedule);
-            Log.i(TAG, "Return schedule status back to 'Draft ");
-            getContentResolver().update(scheduleUri, values2, null, null);
+            changeScheduleToDraft();
         }
 
+    }
+
+    private void changeScheduleToDraft() {
+        mViewModel.mSchedule.setComplete(false);
+        long idSchedule = mViewModel.mSchedule.getId();
+        ContentValues values2 = new ContentValues();
+        values2.put(PaymentProviderContract.Schedules.COLUMN_SCHEDULE_ISCOMPLETE, 0);
+        Uri scheduleUri = ContentUris.withAppendedId(PaymentProviderContract.Schedules.CONTENT_URI,
+                idSchedule);
+        Log.i(TAG, "Return schedule status back to 'Draft ");
+        getContentResolver().update(scheduleUri, values2, null, null);
     }
 
     private int selectedChandaNo() {
