@@ -18,7 +18,7 @@ import android.widget.TextView;
 
 import ng.com.dayma.paymentdummy.data.PaymentProviderContract;
 import ng.com.dayma.paymentdummy.touchhelpers.ItemTouchHelperAdapter;
-import ng.com.dayma.paymentdummy.touchhelpers.ScheduleClickAdapterListener;
+import ng.com.dayma.paymentdummy.touchhelpers.RecyclerClickAdapterListener;
 
 /**
  * Created by Ahmad on 7/31/2019.
@@ -33,7 +33,7 @@ public class MonthRecyclerAdapter extends RecyclerView.Adapter<MonthRecyclerAdap
     private int mIdPos;
     public final String TAG = getClass().getSimpleName();
     private ItemTouchHelper mTouchHelper;
-    private ScheduleClickAdapterListener mListener;
+    private RecyclerClickAdapterListener mListener;
     private ViewHolder mSelectedHolder;
     private GestureDetector mGestureDetector;
     private DataManager.LoadFromDatabase mLoadFromDatabase;
@@ -176,7 +176,7 @@ public class MonthRecyclerAdapter extends RecyclerView.Adapter<MonthRecyclerAdap
         mTouchHelper = touchHelper;
     }
 
-    public void setClickAdapter(ScheduleClickAdapterListener listener){
+    public void setClickAdapter(RecyclerClickAdapterListener listener){
         mListener = listener;
     }
 

@@ -188,6 +188,10 @@ public class PaymentListActivity extends AppCompatActivity implements LoaderMana
 
     }
 
+    private void showPaymentSummary(){
+
+    }
+
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         CursorLoader loader = null;

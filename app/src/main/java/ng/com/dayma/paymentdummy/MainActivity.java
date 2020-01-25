@@ -56,7 +56,7 @@ import ng.com.dayma.paymentdummy.data.PaymentDatabaseContract;
 import ng.com.dayma.paymentdummy.data.PaymentDatabaseContract.ScheduleInfoEntry;
 import ng.com.dayma.paymentdummy.data.PaymentOpenHelper;
 import ng.com.dayma.paymentdummy.data.PaymentProviderContract;
-import ng.com.dayma.paymentdummy.touchhelpers.ScheduleClickAdapterListener;
+import ng.com.dayma.paymentdummy.touchhelpers.RecyclerClickAdapterListener;
 import ng.com.dayma.paymentdummy.touchhelpers.ScheduleTouchHelperCallback;
 import ng.com.dayma.paymentdummy.utils.CsvUtility;
 import ng.com.dayma.paymentdummy.utils.PreferenceKeys;
@@ -65,7 +65,7 @@ import static android.content.Intent.EXTRA_MIME_TYPES;
 
 public class MainActivity extends RuntimePermissionsActivity
         implements NavigationView.OnNavigationItemSelectedListener, LoaderManager.LoaderCallbacks<Cursor>,
-        ScheduleClickAdapterListener,
+        RecyclerClickAdapterListener,
         SwipeRefreshLayout.OnRefreshListener {
 
     public static final int LOADER_SCHEDULES = 0;

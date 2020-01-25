@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ng.com.dayma.paymentdummy.data.PaymentProviderContract;
-import ng.com.dayma.paymentdummy.touchhelpers.ScheduleClickAdapterListener;
+import ng.com.dayma.paymentdummy.touchhelpers.RecyclerClickAdapterListener;
 
 /**
  * Created by Ahmad on 7/31/2019.
@@ -44,7 +44,7 @@ public class ScheduleRecyclerAdapter extends RecyclerView.Adapter<ScheduleRecycl
     public final String TAG = getClass().getSimpleName();
     private GestureDetector mGestureDetector;
     private ViewHolder mSelectedHolder;
-    private ScheduleClickAdapterListener mListener;
+    private RecyclerClickAdapterListener mListener;
     //
     private SparseBooleanArray mSelectedItemsPosition;
     private SparseBooleanArray mSelectedItemsCursorId;
@@ -256,7 +256,7 @@ public class ScheduleRecyclerAdapter extends RecyclerView.Adapter<ScheduleRecycl
         return false;
     }
 
-    public void setClickAdapter(ScheduleClickAdapterListener listener){
+    public void setClickAdapter(RecyclerClickAdapterListener listener){
         mListener = listener;
     }
 

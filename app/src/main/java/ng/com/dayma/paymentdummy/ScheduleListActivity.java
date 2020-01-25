@@ -25,10 +25,10 @@ import java.util.List;
 import ng.com.dayma.paymentdummy.MyViewModels.ScheduleListViewModel;
 import ng.com.dayma.paymentdummy.data.PaymentOpenHelper;
 import ng.com.dayma.paymentdummy.data.PaymentProviderContract;
-import ng.com.dayma.paymentdummy.touchhelpers.ScheduleClickAdapterListener;
+import ng.com.dayma.paymentdummy.touchhelpers.RecyclerClickAdapterListener;
 
 public class ScheduleListActivity extends AppCompatActivity implements
-        LoaderManager.LoaderCallbacks<Cursor>, ScheduleClickAdapterListener {
+        LoaderManager.LoaderCallbacks<Cursor>, RecyclerClickAdapterListener {
 
     public static final String MONTH_ID = "ng.com.dayma.paymentdummy.MONTH_ID";
     public static final int ID_NOT_SET = -1;

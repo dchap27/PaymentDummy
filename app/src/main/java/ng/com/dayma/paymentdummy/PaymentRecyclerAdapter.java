@@ -55,6 +55,10 @@ public class PaymentRecyclerAdapter extends RecyclerView.Adapter<PaymentRecycler
         notifyDataSetChanged();
     }
 
+    private void showPaymentSummary(long id){
+
+    }
+
     @Override
     public PaymentRecyclerAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View viewItem = mLayoutInflater.inflate(R.layout.item_payment_list, parent, false);
@@ -93,7 +97,7 @@ public class PaymentRecyclerAdapter extends RecyclerView.Adapter<PaymentRecycler
         private int mId;
         private String mScheduleId;
 
-        public ViewHolder(View itemView) {
+        public ViewHolder(final View itemView) {
             super(itemView);
             mTextChandaNo = (TextView) itemView.findViewById(R.id.text_payment_id);
             mTextMonthPaid = (TextView) itemView.findViewById(R.id.text_monthpaid_text);
