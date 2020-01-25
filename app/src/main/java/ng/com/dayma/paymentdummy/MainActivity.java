@@ -1046,14 +1046,13 @@ public class MainActivity extends RuntimePermissionsActivity
 
     private void addInvoiceNumber() {
         mAddInvoice = true;
-        final View view = findViewById(R.id.list_schedules);
         List selectedItemPositions = mScheduleRecyclerAdapter.getSelectedItems();
         final long scheduleCursorID = mScheduleRecyclerAdapter.getScheduleCursorID((Integer) selectedItemPositions.get(0));
-        ScheduleInfo schedule = DataManager.getInstance().getSchedule(scheduleCursorID);
-        if(!schedule.isComplete()){
-            Snackbar.make(view, "You can only add invoice number for exported schedule", Snackbar.LENGTH_LONG).show();
-            return;
-        }
+        checkScheduleStatusBeforeAddition(scheduleCursorID);
+        mActionMode = null;
+    }
+
+    private void addInvoiceToDatabase(final View view, final long scheduleCursorID) {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
         initializePopUpDialog();
         alertDialogBuilder.setView(mPopupDialogView);
@@ -1067,9 +1066,9 @@ public class MainActivity extends RuntimePermissionsActivity
             @Override
             public void onClick(View v) {
                 String invoiceNumber = mInputDialogEditText.getText().toString().trim();
-                if(!invoiceNumber.startsWith("JMT")){
-                    Snackbar.make(view, "Invalid invoice number "+ invoiceNumber, Snackbar.LENGTH_LONG).show();
-                    alertDialog.cancel();
+                boolean invalidInvoice = checkInvoiceCharacters(invoiceNumber);
+                if(invalidInvoice){
+                    Snackbar.make(view, "Invalid invoice number "+ invoiceNumber, Snackbar.LENGTH_SHORT).show();
                     return;
                 }
                 ContentValues values = new ContentValues();
@@ -1087,6 +1086,28 @@ public class MainActivity extends RuntimePermissionsActivity
                 };
                 task.execute(values);
                 mScheduleRecyclerAdapter.notifyDataSetChanged();
+                alertDialog.cancel();
+            }
+
+            private boolean checkInvoiceCharacters(String invoiceNumber) {
+                /*
+                valid invoiceNumber is 'JMT[0-9]'
+                */
+                if(!invoiceNumber.startsWith("JMT")){
+                    return true;
+                }
+                // check if invoiceNumber contains letters after first3 letters
+                for(int i=3; i<invoiceNumber.length(); i++) {
+                    char c = invoiceNumber.charAt(i);
+                    if(Character.isLetter(c)){
+                        return true;
+                    }
+                }
+                // check length
+                if(invoiceNumber.length() < 9){
+                    return true;
+                }
+                return false;
             }
         });
         mCancelInputDialogAction.setOnClickListener(new View.OnClickListener() {
@@ -1095,8 +1116,68 @@ public class MainActivity extends RuntimePermissionsActivity
                 alertDialog.cancel();
             }
         });
-        mActionMode = null;
-        mAddInvoice = false;
+    }
+
+    private void checkScheduleStatusBeforeAddition(final long scheduleCursorID) {
+        final View view = findViewById(R.id.list_schedules);
+        AsyncTask<Long,Integer,Integer> task = new AsyncTask<Long, Integer, Integer>() {
+
+            private AlertDialog mDialog;
+            private int mStatus;
+
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(MainActivity.this);
+                alertDialogBuilder.setCancelable(false);
+                initialiseProgressDialog(R.id.progress_bar_main_activity);
+                alertDialogBuilder.setView(mProgressView);
+                mDialog = alertDialogBuilder.create();
+                mDialog.show();
+                mProgressBar.setVisibility(View.VISIBLE);
+                mProgressBar.setProgress(1);
+            }
+
+            @Override
+            protected Integer doInBackground(Long... ids) {
+                long id = ids[0];
+                String[] projection = {PaymentProviderContract.Schedules.COLUMN_SCHEDULE_ISCOMPLETE};
+                String selection = PaymentProviderContract.Schedules._ID + "=?";
+                String[] selectionArgs = { Long.toString(id)};
+                Cursor cursor = getContentResolver().query(PaymentProviderContract.Schedules.CONTENT_URI,
+                        projection,selection,selectionArgs, null);
+                if(cursor.moveToNext()){
+                    int statusPos = cursor.getColumnIndex(PaymentProviderContract.Schedules.COLUMN_SCHEDULE_ISCOMPLETE);
+                    mStatus = cursor.getInt(statusPos);
+                }
+                publishProgress(3);
+                cursor.close();
+                return mStatus;
+            }
+
+            @Override
+            protected void onProgressUpdate(Integer... values) {
+                super.onProgressUpdate(values);
+                int progressValue = values[0];
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    mProgressBar.setProgress(progressValue,true);
+                } else
+                    mProgressBar.setProgress(progressValue);
+            }
+
+            @Override
+            protected void onPostExecute(Integer status) {
+                mDialog.cancel();
+                mProgressBar.setVisibility(View.GONE);
+                if(status == 1){
+                    addInvoiceToDatabase(view, scheduleCursorID);
+                }else {
+                    Snackbar.make(view, "You can only add invoice number for exported schedule", Snackbar.LENGTH_LONG).show();
+                }
+                mAddInvoice = false;
+            }
+        };
+        task.execute(scheduleCursorID);
     }
 
     private void exportSchedule() {
