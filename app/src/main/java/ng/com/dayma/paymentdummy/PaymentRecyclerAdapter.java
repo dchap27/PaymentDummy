@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import ng.com.dayma.paymentdummy.data.PaymentDatabaseContract.PaymentInfoEntry;
+import ng.com.dayma.paymentdummy.touchhelpers.RecyclerClickAdapterListener;
 
 /**
  * Created by Ahmad on 7/31/2019.
@@ -26,6 +27,7 @@ public class PaymentRecyclerAdapter extends RecyclerView.Adapter<PaymentRecycler
     private int mAmountPaidPos;
     private int mIdPos;
     private int mScheduleIdPos;
+    private RecyclerClickAdapterListener mListener;
 
     public PaymentRecyclerAdapter(Context context, Cursor cursor) {
         mContext = context;
@@ -110,6 +112,7 @@ public class PaymentRecyclerAdapter extends RecyclerView.Adapter<PaymentRecycler
                     ScheduleInfo schedule = DataManager.getInstance().getSchedule(mScheduleId);
                     if(schedule.isComplete()){
                         // do something
+                        mListener.onItemClicked(getAdapterPosition(),mId);
                     }else {
                         Intent intent = new Intent(mContext, PaymentActivity.class);
                         intent.putExtra(PaymentActivity.PAYMENT_ID, mId);
@@ -119,5 +122,8 @@ public class PaymentRecyclerAdapter extends RecyclerView.Adapter<PaymentRecycler
                 }
             });
         }
+    }
+    public void setClickAdapter(RecyclerClickAdapterListener listener){
+        mListener = listener;
     }
 }

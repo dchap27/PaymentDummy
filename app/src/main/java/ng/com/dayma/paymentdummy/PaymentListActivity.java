@@ -18,7 +18,9 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.LinearLayout;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,8 +30,10 @@ import ng.com.dayma.paymentdummy.data.PaymentDatabaseContract.PaymentInfoEntry;
 import ng.com.dayma.paymentdummy.data.PaymentOpenHelper;
 import ng.com.dayma.paymentdummy.data.PaymentProviderContract;
 import ng.com.dayma.paymentdummy.data.PaymentProviderContract.Payments;
+import ng.com.dayma.paymentdummy.touchhelpers.RecyclerClickAdapterListener;
 
-public class PaymentListActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
+public class PaymentListActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>,
+        RecyclerClickAdapterListener {
 
     public static final String ID_NOT_SET = null;
     public static final String SCHEDULE_ID = "ng.com.dayma.paymentdummy.SCHEDULE_ID";
@@ -45,6 +49,7 @@ public class PaymentListActivity extends AppCompatActivity implements LoaderMana
     private SQLiteOpenHelper mDbOpenHelper;
     private int mId;
     private PaymentListViewModel mViewModel;
+    private View mPopupDialogView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -184,12 +189,27 @@ public class PaymentListActivity extends AppCompatActivity implements LoaderMana
         recyclerPayments.setLayoutManager(paymentsLayoutManager);
 
         mPaymentRecyclerAdapter = new PaymentRecyclerAdapter(this, null);
+        mPaymentRecyclerAdapter.setClickAdapter(this);
         recyclerPayments.setAdapter(mPaymentRecyclerAdapter);
 
     }
 
-    private void showPaymentSummary(){
+    private void showPaymentSummary(long id){
+        PaymentInfo payment = DataManager.getInstance().getPayment(id);
+        initialisePopuDialog();
 
+    }
+
+    private ArrayList getPaymentDetails(final long id) {
+
+        return null;
+    }
+
+    private void initialisePopuDialog() {
+        LayoutInflater layoutInflater = LayoutInflater.from(PaymentListActivity.this);
+        mPopupDialogView = layoutInflater.inflate(R.layout.payment_summary, null);
+        LinearLayout parentView = (LinearLayout) findViewById(R.id.summary_payment_parent_view);
+//        mInputDialogEditText = (EditText) mPopupDialogView.findViewById(R.id.input_popup_edit_text);
     }
 
     @Override
@@ -242,5 +262,15 @@ public class PaymentListActivity extends AppCompatActivity implements LoaderMana
     public void onLoaderReset(Loader<Cursor> loader) {
         if(loader.getId() == LOADER_PAYMENTS)
             mPaymentRecyclerAdapter.changeCursor(null);
+    }
+
+    @Override
+    public void onItemClicked(int adapterPosition, long cursorDataId) {
+        showPaymentSummary(cursorDataId);
+    }
+
+    @Override
+    public boolean onSingleClick() {
+        return false;
     }
 }

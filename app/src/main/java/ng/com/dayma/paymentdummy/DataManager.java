@@ -296,7 +296,7 @@ public class DataManager {
         return null;
     }
 
-    public PaymentInfo getPayment(int id){
+    public PaymentInfo getPayment(long id){
         for(PaymentInfo payment : mPayments){
             if(id ==(payment.getId()))
                 return payment;

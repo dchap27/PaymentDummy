@@ -28,14 +28,14 @@ public final class PaymentInfo {
     private float mWasiyyat;
     private float mTahrikJadid;
     private float mWaqfJadid;
-    private int mId;
+    private long mId;
 
     public PaymentInfo(ScheduleInfo schedule, int chandaNo, String fullname, String localReceipt, String monthPaid,
                        float chandaAm, float wasiyyat, float jalsaSalana, float tarikiJadid,
                        float waqfJadid, float welfare, float scholarship, float maryam,
                        float tabligh, float zakat, float sadakat, float fitrana,
                        float mosqueDonation, float mta, float centinary, float wasiyyatHissan,
-                       float miscellaneous, float subtotal, int id) {
+                       float miscellaneous, float subtotal, long id) {
         mId = id;
         mChandaNo = chandaNo;
         setFullname(fullname);
@@ -69,7 +69,7 @@ public final class PaymentInfo {
                 0.0f,0.0f,0.0f,-1);
     }
 
-    public int getId() { return mId; }
+    public long getId() { return mId; }
 
     public int getChandaNo() {
         return mChandaNo;
