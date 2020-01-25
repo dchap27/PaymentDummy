@@ -327,6 +327,7 @@ public class PaymentActivity extends AppCompatActivity implements LoaderManager.
         mViewModel.mScheduleId = intent.getStringExtra(SCHEDULE_INFO);
         mViewModel.mSchedule = DataManager.getInstance().getSchedule(mViewModel.mScheduleId);
         mViewModel.mPaymentId = intent.getIntExtra(PAYMENT_ID, ID_NOT_SET);
+        mViewModel.getScheduleStatus(this, mViewModel.mScheduleId);
         mIsNewPayment = mViewModel.mPaymentId == ID_NOT_SET;
         if(mIsNewPayment){
             createNewPayment();
@@ -705,7 +706,7 @@ public class PaymentActivity extends AppCompatActivity implements LoaderManager.
         // get connection to the content provider
         Log.i(TAG, "Saving " + mViewModel.mPaymentUri + " to the database");
         getContentResolver().update(mViewModel.mPaymentUri, values, null, null);
-        if(mViewModel.mSchedule.isComplete()){
+        if(mViewModel.mScheduleStatus == 1){
             changeScheduleToDraft();
         }
 

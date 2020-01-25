@@ -31,6 +31,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.InputFilter;
+import android.text.Spanned;
 import android.util.Log;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
@@ -86,14 +87,16 @@ public class MainActivity extends RuntimePermissionsActivity
     private DataManager.LoadFromDatabase mLoadFromDatabase;
     private MainActivityViewModel mViewModel;
     private View mPopupDialogView;
-    private Button mSaveJamaatNameDialog;
-    private Button mCancelJamaatDialogAction;
-    private EditText mJamaatEditText;
+    private Button mSaveInputDialog;
+    private Button mCancelInputDialogAction;
+    private EditText mInputDialogEditText;
     private String mJamaatName;
     private SharedPreferences mSharedPref;
     private View mProgressView;
     private ProgressBar mProgressBar;
     private int mScheduleIdToWriteToCSV;
+    private TextView mDialogHelpText;
+    private boolean mAddInvoice;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -324,8 +327,6 @@ public class MainActivity extends RuntimePermissionsActivity
                 mProgressBar.setVisibility(View.GONE);
                 mDialog.cancel();
                 if(aBoolean) {
-                    ScheduleInfo schedule = DataManager.getInstance().getSchedule(mScheduleId);
-                    schedule.setComplete(true);
                     Snackbar.make(v, "Schedule successfully exported to /ChandaPay/"+mMonthId +"/"+mFileName,
                             Snackbar.LENGTH_LONG).show();
                 } else {
@@ -699,10 +700,10 @@ public class MainActivity extends RuntimePermissionsActivity
             alertDialog = alertDialogBuilder.create();
             alertDialog.show();
 
-            mSaveJamaatNameDialog.setOnClickListener(new View.OnClickListener() {
+            mSaveInputDialog.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    String jamaatName = mJamaatEditText.getText().toString().trim().toUpperCase();
+                    String jamaatName = mInputDialogEditText.getText().toString().trim().toUpperCase();
                     if(!jamaatName.isEmpty()) {
                         Set<String> allowedJamaats = mSharedPref.getStringSet(PreferenceKeys.MULTI_SELECT_JAMAAT_PREF,null);
                         String baseJamaat = mSharedPref.getString(PreferenceKeys.JAMAAT_NAME_PREF, "");
@@ -723,7 +724,7 @@ public class MainActivity extends RuntimePermissionsActivity
                     alertDialog.cancel();
                 }
             });
-            mCancelJamaatDialogAction.setOnClickListener(new View.OnClickListener() {
+            mCancelInputDialogAction.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     alertDialog.cancel();
@@ -798,17 +799,46 @@ public class MainActivity extends RuntimePermissionsActivity
 
     private void initializePopUpDialog(){
         LayoutInflater layoutInflater = LayoutInflater.from(MainActivity.this);
-        mPopupDialogView = layoutInflater.inflate(R.layout.jamaat_input_dialog, null);
-        mJamaatEditText = (EditText) mPopupDialogView.findViewById(R.id.popup_jamaat_edit_text);
-        mSaveJamaatNameDialog = (Button) mPopupDialogView.findViewById(R.id.save_input_dialog_jamaatname);
-        mCancelJamaatDialogAction = (Button) mPopupDialogView.findViewById(R.id.cancel_input_dialog_jamaatname);
+        mPopupDialogView = layoutInflater.inflate(R.layout.textinput_dialog, null);
+        mInputDialogEditText = (EditText) mPopupDialogView.findViewById(R.id.input_popup_edit_text);
+        mDialogHelpText = (TextView) mPopupDialogView.findViewById(R.id.help_text_message_input_dialog);
+        mSaveInputDialog = (Button) mPopupDialogView.findViewById(R.id.save_input_dialog_text);
+        mCancelInputDialogAction = (Button) mPopupDialogView.findViewById(R.id.cancel_input_dialog_text);
 
         // Apply the filters to control the input (alphanumeric)
-        ArrayList<InputFilter> curInputFilters = new ArrayList<InputFilter>(Arrays.asList(mJamaatEditText.getFilters()));
-        curInputFilters.add(0, new AlphaNumericInputFilter());
-        curInputFilters.add(1, new InputFilter.AllCaps());
-        InputFilter[] newInputFilters = curInputFilters.toArray(new InputFilter[curInputFilters.size()]);
-        mJamaatEditText.setFilters(newInputFilters);
+        ArrayList<InputFilter> curInputFilters = new ArrayList<InputFilter>(Arrays.asList(mInputDialogEditText.getFilters()));
+        if(mAddInvoice) {
+            mInputDialogEditText.setHint(getString(R.string.add_invoice_no));
+            curInputFilters.add(0, new InputFilter.AllCaps());
+            curInputFilters.add(1, new InputFilter() {
+                @Override
+                public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {
+                    // Keep only alphabetic and Numeric characters
+                    StringBuilder builder = new StringBuilder();
+                    for(int i = start; i < end; i++){
+                        char c = source.charAt(i);
+                        if(Character.isLetter(c)){
+                            builder.append(c);
+                        } else if(Character.isDigit(c)) {
+                            builder.append(c);
+                        }
+                    }
+                    // if all characters are valid return null, otherwise return filtered characters
+                    boolean allCharactersValid = (builder.length() == end - start);
+
+                    return allCharactersValid ? null : builder.toString();
+                }
+            });
+            InputFilter[] newInputFilters = curInputFilters.toArray(new InputFilter[curInputFilters.size()]);
+            mInputDialogEditText.setFilters(newInputFilters);
+        }else{
+            mDialogHelpText.setText((R.string.jamaat_input_type_help));
+            mInputDialogEditText.setHint(getString(R.string.jamaat_name_hint));
+            curInputFilters.add(0, new AlphaNumericInputFilter());
+            curInputFilters.add(1, new InputFilter.AllCaps());
+            InputFilter[] newInputFilters = curInputFilters.toArray(new InputFilter[curInputFilters.size()]);
+            mInputDialogEditText.setFilters(newInputFilters);
+        }
     }
     private void initialiseProgressDialog(int progressBarId){
         LayoutInflater layoutInflater = LayoutInflater.from(MainActivity.this);
@@ -965,12 +995,15 @@ public class MainActivity extends RuntimePermissionsActivity
         public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
             MenuItem edit_menu = menu.findItem(R.id.edit_schedule);
             MenuItem export_menu = menu.findItem(R.id.export_schedule);
+            MenuItem invoice_menu = menu.findItem(R.id.add_invoice_menu);
             if(mScheduleRecyclerAdapter.getSelectedItemCount() == 1){
                 edit_menu.setEnabled(true);
                 export_menu.setEnabled(true);
+                invoice_menu.setEnabled(true);
             } else {
                 edit_menu.setEnabled(false);
                 export_menu.setEnabled(false);
+                invoice_menu.setEnabled(false);
             }
             return false;
         }
@@ -994,6 +1027,11 @@ public class MainActivity extends RuntimePermissionsActivity
                     exportSchedule();
                     mode.finish();
                     return true;
+                case R.id.add_invoice_menu:
+                    Log.d(TAG, "Invoice");
+                    addInvoiceNumber();
+                    mode.finish();
+                    return true;
             }
             return false;
         }
@@ -1004,6 +1042,61 @@ public class MainActivity extends RuntimePermissionsActivity
             mActionMode = null;
 
         }
+    }
+
+    private void addInvoiceNumber() {
+        mAddInvoice = true;
+        final View view = findViewById(R.id.list_schedules);
+        List selectedItemPositions = mScheduleRecyclerAdapter.getSelectedItems();
+        final long scheduleCursorID = mScheduleRecyclerAdapter.getScheduleCursorID((Integer) selectedItemPositions.get(0));
+        ScheduleInfo schedule = DataManager.getInstance().getSchedule(scheduleCursorID);
+        if(!schedule.isComplete()){
+            Snackbar.make(view, "You can only add invoice number for exported schedule", Snackbar.LENGTH_LONG).show();
+            return;
+        }
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+        initializePopUpDialog();
+        alertDialogBuilder.setView(mPopupDialogView);
+        String dialogTitle = "Add invoice number";
+        alertDialogBuilder.setTitle(dialogTitle);
+        alertDialogBuilder.setCancelable(false);
+        final AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.show();
+        mSaveInputDialog.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                String invoiceNumber = mInputDialogEditText.getText().toString().trim();
+                if(!invoiceNumber.startsWith("JMT")){
+                    Snackbar.make(view, "Invalid invoice number "+ invoiceNumber, Snackbar.LENGTH_LONG).show();
+                    alertDialog.cancel();
+                    return;
+                }
+                ContentValues values = new ContentValues();
+                values.put(PaymentProviderContract.Schedules.COLUMN_SCHEDULE_INVOICE, invoiceNumber);
+                values.put(PaymentProviderContract.Schedules.COLUMN_SCHEDULE_ISCOMPLETE, 2);
+                AsyncTask<ContentValues, Void, Void> task = new AsyncTask<ContentValues, Void, Void>() {
+                    @Override
+                    protected Void doInBackground(ContentValues... contentValues) {
+                        ContentValues values = contentValues[0];
+                        Uri scheduleUri = ContentUris.withAppendedId(PaymentProviderContract.Schedules.CONTENT_URI, scheduleCursorID);
+                        Log.d(TAG, "Updating the invoice number for "+ scheduleUri);
+                        getContentResolver().update(scheduleUri, values, null, null);
+                        return null;
+                    }
+                };
+                task.execute(values);
+                mScheduleRecyclerAdapter.notifyDataSetChanged();
+            }
+        });
+        mCancelInputDialogAction.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                alertDialog.cancel();
+            }
+        });
+        mActionMode = null;
+        mAddInvoice = false;
     }
 
     private void exportSchedule() {

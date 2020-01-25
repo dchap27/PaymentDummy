@@ -82,7 +82,7 @@
     <string name="schedule_title_hint">Schedule Title</string>
     <string name="jamaat_name_hint">Jamaat Name</string>
     <string name="menu_edit_item">Edit</string>
-    <string name="selected_item_count"> Selected item</string>
+    <string name="selected_item_count"> selected</string>
     <string name="runtime_permissions_read_storage">
         Chanda App needs storage access permissions to update members list/info</string>
     <string name="runtime_permissions_write_storage">
@@ -137,8 +137,9 @@
     <string name="message_warning_update_jamaat">Are you sure you want to update list for %s</string>
     <string name="loading_message">please wait ...</string>
     <string name="pref_member_id">Member ID</string>
-    <string name="input_type_help">Hint: use underscore ( _ ) for spaces or hyphen</string>
+    <string name="jamaat_input_type_help">Hint: use underscore ( _ ) for spaces or hyphen</string>
     <string name="for_all">Payment month(s)</string>
+    <string name="add_invoice_no">Enter invoice number</string>
     <string-array name="pref_entries_jamaat_list">
         <item>Agbokojo</item>
         <item>Anfani</item>

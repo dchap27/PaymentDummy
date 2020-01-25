@@ -24,4 +24,5 @@ public class AlphaNumericInputFilter implements InputFilter {
 
         return allCharactersValid ? null : builder.toString();
     }
+
 }

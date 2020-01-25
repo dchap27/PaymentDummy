@@ -16,4 +16,7 @@
         android:icon="@android:drawable/ic_menu_delete"
         android:title="delete"
         app:showAsAction="always" />
+    <item
+        android:id="@+id/add_invoice_menu"
+        android:title="@string/add_invoice_no" />
 </menu>

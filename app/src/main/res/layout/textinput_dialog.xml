@@ -23,14 +23,14 @@
             android:orientation="horizontal">
 
             <EditText
-                android:id="@+id/popup_jamaat_edit_text"
+                android:id="@+id/input_popup_edit_text"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
                 android:layout_marginStart="8dp"
                 android:layout_weight="1"
                 android:ems="10"
-                android:hint="@string/jamaat_name_hint" />
+                />
         </TableRow>
 
         <TextView
@@ -45,14 +45,13 @@
             android:paddingLeft="24dp"
             android:paddingTop="0dp"
             android:selectAllOnFocus="false"
-            android:text="@string/input_type_help"
             android:textSize="12sp" />
 
         <TableRow
             android:gravity="center_horizontal">
 
             <Button
-                android:id="@+id/save_input_dialog_jamaatname"
+                android:id="@+id/save_input_dialog_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="center_horizontal"
@@ -61,7 +60,7 @@
                 android:text="OK" />
 
             <Button
-                android:id="@+id/cancel_input_dialog_jamaatname"
+                android:id="@+id/cancel_input_dialog_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="center_horizontal"

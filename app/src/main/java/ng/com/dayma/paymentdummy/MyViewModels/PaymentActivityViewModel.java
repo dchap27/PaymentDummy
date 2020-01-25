@@ -1,6 +1,8 @@
 package ng.com.dayma.paymentdummy.MyViewModels;
 
 import android.arch.lifecycle.ViewModel;
+import android.content.Context;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -9,6 +11,7 @@ import java.util.ArrayList;
 import ng.com.dayma.paymentdummy.DataManager;
 import ng.com.dayma.paymentdummy.PaymentInfo;
 import ng.com.dayma.paymentdummy.ScheduleInfo;
+import ng.com.dayma.paymentdummy.data.PaymentProviderContract;
 
 public class PaymentActivityViewModel extends ViewModel {
 
@@ -66,6 +69,7 @@ public class PaymentActivityViewModel extends ViewModel {
     private float mOriginalPaymentWasiyyatHissan;
     private float mOriginalPaymentJalsaSalana;
     private String mOriginalScheduleId;
+    public int mScheduleStatus;
 
     public void saveOriginalPaymentValues() {
         if(isNewlyCreated){
@@ -149,5 +153,20 @@ public class PaymentActivityViewModel extends ViewModel {
         mOriginalPaymentWasiyyatHissan = Float.parseFloat(savedInstanceState.getString(ORIGINAL_PAYMENT_WASIYYATHISSAN));
         String StringPaymentUri = savedInstanceState.getString(PAYMENT_URI);
         mPaymentUri = Uri.parse(StringPaymentUri);
+    }
+
+    public void getScheduleStatus(Context context, String scheduleId){
+        Uri uri = PaymentProviderContract.Schedules.CONTENT_URI;
+        String[] projection = {PaymentProviderContract.Schedules.COLUMN_SCHEDULE_ID,
+                PaymentProviderContract.Schedules.COLUMN_SCHEDULE_ISCOMPLETE};
+        String selection = PaymentProviderContract.Schedules.COLUMN_SCHEDULE_ID + "=?";
+        String[] selectionArgs = {scheduleId };
+        Cursor cursor = context.getContentResolver().query(uri, projection, selection, selectionArgs,null);
+        if(cursor.moveToNext()){
+            int statusPos = cursor.getColumnIndex(PaymentProviderContract.Schedules.COLUMN_SCHEDULE_ISCOMPLETE);
+            int status = cursor.getInt(statusPos);
+            mScheduleStatus = status;
+        }
+        cursor.close();
     }
 }

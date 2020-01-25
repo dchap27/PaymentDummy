@@ -28,8 +28,6 @@ public class DataManager {
     public static DataManager getInstance() {
         if(ourInstance == null){
             ourInstance = new DataManager();
-//            ourInstance.initializeMonths();
-//            ourInstance.initializeExamplePayments();
         }
         return ourInstance;
     }
@@ -186,7 +184,7 @@ public class DataManager {
             String jamaat = cursor.getString(jamaatPos);
             int completionStatus = cursor.getInt(completionstatusPos);
             int id = cursor.getInt(idPos);
-            if (completionStatus >= 1){
+            if (completionStatus == 2){
                 status = true;
             }
 
@@ -290,7 +288,7 @@ public class DataManager {
         return null;
     }
 
-    public ScheduleInfo getSchedule(int id){
+    public ScheduleInfo getSchedule(long id){
         for(ScheduleInfo schedule : mSchedules){
             if(id ==(schedule.getId()))
                 return schedule;

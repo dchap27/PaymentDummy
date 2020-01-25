@@ -103,10 +103,15 @@ public class PaymentRecyclerAdapter extends RecyclerView.Adapter<PaymentRecycler
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent intent = new Intent(mContext, PaymentActivity.class);
-                    intent.putExtra(PaymentActivity.PAYMENT_ID, mId);
-                    intent.putExtra(PaymentActivity.SCHEDULE_INFO, mScheduleId);
-                    mContext.startActivity(intent);
+                    ScheduleInfo schedule = DataManager.getInstance().getSchedule(mScheduleId);
+                    if(schedule.isComplete()){
+                        // do something
+                    }else {
+                        Intent intent = new Intent(mContext, PaymentActivity.class);
+                        intent.putExtra(PaymentActivity.PAYMENT_ID, mId);
+                        intent.putExtra(PaymentActivity.SCHEDULE_INFO, mScheduleId);
+                        mContext.startActivity(intent);
+                    }
                 }
             });
         }
