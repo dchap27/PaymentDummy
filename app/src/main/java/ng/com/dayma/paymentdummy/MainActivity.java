@@ -1065,28 +1065,66 @@ public class MainActivity extends RuntimePermissionsActivity
 
             @Override
             public void onClick(View v) {
-                String invoiceNumber = mInputDialogEditText.getText().toString().trim();
+                final String invoiceNumber = mInputDialogEditText.getText().toString().trim();
                 boolean invalidInvoice = checkInvoiceCharacters(invoiceNumber);
                 if(invalidInvoice){
                     Snackbar.make(view, "Invalid invoice number "+ invoiceNumber, Snackbar.LENGTH_SHORT).show();
                     return;
                 }
+                checkInvoiceExistBeforeAdding(invoiceNumber);
+                mScheduleRecyclerAdapter.notifyDataSetChanged();
+                alertDialog.cancel();
+            }
+
+            private void checkInvoiceExistBeforeAdding(final String invoiceNumber) {
                 ContentValues values = new ContentValues();
                 values.put(PaymentProviderContract.Schedules.COLUMN_SCHEDULE_INVOICE, invoiceNumber);
                 values.put(PaymentProviderContract.Schedules.COLUMN_SCHEDULE_ISCOMPLETE, 2);
-                AsyncTask<ContentValues, Void, Void> task = new AsyncTask<ContentValues, Void, Void>() {
+                AsyncTask<ContentValues, Void, String[]> task = new AsyncTask<ContentValues, Void, String[] >() {
+
+                    private String mScheduleId;
+
                     @Override
-                    protected Void doInBackground(ContentValues... contentValues) {
+                    protected String[] doInBackground(ContentValues... contentValues) {
+
+                        String[] projection = { PaymentProviderContract.Schedules.COLUMN_SCHEDULE_INVOICE,
+                                PaymentProviderContract.Schedules.COLUMN_SCHEDULE_ID,
+                                PaymentProviderContract.Schedules.COLUMN_SCHEDULE_TITLE
+                        };
+                        String selection = PaymentProviderContract.Schedules.COLUMN_SCHEDULE_INVOICE + "=?";
+                        String[] selectionArgs = { invoiceNumber };
+                        Cursor cursor = getContentResolver().query(PaymentProviderContract.Schedules.CONTENT_URI,
+                                projection,selection,selectionArgs,null);
+                        if(cursor.getCount() > 0){
+                            cursor.moveToFirst();
+                            int scheduleIdPos = cursor.getColumnIndex(PaymentProviderContract.Schedules.COLUMN_SCHEDULE_ID);
+                            int scheduleInvoicePos = cursor.getColumnIndex(PaymentProviderContract.Schedules.COLUMN_SCHEDULE_INVOICE);
+                            int scheduleTitlePos = cursor.getColumnIndex(PaymentProviderContract.Schedules.COLUMN_SCHEDULE_TITLE);
+
+                            mScheduleId = cursor.getString(scheduleIdPos);
+                            String scheduleTitle = cursor.getString(scheduleTitlePos);
+                            String scheduleInvoice = cursor.getString(scheduleInvoicePos);
+                            cursor.close();
+                            return new String[]{mScheduleId, scheduleTitle, scheduleInvoice};
+                        }
                         ContentValues values = contentValues[0];
                         Uri scheduleUri = ContentUris.withAppendedId(PaymentProviderContract.Schedules.CONTENT_URI, scheduleCursorID);
-                        Log.d(TAG, "Updating the invoice number for "+ scheduleUri);
+                        Log.d(TAG, "Updating the invoice number for " + scheduleUri);
                         getContentResolver().update(scheduleUri, values, null, null);
                         return null;
                     }
+
+                    @Override
+                    protected void onPostExecute(String[] strings) {
+                        if(strings != null){
+                            Snackbar.make(view, "Invoice "+invoiceNumber+" already exist for "+
+                                    mScheduleId, Snackbar.LENGTH_LONG);
+                        }else {
+                            Snackbar.make(view, "Invoice " + invoiceNumber + " added", Snackbar.LENGTH_LONG);
+                        }
+                    }
                 };
                 task.execute(values);
-                mScheduleRecyclerAdapter.notifyDataSetChanged();
-                alertDialog.cancel();
             }
 
             private boolean checkInvoiceCharacters(String invoiceNumber) {
