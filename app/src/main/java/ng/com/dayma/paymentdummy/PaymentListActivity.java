@@ -197,7 +197,6 @@ public class PaymentListActivity extends AppCompatActivity implements LoaderMana
     private void showPaymentSummary(long id){
         PaymentInfo payment = DataManager.getInstance().getPayment(id);
         initialisePopuDialog();
-
     }
 
     private ArrayList getPaymentDetails(final long id) {

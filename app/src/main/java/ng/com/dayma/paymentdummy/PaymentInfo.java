@@ -1,5 +1,8 @@
 package ng.com.dayma.paymentdummy;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by Ahmad on 7/12/2019.
  */
@@ -288,5 +291,33 @@ public final class PaymentInfo {
 
     public void setMta(float mta) {
         mMta = mta;
+    }
+
+    public List getPaymentCategories(){
+
+        ArrayList categories = new ArrayList();
+
+        categories.add(0, mFullname);
+        categories.add(1,mLocalReceipt);
+        categories.add(2,mMonthPaid);
+        if(mChandaNo > 0){ categories.add(mChandaNo);}
+        if(mWasiyyat > 0){ categories.add(mWasiyyat);}
+        if(mJalsaSalana > 0){ categories.add(mJalsaSalana);}
+        if(mTahrikJadid > 0){ categories.add(mTahrikJadid);}
+        if(mWaqfJadid > 0){ categories.add(mWaqfJadid);}
+        if(mWelfare > 0){ categories.add(mWelfare);}
+        if(mScholarship > 0){ categories.add(mScholarship);}
+        if(mMaryam > 0){ categories.add(mMaryam);}
+        if(mTabligh > 0){ categories.add(mTabligh);}
+        if(mZakat > 0){ categories.add(mZakat);}
+        if(mSadakat > 0){ categories.add(mSadakat);}
+        if(mFitrana > 0){ categories.add(mFitrana);}
+        if(mMosqueDonation > 0){ categories.add(mMosqueDonation);}
+        if(mMta > 0){ categories.add(mMta);}
+        if(mCentinary > 0){ categories.add(mCentinary);}
+        if(mWasiyyatHissan > 0){ categories.add(mWasiyyatHissan);}
+        if(mMiscellaneous > 0){ categories.add(mMiscellaneous);}
+        categories.add(mSubtotal);
+        return categories;
     }
 }
