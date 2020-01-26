@@ -293,31 +293,31 @@ public final class PaymentInfo {
         mMta = mta;
     }
 
-    public List getPaymentCategories(){
+    public List<String[]> getPaymentCategories(){
 
         ArrayList categories = new ArrayList();
 
-        categories.add(0, mFullname);
-        categories.add(1,mLocalReceipt);
-        categories.add(2,mMonthPaid);
-        if(mChandaNo > 0){ categories.add(mChandaNo);}
-        if(mWasiyyat > 0){ categories.add(mWasiyyat);}
-        if(mJalsaSalana > 0){ categories.add(mJalsaSalana);}
-        if(mTahrikJadid > 0){ categories.add(mTahrikJadid);}
-        if(mWaqfJadid > 0){ categories.add(mWaqfJadid);}
-        if(mWelfare > 0){ categories.add(mWelfare);}
-        if(mScholarship > 0){ categories.add(mScholarship);}
-        if(mMaryam > 0){ categories.add(mMaryam);}
-        if(mTabligh > 0){ categories.add(mTabligh);}
-        if(mZakat > 0){ categories.add(mZakat);}
-        if(mSadakat > 0){ categories.add(mSadakat);}
-        if(mFitrana > 0){ categories.add(mFitrana);}
-        if(mMosqueDonation > 0){ categories.add(mMosqueDonation);}
-        if(mMta > 0){ categories.add(mMta);}
-        if(mCentinary > 0){ categories.add(mCentinary);}
-        if(mWasiyyatHissan > 0){ categories.add(mWasiyyatHissan);}
-        if(mMiscellaneous > 0){ categories.add(mMiscellaneous);}
-        categories.add(mSubtotal);
+        categories.add(0, new String[]{"Fullname",mFullname});
+        categories.add(1,new String[]{"Receipt Number",mLocalReceipt});
+        categories.add(2,new String[] {"Month Paid", mMonthPaid});
+        if(mChandaAm > 0){ categories.add(new String[]{"Chanda No",String.valueOf(mChandaAm)});}
+        if(mWasiyyat > 0){ categories.add(new String[]{"Wasiyyat",String.valueOf(mWasiyyat)});}
+        if(mJalsaSalana > 0){ categories.add(new String[]{"Jalsa Salana", String.valueOf(mJalsaSalana)});}
+        if(mTahrikJadid > 0){ categories.add(new String[]{"Tahrik Jadid", String.valueOf(mTahrikJadid)});}
+        if(mWaqfJadid > 0){ categories.add(new String[]{"Waqf Jadid", String.valueOf(mWaqfJadid)});}
+        if(mWelfare > 0){ categories.add(new String[]{"Welfare", String.valueOf(mWelfare)});}
+        if(mScholarship > 0){ categories.add(new String[]{"Scholarship", String.valueOf(mScholarship)});}
+        if(mMaryam > 0){ categories.add(new String[]{"Maryam Fund", String.valueOf(mMaryam)});}
+        if(mTabligh > 0){ categories.add(new String[]{"Tabligh", String.valueOf(mTabligh)});}
+        if(mZakat > 0){ categories.add(new String[]{"Zakat", String.valueOf(mZakat)});}
+        if(mSadakat > 0){ categories.add(new String[]{"Sadakat", String.valueOf(mSadakat)});}
+        if(mFitrana > 0){ categories.add(new String[]{"Fitrana", String.valueOf(mFitrana)});}
+        if(mMosqueDonation > 0){ categories.add(new String[]{"Mosque Donation",String.valueOf(mMosqueDonation)});}
+        if(mMta > 0){ categories.add(new String[]{"Mta", String.valueOf(mMta)});}
+        if(mCentinary > 0){ categories.add(new String[]{"Centinary Fund", String.valueOf(mCentinary)});}
+        if(mWasiyyatHissan > 0){ categories.add(new String[]{"Wasiyyat Hissan", String.valueOf(mWasiyyatHissan)});}
+        if(mMiscellaneous > 0){ categories.add(new String[]{"Miscellaneous", String.valueOf(mMiscellaneous)});}
+        categories.add(new String[]{"Total", String.valueOf(mSubtotal)});
         return categories;
     }
 }
