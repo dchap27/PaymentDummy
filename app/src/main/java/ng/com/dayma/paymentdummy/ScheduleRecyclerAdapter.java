@@ -228,13 +228,16 @@ public class ScheduleRecyclerAdapter extends RecyclerView.Adapter<ScheduleRecycl
 
     @Override
     public boolean onSingleTapUp(MotionEvent e) {
+        if(!mListener.onSingleClick()) {
 
-        Log.d("onSingleTapUp", "create intent PaymentListActivity");
-        Intent intent = new Intent(mContext, PaymentListActivity.class);
-        intent.putExtra(PaymentListActivity.SCHEDULE_ID, mSelectedHolder.mScheduleId);
-        mContext.startActivity(intent);
+            Log.d("onSingleTapUp", "create intent PaymentListActivity");
+            Intent intent = new Intent(mContext, PaymentListActivity.class);
+            intent.putExtra(PaymentListActivity.SCHEDULE_ID, mSelectedHolder.mScheduleId);
+            mContext.startActivity(intent);
+        } else{
+            mListener.onItemClicked(mSelectedHolder.getAdapterPosition(), mSelectedHolder.mId);
+        }
 //        Snackbar.make(v, mScheduleTitle.getText(), Snackbar.LENGTH_LONG).show();
-
         return true;
     }
 
