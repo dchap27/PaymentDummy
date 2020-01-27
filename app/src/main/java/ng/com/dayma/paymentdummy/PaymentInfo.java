@@ -300,7 +300,7 @@ public final class PaymentInfo {
         categories.add(0, new String[]{"Fullname",mFullname});
         categories.add(1,new String[]{"Receipt Number",mLocalReceipt});
         categories.add(2,new String[] {"Month Paid", mMonthPaid});
-        if(mChandaAm > 0){ categories.add(new String[]{"Chanda No",String.valueOf(mChandaAm)});}
+        if(mChandaAm > 0){ categories.add(new String[]{"Chanda aAm",String.valueOf(mChandaAm)});}
         if(mWasiyyat > 0){ categories.add(new String[]{"Wasiyyat",String.valueOf(mWasiyyat)});}
         if(mJalsaSalana > 0){ categories.add(new String[]{"Jalsa Salana", String.valueOf(mJalsaSalana)});}
         if(mTahrikJadid > 0){ categories.add(new String[]{"Tahrik Jadid", String.valueOf(mTahrikJadid)});}

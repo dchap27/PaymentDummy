@@ -5,6 +5,7 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.CursorLoader;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
@@ -13,6 +14,8 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -21,6 +24,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -75,10 +79,14 @@ public class PaymentListActivity extends AppCompatActivity implements LoaderMana
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(PaymentListActivity.this, PaymentActivity.class);
-                intent.putExtra(PaymentActivity.SCHEDULE_INFO, mViewModel.getScheduleId());
-                // open PaymentActivity as intent for new payment
-                startActivity(intent);
+                if(!mSchedule.isComplete()) {
+                    Intent intent = new Intent(PaymentListActivity.this, PaymentActivity.class);
+                    intent.putExtra(PaymentActivity.SCHEDULE_INFO, mViewModel.getScheduleId());
+                    // open PaymentActivity as intent for new payment
+                    startActivity(intent);
+                }else {
+                    Snackbar.make(view, "You cannot edit a complete schedule", Snackbar.LENGTH_LONG).show();
+                }
             }
         });
 
@@ -88,8 +96,6 @@ public class PaymentListActivity extends AppCompatActivity implements LoaderMana
         Intent intent = getIntent();
         //get value that was put into the intent
         mScheID = intent.getStringExtra(SCHEDULE_ID);
-//        mSchedule = DataManager.getInstance().getSchedule(mScheID);
-//        mId = mSchedule.getId();
     }
 
     @Override
@@ -196,19 +202,41 @@ public class PaymentListActivity extends AppCompatActivity implements LoaderMana
 
     private void showPaymentSummary(long id){
         PaymentInfo payment = DataManager.getInstance().getPayment(id);
-        initialisePopuDialog();
+        List<String[]> categories = payment.getPaymentCategories();
+        initialisePopuDialog(categories);
+        final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+        alertDialogBuilder.setCancelable(false);
+        alertDialogBuilder.setView(mPopupDialogView);
+        alertDialogBuilder.setTitle("Payment Summary");
+        alertDialogBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+        AlertDialog dialog = alertDialogBuilder.create();
+        dialog.show();
     }
 
-    private ArrayList getPaymentDetails(final long id) {
-
-        return null;
-    }
-
-    private void initialisePopuDialog() {
+    private void initialisePopuDialog(List<String[]> items) {
         LayoutInflater layoutInflater = LayoutInflater.from(PaymentListActivity.this);
         mPopupDialogView = layoutInflater.inflate(R.layout.payment_summary, null);
-        LinearLayout parentView = (LinearLayout) findViewById(R.id.summary_payment_parent_view);
-//        mInputDialogEditText = (EditText) mPopupDialogView.findViewById(R.id.input_popup_edit_text);
+        LinearLayout parentView = (LinearLayout) mPopupDialogView.findViewById(R.id.summary_payment_parent_view);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT);
+
+        params.setMargins(16,8,16,8);
+        for(String[] value: items){
+            LinearLayout linearLayout = new LinearLayout(this);
+            linearLayout.setOrientation(LinearLayout.HORIZONTAL);
+            parentView.addView(linearLayout);
+            for(int i=0;i<value.length;i++) {
+                TextView textView = new TextView(this);
+                textView.setText(value[i]);
+                textView.setLayoutParams(params);
+                linearLayout.addView(textView);
+            }
+        }
     }
 
     @Override
