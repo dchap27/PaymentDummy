@@ -150,8 +150,9 @@ public class MonthRecyclerAdapter extends RecyclerView.Adapter<MonthRecyclerAdap
         String[] scheduleSelectionArgs = {mSelectedHolder.mMonthId};
         Cursor scheduleCursor = mContext.getContentResolver().query(PaymentProviderContract.Schedules.CONTENT_URI,
                 scheduleProjection, scheduleSelection, scheduleSelectionArgs, null);
-        while(scheduleCursor.moveToNext()){
-            int scheduleIdPos = scheduleCursor.getColumnIndex(PaymentProviderContract.Schedules.COLUMN_SCHEDULE_ID);
+        int scheduleIdPos = scheduleCursor.getColumnIndex(PaymentProviderContract.Schedules.COLUMN_SCHEDULE_ID);
+        boolean more = scheduleCursor.moveToFirst();
+        while (more) {
             String scheduleId = scheduleCursor.getString(scheduleIdPos);
             // delete payment with scheduleId
             String paymentSelection = PaymentProviderContract.Payments.COLUMN_SCHEDULE_ID + "=?";
@@ -159,11 +160,13 @@ public class MonthRecyclerAdapter extends RecyclerView.Adapter<MonthRecyclerAdap
             Log.d(TAG, "Deleting payment "+ scheduleId);
             mContext.getContentResolver().delete(PaymentProviderContract.Payments.CONTENT_URI, paymentSelection,
                     paymentSelectionArgs);
-        };
+            more = scheduleCursor.moveToNext();
+        }
         scheduleCursor.close();
         // delete Schedule
         Log.d(TAG, "Deleting schedule "+ mSelectedHolder.mMonthId);
-        mContext.getContentResolver().delete(PaymentProviderContract.Schedules.CONTENT_URI, scheduleSelection, scheduleSelectionArgs);
+        int numOfSchedules = mContext.getContentResolver().delete(
+                PaymentProviderContract.Schedules.CONTENT_URI, scheduleSelection, scheduleSelectionArgs);
         // delete Month from MONTH_TABLE
         Uri mMonthUri = ContentUris.withAppendedId(PaymentProviderContract.Months.CONTENT_URI, mSelectedHolder.mId);
         Log.d(TAG, "Deleting Month "+ mMonthUri);

@@ -1248,7 +1248,6 @@ public class MainActivity extends RuntimePermissionsActivity
             mScheduleRecyclerAdapter.removeData((Integer) selectedItemPositions.get(i));
         }
         mScheduleRecyclerAdapter.notifyDataSetChanged();
-        mLoadFromDatabase.execute(this);
         Log.d(TAG, "done deleting");
         mActionMode = null;
     }

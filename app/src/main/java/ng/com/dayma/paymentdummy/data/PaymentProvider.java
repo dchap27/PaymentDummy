@@ -59,8 +59,8 @@ public class PaymentProvider extends ContentProvider {
     @Override
     public int delete(Uri uri, String selection, String[] selectionArgs) {
         long rowId = -1;
-        String rowSelection = null;
-        String[] rowSelectionArgs = null;
+        String rowSelection = selection;
+        String[] rowSelectionArgs = selectionArgs;
         int nRows = -1;
         SQLiteDatabase db = mDbOpenHelper.getReadableDatabase();
         int uriMatch = sUriMatcher.match(uri);
