@@ -122,6 +122,9 @@ public class MainActivity extends RuntimePermissionsActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if(mActionMode != null) {
+                    mActionMode.finish();
+                }
                 String isFirstLoad = mSharedPref.getString(PreferenceKeys.JAMAAT_INFO_FIRST_LOAD, null);
                 if(isFirstLoad != null) {
                     Intent intent = new Intent(MainActivity.this, ScheduleActivity.class);
@@ -632,6 +635,10 @@ public class MainActivity extends RuntimePermissionsActivity
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
+        // Disable actionMode if already enabled
+        if(mActionMode != null) {
+            mActionMode.finish();
+        }
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
@@ -652,6 +659,9 @@ public class MainActivity extends RuntimePermissionsActivity
     }
 
     private void openSettingsActivity() {
+        if(mActionMode != null) {
+            mActionMode.finish();
+        }
         startActivity(new Intent(MainActivity.this, SettingsActivity.class));
     }
 
