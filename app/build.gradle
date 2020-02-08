@@ -12,12 +12,12 @@ keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 // create versioning formula
 ext {
     versionMajor = 1
-    versionMinor = 0
+    versionMinor = 1
     versionPatch = 4
     screenSize = 0
     minimumSdkVersion = 18
     versionClassifier = null
-    isSnapShot = true
+    isSnapShot = false
 }
 
 android {
