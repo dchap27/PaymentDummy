@@ -3,6 +3,9 @@ package ng.com.dayma.paymentdummy;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by Ahmad on 7/12/2019.
  */
@@ -123,4 +126,69 @@ public final class ScheduleInfo implements Parcelable {
             };
 
     public long getId() { return mId; }
+
+    public List<String[]> getScheduleCategories(List<PaymentInfo> payments, String invoiceNumber){
+
+        ArrayList categories = new ArrayList();
+        double chandaAm = 0;
+        double wasiyyat = 0;
+        double jalsaSalana = 0;
+        double tahrikJadid = 0;
+        double waqfJadid = 0;
+        double welfare = 0;
+        double scholarship = 0;
+        double maryam = 0;
+        double tabligh = 0;
+        double zakat = 0;
+        double sadakat = 0;
+        double fitrana = 0;
+        double mosqueDonation = 0;
+        double mta = 0;
+        double centinary = 0;
+        double wasiyyatHissan = 0;
+        double miscellaneous = 0;
+        double total = 0;
+
+        for(PaymentInfo paymentInfo : payments){
+            chandaAm += paymentInfo.getChandaAm();
+            wasiyyat += paymentInfo.getWasiyyat();
+            jalsaSalana += paymentInfo.getJalsaSalana();
+            tahrikJadid += paymentInfo.getTahrikJadid();
+            waqfJadid += paymentInfo.getWaqfJadid();
+            scholarship += paymentInfo.getScholarship();
+            maryam += paymentInfo.getMaryam();
+            tabligh += paymentInfo.getTabligh();
+            zakat += paymentInfo.getZakat();
+            sadakat += paymentInfo.getSadakat();
+            fitrana += paymentInfo.getFitrana();
+            mosqueDonation += paymentInfo.getMosqueDonation();
+            mta += paymentInfo.getMta();
+            centinary += paymentInfo.getCentinary();
+            wasiyyatHissan += paymentInfo.getWasiyyatHissan();
+            miscellaneous += paymentInfo.getMiscellaneous();
+            total += paymentInfo.getSubtotal();
+        }
+        categories.add(0, new String[]{" ",mTitle});
+        categories.add(1,new String[] {"Month Paid", mMonth.getMonthId()});
+        categories.add(2,new String[] {"Invoice number", invoiceNumber});
+        if(chandaAm > 0){ categories.add(new String[]{"Chanda aAm",String.valueOf(chandaAm)});}
+        if(wasiyyat > 0){ categories.add(new String[]{"Wasiyyat",String.valueOf(wasiyyat)});}
+        if(jalsaSalana > 0){ categories.add(new String[]{"Jalsa Salana", String.valueOf(jalsaSalana)});}
+        if(tahrikJadid > 0){ categories.add(new String[]{"Tahrik Jadid", String.valueOf(tahrikJadid)});}
+        if(waqfJadid > 0){ categories.add(new String[]{"Waqf Jadid", String.valueOf(waqfJadid)});}
+        if(welfare > 0){ categories.add(new String[]{"Welfare", String.valueOf(welfare)});}
+        if(scholarship > 0){ categories.add(new String[]{"Scholarship", String.valueOf(scholarship)});}
+        if(maryam > 0){ categories.add(new String[]{"Maryam Fund", String.valueOf(maryam)});}
+        if(tabligh > 0){ categories.add(new String[]{"Tabligh", String.valueOf(tabligh)});}
+        if(zakat > 0){ categories.add(new String[]{"Zakat", String.valueOf(zakat)});}
+        if(sadakat > 0){ categories.add(new String[]{"Sadakat", String.valueOf(sadakat)});}
+        if(fitrana > 0){ categories.add(new String[]{"Fitrana", String.valueOf(fitrana)});}
+        if(mosqueDonation > 0){ categories.add(new String[]{"Mosque Donation",String.valueOf(mosqueDonation)});}
+        if(mta > 0){ categories.add(new String[]{"Mta", String.valueOf(mta)});}
+        if(centinary > 0){ categories.add(new String[]{"Centinary Fund", String.valueOf(centinary)});}
+        if(wasiyyatHissan > 0){ categories.add(new String[]{"Wasiyyat Hissan", String.valueOf(wasiyyatHissan)});}
+        if(miscellaneous > 0){ categories.add(new String[]{"Miscellaneous", String.valueOf(miscellaneous)});}
+        categories.add(new String[]{"Total", String.valueOf(total)});
+        return categories;
+    }
 }

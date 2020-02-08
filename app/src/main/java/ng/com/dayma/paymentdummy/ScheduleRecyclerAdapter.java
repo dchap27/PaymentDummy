@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.net.Uri;
+import android.support.design.widget.Snackbar;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.util.SparseBooleanArray;
@@ -182,7 +183,7 @@ public class ScheduleRecyclerAdapter extends RecyclerView.Adapter<ScheduleRecycl
             holder.mTextCompletionStatus.setTextColor(Color.BLUE);
         } else{
             completion = "Completed";
-            holder.mTextCompletionStatus.setTextColor(Color.GREEN);
+            holder.mTextCompletionStatus.setTextColor(Color.MAGENTA);
         }
 
         holder.mScheduleTitle.setText(title);
@@ -235,9 +236,13 @@ public class ScheduleRecyclerAdapter extends RecyclerView.Adapter<ScheduleRecycl
             intent.putExtra(PaymentListActivity.SCHEDULE_ID, mSelectedHolder.mScheduleId);
             mContext.startActivity(intent);
         } else{
-            mListener.onItemClicked(mSelectedHolder.getAdapterPosition(), mSelectedHolder.mId);
+            if(mSelectedHolder.mTextCompletionStatus.getText().toString().equals("Completed")){
+                Snackbar.make(mSelectedHolder.itemView,
+                        "You cannot edit a COMPLETED schedule", Snackbar.LENGTH_LONG).show();
+            }else {
+                mListener.onItemClicked(mSelectedHolder.getAdapterPosition(), mSelectedHolder.mId);
+            }
         }
-//        Snackbar.make(v, mScheduleTitle.getText(), Snackbar.LENGTH_LONG).show();
         return true;
     }
 
@@ -249,7 +254,12 @@ public class ScheduleRecyclerAdapter extends RecyclerView.Adapter<ScheduleRecycl
     @Override
     public void onLongPress(MotionEvent e) {
         View view = mSelectedHolder.parentView;
-        mListener.onItemClicked(mSelectedHolder.getAdapterPosition(),mSelectedHolder.mId );
+        if(mSelectedHolder.mTextCompletionStatus.getText().toString().equals("Completed")){
+            Snackbar.make(mSelectedHolder.itemView,
+                    "You cannot edit a COMPLETED schedule", Snackbar.LENGTH_LONG).show();
+        }else {
+            mListener.onItemClicked(mSelectedHolder.getAdapterPosition(), mSelectedHolder.mId);
+        }
         (view).performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
 
     }

@@ -22,6 +22,8 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -73,6 +75,7 @@ public class PaymentListActivity extends AppCompatActivity implements LoaderMana
         mViewModel.setScheduleId(mScheID);
         mSchedule = mViewModel.getSchedule(mScheID);
         mViewModel.setId(mSchedule.getId());
+        mViewModel.getInvoiceNumber(this);
         initializeDisplayContent();
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -121,6 +124,50 @@ public class PaymentListActivity extends AppCompatActivity implements LoaderMana
         updateTotalAmountOnSchedule();
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_payment_list, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        MenuItem item = menu.findItem(R.id.menu_view_schedule_summary);
+        if(mSchedule.isComplete()){
+            item.setVisible(true);
+            item.setEnabled(true);
+        }
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        int id = item.getItemId();
+        if(id == R.id.menu_view_schedule_summary){
+            Log.d(TAG, "View Schedule Summary selected");
+            showScheduleSummary();
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void showScheduleSummary() {
+        List<PaymentInfo> payments = DataManager.getInstance().getPayments(mSchedule);
+        List<String[]> categories = mSchedule.getScheduleCategories(payments, mViewModel.mInvoiceNumber);
+        initialisePopupDialog(categories);
+        final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+        alertDialogBuilder.setCancelable(false);
+        alertDialogBuilder.setView(mPopupDialogView);
+        alertDialogBuilder.setTitle("Schedule Summary");
+        alertDialogBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+        AlertDialog dialog = alertDialogBuilder.create();
+        dialog.show();
+    }
 
     private void updateTotalAmountOnSchedule() {
         String[] projection = {
@@ -203,7 +250,7 @@ public class PaymentListActivity extends AppCompatActivity implements LoaderMana
     private void showPaymentSummary(long id){
         PaymentInfo payment = DataManager.getInstance().getPayment(id);
         List<String[]> categories = payment.getPaymentCategories();
-        initialisePopuDialog(categories);
+        initialisePopupDialog(categories);
         final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
         alertDialogBuilder.setCancelable(false);
         alertDialogBuilder.setView(mPopupDialogView);
@@ -218,7 +265,7 @@ public class PaymentListActivity extends AppCompatActivity implements LoaderMana
         dialog.show();
     }
 
-    private void initialisePopuDialog(List<String[]> items) {
+    private void initialisePopupDialog(List<String[]> items) {
         LayoutInflater layoutInflater = LayoutInflater.from(PaymentListActivity.this);
         mPopupDialogView = layoutInflater.inflate(R.layout.payment_summary, null);
         LinearLayout parentView = (LinearLayout) mPopupDialogView.findViewById(R.id.summary_payment_parent_view);
