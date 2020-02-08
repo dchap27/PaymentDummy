@@ -88,7 +88,8 @@
     <string name="runtime_permissions_write_storage">
         Chanda App needs storage access permissions to export your schedule</string>
     <string name="jamaat_name_warning">Please, provide Jamaat Name to update members info</string>
-    <string name="first_time_user_message">Welcome! Make sure to set your preferences in the settings
+    <string name="first_time_user_message">Welcome! This app is intended for Jamaat Fin. Secretary ONLY
+        for easy compilation of monthly payment records.  Make sure to set your preferences in the settings
          screen for tailored usage of the app.</string>
     <string name="welcome_title_message">Welcome</string>
     <string name="warning_title_firstusage">Set your preferences</string>
