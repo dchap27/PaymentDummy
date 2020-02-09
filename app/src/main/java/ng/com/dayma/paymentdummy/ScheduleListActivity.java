@@ -64,6 +64,9 @@ public class ScheduleListActivity extends AppCompatActivity implements
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if(mActionMode != null) {
+                    mActionMode.finish();
+                }
                 Intent intent = new Intent(ScheduleListActivity.this, ScheduleActivity.class);
                 startActivity(intent);
             }
@@ -224,11 +227,15 @@ public class ScheduleListActivity extends AppCompatActivity implements
         @Override
         public boolean onPrepareActionMode(android.support.v7.view.ActionMode mode, Menu menu) {
             MenuItem edit_menu = menu.findItem(R.id.edit_schedule);
+            MenuItem export_menu = menu.findItem(R.id.export_schedule);
+            MenuItem invoice_menu = menu.findItem(R.id.add_invoice_menu);
             if(mMonthSchedulesAdapter.getSelectedItemCount() == 1){
                 edit_menu.setEnabled(true);
             } else {
                 edit_menu.setEnabled(false);
             }
+            export_menu.setVisible(false);
+            invoice_menu.setVisible(false);
             return false;
         }
 
