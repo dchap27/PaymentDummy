@@ -43,6 +43,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
@@ -1024,8 +1025,8 @@ public class MainActivity extends RuntimePermissionsActivity
 
                 case R.id.delete_schedule:
                     Log.d(TAG, "Delete Menu clicked");
-                    deleteSchedule();
-                    mode.finish();
+                    deleteSchedule(mode);
+//                    mode.finish();
                     return true;
                 case R.id.edit_schedule:
                     Log.d(TAG, "Edit Menu clicked");
@@ -1241,15 +1242,46 @@ public class MainActivity extends RuntimePermissionsActivity
 
     }
 
-    private void deleteSchedule() {
-        List selectedItemPositions =
+    private void deleteSchedule(final ActionMode mode) {
+        final List selectedItemPositions =
                 mScheduleRecyclerAdapter.getSelectedItems();
-        for (int i = selectedItemPositions.size() - 1; i >= 0; i--) {
-            mScheduleRecyclerAdapter.removeData((Integer) selectedItemPositions.get(i));
+        String displayNounMessage = " schedule";
+        String displayQualifierMessage = " this ";
+        if(selectedItemPositions.size() >1){
+            displayNounMessage = " schedules";
+            displayQualifierMessage = " these ";
         }
-        mScheduleRecyclerAdapter.notifyDataSetChanged();
-        Log.d(TAG, "done deleting");
-        mActionMode = null;
+
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+        alertDialogBuilder.setMessage(
+                "Are you sure you want to delete "+ displayQualifierMessage + displayNounMessage+ "?");
+        final String finalDisplayNounMessage = displayNounMessage;
+        alertDialogBuilder.setPositiveButton("YES", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+                for (int i = selectedItemPositions.size() - 1; i >= 0; i--) {
+                    mScheduleRecyclerAdapter.removeData((Integer) selectedItemPositions.get(i));
+                }
+                mScheduleRecyclerAdapter.notifyDataSetChanged();
+                Log.d(TAG, "done deleting");
+                Toast.makeText(MainActivity.this,
+                        selectedItemPositions.size() + finalDisplayNounMessage + " deleted",Toast.LENGTH_LONG).show();
+                mActionMode = null;
+                mode.finish();
+            }
+        });
+        alertDialogBuilder.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                mActionMode = null;
+                mode.finish();
+                dialog.dismiss();
+            }
+        });
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.show();
+
     }
 
     private void editSchedule() {

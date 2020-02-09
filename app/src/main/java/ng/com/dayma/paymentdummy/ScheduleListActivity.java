@@ -3,12 +3,14 @@ package ng.com.dayma.paymentdummy;
 import android.app.LoaderManager;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.CursorLoader;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.GridLayoutManager;
@@ -19,6 +21,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.Toast;
 
 import java.util.List;
 
@@ -121,7 +124,6 @@ public class ScheduleListActivity extends AppCompatActivity implements
 
         Intent intent = getIntent();
         mMonID = intent.getStringExtra(MONTH_ID);
-        MonthInfo month = DataManager.getInstance().getMonth(mMonID);
 
         mRecyclerItems = (RecyclerView) findViewById(R.id.list_monthschedules);
         mMonthSchedulesAdapter = new ScheduleRecyclerAdapter(this, null);
@@ -236,8 +238,7 @@ public class ScheduleListActivity extends AppCompatActivity implements
 
                 case R.id.delete_schedule:
                     Log.d(TAG, "Delete schedule menu selected");
-                    deleteSchedule();
-                    mode.finish();
+                    deleteSchedule(mode);
                     return true;
                 case R.id.edit_schedule:
                     Log.d(TAG, "Edit schedule menu selected");
@@ -255,15 +256,45 @@ public class ScheduleListActivity extends AppCompatActivity implements
         }
     }
 
-    private void deleteSchedule() {
-        List selectedItemPositions =
+    private void deleteSchedule(final android.support.v7.view.ActionMode mode) {
+        final List selectedItemPositions =
                 mMonthSchedulesAdapter.getSelectedItems();
-        for (int i = selectedItemPositions.size() - 1; i >= 0; i--) {
-            mMonthSchedulesAdapter.removeData((Integer) selectedItemPositions.get(i));
+        String displayNounMessage = " schedule";
+        String displayQualifierMessage = " this ";
+        if(selectedItemPositions.size() >1){
+            displayNounMessage = " schedules";
+            displayQualifierMessage = " these ";
         }
-        mMonthSchedulesAdapter.notifyDataSetChanged();
-        Log.d(TAG, "done deleting");
-        mActionMode = null;
+
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+        alertDialogBuilder.setMessage(
+                "Are you sure you want to delete "+ displayQualifierMessage + displayNounMessage+ "?");
+        final String finalDisplayNounMessage = displayNounMessage;
+        alertDialogBuilder.setPositiveButton("YES", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+                for (int i = selectedItemPositions.size() - 1; i >= 0; i--) {
+                    mMonthSchedulesAdapter.removeData((Integer) selectedItemPositions.get(i));
+                }
+                mMonthSchedulesAdapter.notifyDataSetChanged();
+                Log.d(TAG, "done deleting");
+                Toast.makeText(ScheduleListActivity.this,
+                        selectedItemPositions.size() + finalDisplayNounMessage + " deleted",Toast.LENGTH_LONG).show();
+                mActionMode = null;
+                mode.finish();
+            }
+        });
+        alertDialogBuilder.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                mActionMode = null;
+                mode.finish();
+                dialog.dismiss();
+            }
+        });
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.show();
     }
 
     private void editSchedule() {

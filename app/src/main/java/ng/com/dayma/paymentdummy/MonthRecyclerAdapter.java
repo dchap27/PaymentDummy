@@ -2,9 +2,11 @@ package ng.com.dayma.paymentdummy;
 
 import android.content.ContentUris;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
@@ -15,6 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import ng.com.dayma.paymentdummy.data.PaymentProviderContract;
 import ng.com.dayma.paymentdummy.touchhelpers.ItemTouchHelperAdapter;
@@ -141,7 +144,28 @@ public class MonthRecyclerAdapter extends RecyclerView.Adapter<MonthRecyclerAdap
     @Override
     public void onItemSwiped(int position) {
         Log.d("ON SWIPE", "Delete Month and corresponding Schedules and associated payments");
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(mContext);
+        alertDialogBuilder.setMessage(
+                "Are you sure you want to delete schedules for "+mSelectedHolder.mMonthId +"?");
+        alertDialogBuilder.setPositiveButton("YES", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                deleteMonthRecords();
+            }
+        });
+        alertDialogBuilder.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                notifyDataSetChanged();
+                dialog.dismiss();
+            }
+        });
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.show();
 
+    }
+
+    private void deleteMonthRecords() {
         String[] scheduleProjection = {
                 PaymentProviderContract.Schedules.COLUMN_MONTH_ID,
                 PaymentProviderContract.Schedules.COLUMN_SCHEDULE_ID,
@@ -174,7 +198,13 @@ public class MonthRecyclerAdapter extends RecyclerView.Adapter<MonthRecyclerAdap
         mLoadFromDatabase = new DataManager.LoadFromDatabase();
         mLoadFromDatabase.execute(mContext);
 
+        String displayVerbMessage = " Schedule";
+        if(numOfSchedules>1){
+            displayVerbMessage = " Schedules";
+        }
+        Toast.makeText(mContext, numOfSchedules+displayVerbMessage+" deleted",Toast.LENGTH_LONG).show();
     }
+
     public void setTouchHelper(ItemTouchHelper touchHelper){
         mTouchHelper = touchHelper;
     }
@@ -198,16 +228,6 @@ public class MonthRecyclerAdapter extends RecyclerView.Adapter<MonthRecyclerAdap
             mTextScheduleTotal = (TextView) itemView.findViewById(R.id.text_schedule_total_text);
             parentView = (FrameLayout) itemView.findViewById(R.id.frame_layout_month_list);
 
-//            itemView.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View v) {
-//
-//                    Intent intent = new Intent(mContext, ScheduleListActivity.class);
-//                    intent.putExtra(ScheduleListActivity.MONTH_ID, mMonthId);
-//                    mContext.startActivity(intent);
-////                    Snackbar.make(v, mTextMonth.getText(), Snackbar.LENGTH_LONG).show();
-//                }
-//            });
         }
     }
 }
