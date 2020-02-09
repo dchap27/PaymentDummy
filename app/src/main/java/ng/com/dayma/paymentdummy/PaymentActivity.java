@@ -458,22 +458,29 @@ public class PaymentActivity extends AppCompatActivity implements LoaderManager.
             int payerNamePos = cursor.getColumnIndex(PaymentProviderContract.Payments.COLUMN_MEMBER_FULLNAME);
             int monthPaidPos = cursor.getColumnIndex(PaymentProviderContract.Payments.COLUMN_PAYMENT_MONTHPAID);
             int chandaPos = cursor.getColumnIndex(PaymentProviderContract.Payments.COLUMN_MEMBER_CHANDANO);
+            boolean more = cursor.moveToFirst();
+            ArrayList<String[]> receiptNumbers = new ArrayList(cursor.getCount());
 
-            if(cursor.moveToNext()){
+            while (more){
                 String receiptNumber = cursor.getString(receiptNoPos);
                 String payerName = cursor.getString(payerNamePos);
                 String monthPaid = cursor.getString(monthPaidPos);
                 int chandaNo = cursor.getInt(chandaPos);
-                String jamaatName = getPayerJamaat(chandaNo);
-                if(mChandaNo != chandaNo) {
+                receiptNumbers.add(new String[]{receiptNumber,payerName,monthPaid,String.valueOf(chandaNo)});
+                more = cursor.moveToNext();
+            }
+            cursor.close();
+            for(String[] details:receiptNumbers){
+                if(Integer.valueOf(details[0]) == Integer.valueOf(receiptNo) && mChandaNo != Integer.valueOf(details[3])){
+                    // get the jamaatName of payer with chandaNo
+                    String jamaatName = getPayerJamaat(Integer.valueOf(details[3]));
                     Snackbar.make(view, "Receipt Number: " +
-                            receiptNumber + " already entered for " +
-                            payerName.toUpperCase() + " at " +
-                            jamaatName + " Jamaat for " + monthPaid, Snackbar.LENGTH_LONG).show();
+                            details[0] + " already entered for " +
+                            details[1].toUpperCase() + " at " +
+                            jamaatName + " Jamaat for " + details[2], Snackbar.LENGTH_LONG).show();
                     mTextReceiptNo.requestFocus();
                     return false;
                 }
-
             }
 
         }
@@ -488,7 +495,7 @@ public class PaymentActivity extends AppCompatActivity implements LoaderManager.
         String[] selectionArgs = { Integer.toString(chandaNo) };
         Cursor cursor = getContentResolver().query(uri, projection, selection, selectionArgs,null);
 
-        if(cursor.moveToNext()){
+        if(cursor.moveToFirst()){
             int jamaatNamePos = cursor.getColumnIndex(Members.COLUMN_MEMBER_JAMAATNAME);
             String jamaatName = cursor.getString(jamaatNamePos);
             return jamaatName;
@@ -508,7 +515,7 @@ public class PaymentActivity extends AppCompatActivity implements LoaderManager.
         int integerReceipt = Integer.valueOf(receiptNo);
         String selection = PaymentProviderContract.Payments.COLUMN_PAYMENT_LOCALRECEIPT + "= ? OR " +
                 PaymentProviderContract.Payments.COLUMN_PAYMENT_LOCALRECEIPT + " LIKE ?";
-        String[] selectionArgs = { receiptNo, "%" +integerReceipt+"%" };
+        String[] selectionArgs = { receiptNo, "%" +integerReceipt };
         Cursor cursor = getContentResolver().query(uri,projection,selection,selectionArgs,null);
 
         return cursor;
