@@ -1011,10 +1011,13 @@ public class MainActivity extends RuntimePermissionsActivity
                 edit_menu.setEnabled(true);
                 export_menu.setEnabled(true);
                 invoice_menu.setEnabled(true);
+                edit_menu.setVisible(true);
+                export_menu.setVisible(true);
+                invoice_menu.setVisible(true);
             } else {
-                edit_menu.setEnabled(false);
-                export_menu.setEnabled(false);
-                invoice_menu.setEnabled(false);
+                edit_menu.setVisible(false);
+                export_menu.setVisible(false);
+                invoice_menu.setVisible(false);
             }
             return false;
         }
