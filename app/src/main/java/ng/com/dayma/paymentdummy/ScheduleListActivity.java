@@ -230,9 +230,10 @@ public class ScheduleListActivity extends AppCompatActivity implements
             MenuItem export_menu = menu.findItem(R.id.export_schedule);
             MenuItem invoice_menu = menu.findItem(R.id.add_invoice_menu);
             if(mMonthSchedulesAdapter.getSelectedItemCount() == 1){
+                edit_menu.setVisible(true);
                 edit_menu.setEnabled(true);
             } else {
-                edit_menu.setEnabled(false);
+                edit_menu.setVisible(false);
             }
             export_menu.setVisible(false);
             invoice_menu.setVisible(false);
