@@ -32,6 +32,10 @@ public class DataManager {
         return ourInstance;
     }
 
+    public void initializeExamplePayments() {
+
+    }
+
     public static class LoadFromDatabase extends AsyncTask<Context, Void, Void>{
         // SQLiteDatabase db = dbHelper.getReadableDatabase();
         // get the columns for the month_info table

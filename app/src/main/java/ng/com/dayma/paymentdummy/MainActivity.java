@@ -127,7 +127,7 @@ public class MainActivity extends RuntimePermissionsActivity
                     mActionMode.finish();
                 }
                 String isFirstLoad = mSharedPref.getString(PreferenceKeys.JAMAAT_INFO_FIRST_LOAD, null);
-                if(isFirstLoad != null) {
+                if(isFirstLoad == mViewModel.mJamaatName) {
                     Intent intent = new Intent(MainActivity.this, ScheduleActivity.class);
                     // open ScheduleActivity for new entry
                     startActivity(intent);
@@ -209,13 +209,17 @@ public class MainActivity extends RuntimePermissionsActivity
     }
 
     private void loadJamaatInfoToDatabase(String jamaatName) {
-        final int fileIdentifier = getResources().getIdentifier(jamaatName, "raw", this.getPackageName());
-        try {
-            InputStream inputstream = getResources().openRawResource(fileIdentifier);
-            readDataToDatabase(inputstream, jamaatName);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
+//        final int fileIdentifier = getResources().getIdentifier(jamaatName, "raw", this.getPackageName());
+//        try {
+//            InputStream inputstream = getResources().openRawResource(fileIdentifier);
+//            readDataToDatabase(inputstream, jamaatName);
+//        } catch (FileNotFoundException e) {
+//            e.printStackTrace();
+//        }
+        mViewModel.jamaatToUpdate = jamaatName;
+        MainActivity.super.requestAppPermissions(new
+                        String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                R.string.runtime_permissions_read_storage, PERMISSION_REQUEST_READ_EXTERNAL_STORAGE);
 
     }
 
@@ -447,6 +451,9 @@ public class MainActivity extends RuntimePermissionsActivity
                 Snackbar.make(v, String.format(
                         "%s member list added successfully!", mViewModel.jamaatToUpdate.toUpperCase()),
                         Snackbar.LENGTH_LONG).show();
+                SharedPreferences.Editor editor = mSharedPref.edit();
+                editor.putString(PreferenceKeys.JAMAAT_INFO_FIRST_LOAD, mViewModel.mJamaatName);
+                editor.commit();
             }
         };
         task.execute();
@@ -716,7 +723,7 @@ public class MainActivity extends RuntimePermissionsActivity
                 public void onClick(View v) {
                     String jamaatName = mInputDialogEditText.getText().toString().trim().toUpperCase();
                     if(!jamaatName.isEmpty()) {
-                        Set<String> allowedJamaats = mSharedPref.getStringSet(PreferenceKeys.MULTI_SELECT_JAMAAT_PREF,null);
+                        Set<String> allowedJamaats = mSharedPref.getStringSet(PreferenceKeys.MULTI_SELECT_JAMAAT_PREF, null);
                         String baseJamaat = mSharedPref.getString(PreferenceKeys.JAMAAT_NAME_PREF, "");
                         if(allowedJamaats.contains(jamaatName.toLowerCase()) || baseJamaat.equals(jamaatName.toLowerCase())) {
                             mViewModel.jamaatToUpdate = jamaatName;
@@ -956,7 +963,7 @@ public class MainActivity extends RuntimePermissionsActivity
         mViewModel.mJamaatName = mSharedPref.getString(PreferenceKeys.JAMAAT_NAME_PREF, "");
         if(mViewModel.mJamaatName.length() > 1){
             firstDataLoading();
-            loadAdditionalJamaatRecords();
+//            loadAdditionalJamaatRecords();
         }
         (mRecyclerItems.getAdapter()).notifyDataSetChanged();
         mSwipeRefreshLayout.setRefreshing(false);
@@ -978,18 +985,18 @@ public class MainActivity extends RuntimePermissionsActivity
         boolean isMultipleJamaat = mSharedPref.getBoolean(PreferenceKeys.KEY_ENABLE_MULTIPLE_JAMAAT, false);
         if(isFirstLoad == null) {
             Log.d(TAG, "Initial loading of jamaat info into database");
-            if (isMultipleJamaat) {
-                String[] jamaats = mSharedPref.getStringSet(PreferenceKeys.MULTI_SELECT_JAMAAT_PREF, null).toArray(new String[0]);
-                for (int i = 0; i < jamaats.length; i++) {
-                    loadJamaatInfoToDatabase(jamaats[i]);
-                    mViewModel.loadedJamaats = new ArrayList<>();
-                    mViewModel.loadedJamaats.add(jamaats[i]);
-                }
-            }
+//            if (isMultipleJamaat) {
+//                String[] jamaats = mSharedPref.getStringSet(PreferenceKeys.MULTI_SELECT_JAMAAT_PREF, null).toArray(new String[0]);
+//                for (int i = 0; i < jamaats.length; i++) {
+//                    loadJamaatInfoToDatabase(jamaats[i]);
+//                    mViewModel.loadedJamaats = new ArrayList<>();
+//                    mViewModel.loadedJamaats.add(jamaats[i]);
+//                }
+//            }
             loadJamaatInfoToDatabase(mViewModel.mJamaatName);
-            SharedPreferences.Editor editor = mSharedPref.edit();
-            editor.putString(PreferenceKeys.JAMAAT_INFO_FIRST_LOAD, mViewModel.mJamaatName);
-            editor.commit();
+//            SharedPreferences.Editor editor = mSharedPref.edit();
+//            editor.putString(PreferenceKeys.JAMAAT_INFO_FIRST_LOAD, mViewModel.mJamaatName);
+//            editor.commit();
         }
     }
 

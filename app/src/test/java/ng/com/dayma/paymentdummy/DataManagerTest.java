@@ -26,9 +26,9 @@ public class DataManagerTest {
     public void createNewNote() throws Exception {
         final MonthInfo month = sDataManager.getMonth("May 2019");
         final ScheduleInfo schedule = sDataManager.getSchedule("Schedule2 for schedule_kewulere");
-        final int paymentId = "Modupe Ade";
+        final int paymentId = 44114;
         final String monthPaid = "May";
-        final String receiptno = 12534;
+        final String receiptno = "12534";
         final float chandaam = 2002;
         final float wasiyyat = 20000;
         final float tahrikJadid = 150;
@@ -55,9 +55,9 @@ public class DataManagerTest {
     @Test
     public void findSimilarNotes() throws Exception {
         final ScheduleInfo schedule = sDataManager.getSchedule("Schedule1 for schedule_kewulere");
-        final int paymentId = "Adeola";
+        final int paymentId = 44114;
         final String monthPaid = "June";
-        final String receiptno = 12980;
+        final String receiptno = "12980";
         final float chandaam = 20000;
 
         int paymentIndex1 = sDataManager.createNewPayment();

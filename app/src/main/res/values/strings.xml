@@ -94,7 +94,7 @@
     <string name="welcome_title_message">Welcome</string>
     <string name="warning_title_firstusage">Set your preferences</string>
     <string name="warning_message_jamaat_not_set">You have to set your membership ID and Jamaat before using the app</string>
-    <string name="enable_mutiple_jamaat">Multiple Jamaat</string>
+    <string name="enable_mutiple_jamaat">Enable Multiple Jamaat</string>
     <string name="add_jamaat_not_enabled">You are not allowed to add new jamaat</string>
     <string name="Jamaat_Multi_selection">Add Jamaat(s)</string>
     <string-array name="pref_example_list_titles">
