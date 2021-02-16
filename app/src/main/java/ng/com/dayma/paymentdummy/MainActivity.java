@@ -127,7 +127,7 @@ public class MainActivity extends RuntimePermissionsActivity
                     mActionMode.finish();
                 }
                 String isFirstLoad = mSharedPref.getString(PreferenceKeys.JAMAAT_INFO_FIRST_LOAD, null);
-                if(isFirstLoad == mViewModel.mJamaatName) {
+                if(isFirstLoad.equals(mViewModel.mJamaatName)) {
                     Intent intent = new Intent(MainActivity.this, ScheduleActivity.class);
                     // open ScheduleActivity for new entry
                     startActivity(intent);
@@ -216,7 +216,6 @@ public class MainActivity extends RuntimePermissionsActivity
 //        } catch (FileNotFoundException e) {
 //            e.printStackTrace();
 //        }
-        mViewModel.jamaatToUpdate = jamaatName;
         MainActivity.super.requestAppPermissions(new
                         String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
                 R.string.runtime_permissions_read_storage, PERMISSION_REQUEST_READ_EXTERNAL_STORAGE);
@@ -427,7 +426,7 @@ public class MainActivity extends RuntimePermissionsActivity
                 CsvUtility utility = new CsvUtility(MainActivity.this);
                 publishProgress(2);
                 Log.d(TAG, "reading into database");
-                utility.readCSVToDatabase(mViewModel.jamaatToUpdate.toUpperCase(), inputStream);
+                utility.readCSVToDatabase(mViewModel.mJamaatName.toUpperCase(), inputStream);
                 publishProgress(3);
                 return true;
             }
@@ -449,7 +448,7 @@ public class MainActivity extends RuntimePermissionsActivity
                 mProgressBar.setVisibility(View.GONE);
                 View v = findViewById(R.id.list_schedules);
                 Snackbar.make(v, String.format(
-                        "%s member list added successfully!", mViewModel.jamaatToUpdate.toUpperCase()),
+                        "%s member list added successfully!", mViewModel.mJamaatName.toUpperCase()),
                         Snackbar.LENGTH_LONG).show();
                 SharedPreferences.Editor editor = mSharedPref.edit();
                 editor.putString(PreferenceKeys.JAMAAT_INFO_FIRST_LOAD, mViewModel.mJamaatName);

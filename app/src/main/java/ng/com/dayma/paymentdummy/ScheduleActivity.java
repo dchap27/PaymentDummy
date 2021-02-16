@@ -62,6 +62,7 @@ public class ScheduleActivity extends AppCompatActivity implements LoaderManager
     private DataManager.LoadFromDatabase mLoadFromDatabase;
     private ScheduleActivityViewModel mViewModel;
     private boolean mPrefMultipleJamaat;
+    private String mScheduleId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -233,9 +234,9 @@ public class ScheduleActivity extends AppCompatActivity implements LoaderManager
         String jamaat = String.valueOf(mSpinnerJamaat.getSelectedItem());
         String monthId = month +" " + year;
         long scheduleRowId = ContentUris.parseId(mViewModel.scheduleUri);
-        String scheduleId = month + year + jamaat + scheduleRowId;
+        mScheduleId = month + year + jamaat + scheduleRowId;
 
-        saveScheduleToDatabase(scheduleId, monthId, jamaat, scheduleTitle);
+        saveScheduleToDatabase(mScheduleId, monthId, jamaat, scheduleTitle);
     }
 
     private void saveScheduleToDatabase(String scheduleId, final String month, String jamaat, String scheduleTitle) {
@@ -277,7 +278,11 @@ public class ScheduleActivity extends AppCompatActivity implements LoaderManager
                 mMonthUri = uri;
                 mLoadFromDatabase = new DataManager.LoadFromDatabase();
                 mLoadFromDatabase.execute(ScheduleActivity.this);
-                finish();
+//                finish();
+
+                Intent intent = new Intent(ScheduleActivity.this, PaymentListActivity.class);
+                intent.putExtra(PaymentListActivity.SCHEDULE_ID, mScheduleId);
+                startActivity(intent);
             }
         };
         if(mIsNewSchedule) {
