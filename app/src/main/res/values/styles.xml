@@ -26,7 +26,7 @@
 
     <style name="AddFab" parent="@style/Widget.Design.FloatingActionButton">
         <item name="srcCompat">@drawable/ic_baseline_post_add_24</item>
-        <item name="android:tint">@android:color/white</item>
+        <item name="android:tint">#ffffff</item>
     </style>
 
 

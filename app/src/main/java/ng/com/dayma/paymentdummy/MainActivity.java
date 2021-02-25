@@ -160,7 +160,7 @@ public class MainActivity extends RuntimePermissionsActivity
 
     }
 
-    private void isFirstUsage(){
+        private void isFirstUsage(){
         Log.d(TAG, "Checking if this is user's first usage");
 
         mSharedPref = PreferenceManager.getDefaultSharedPreferences(this);
