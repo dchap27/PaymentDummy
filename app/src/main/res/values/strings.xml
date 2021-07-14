@@ -141,6 +141,7 @@
     <string name="jamaat_input_type_help">Hint: use underscore ( _ ) for spaces or hyphen</string>
     <string name="for_all">Payment month(s)</string>
     <string name="add_invoice_no">Enter invoice number</string>
+    <string name="nav_members_list">Members List</string>
     <string-array name="pref_entries_jamaat_list">
         <item>Agbokojo</item>
         <item>Anfani</item>

@@ -71,6 +71,7 @@ public class MainActivity extends RuntimePermissionsActivity
 
     public static final int LOADER_SCHEDULES = 0;
     private static final int LOADER_MONTHS = 1;
+    private static final int LOADER_MEMBERS = 2;
     private static final int PERMISSION_REQUEST_READ_EXTERNAL_STORAGE = 10;
     private static final int PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE = 11;
     private static final int SCHEDULE_FILE_RESULT = 22;
@@ -98,6 +99,7 @@ public class MainActivity extends RuntimePermissionsActivity
     private int mScheduleIdToWriteToCSV;
     private TextView mDialogHelpText;
     private boolean mAddInvoice;
+    private MemberRecyclerAdapter mMemberRecyclerAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -557,6 +559,7 @@ public class MainActivity extends RuntimePermissionsActivity
         mScheduleRecyclerAdapter = new ScheduleRecyclerAdapter(this, null);
 
         mMonthRecyclerAdapter = new MonthRecyclerAdapter(this, null);
+        mMemberRecyclerAdapter = new MemberRecyclerAdapter(this, null);
     }
 
     private void displaySchedules() {
@@ -584,6 +587,15 @@ public class MainActivity extends RuntimePermissionsActivity
 
         selectNavigationMenuItem(R.id.nav_months);
 
+    }
+    private void displayMembers() {
+        Toast.makeText(MainActivity.this,
+                " view members list",Toast.LENGTH_LONG).show();
+        getLoaderManager().restartLoader(LOADER_MEMBERS, null, this);
+        mRecyclerItems.setLayoutManager(mGridLayoutManager);
+        mRecyclerItems.setAdapter(mMemberRecyclerAdapter);
+
+        selectNavigationMenuItem(R.id.nav_members);
     }
 
     private void loadMonthsData() {
@@ -649,7 +661,7 @@ public class MainActivity extends RuntimePermissionsActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == (R.id.nav_schedules) || id == R.id.nav_months ){
+        if (id == (R.id.nav_schedules) || id == R.id.nav_months || id == (R.id.nav_members) ){
             handleDisplaySelection(id);
             // store the selection id to viewModel
             mViewModel.navDrawerDisplaySelection = item.getItemId();
@@ -808,6 +820,9 @@ public class MainActivity extends RuntimePermissionsActivity
             case R.id.nav_schedules:
                 displaySchedules();
                 break;
+            case R.id.nav_members:
+                displayMembers();
+                break;
             default:
                 displaySchedules();
 
@@ -888,7 +903,22 @@ public class MainActivity extends RuntimePermissionsActivity
         else if(id == LOADER_MONTHS){
             loader = cursorLoaderMonths();
         }
+        else if(id == LOADER_MEMBERS){
+            loader = cursorLoaderMembers();
+        }
         return loader;
+    }
+
+    private CursorLoader cursorLoaderMembers() {
+        Uri uri = PaymentProviderContract.Members.CONTENT_URI;
+        final String[] memberColumns = {
+                PaymentProviderContract.Members._ID,
+                PaymentProviderContract.Members.COLUMN_MEMBER_CHANDANO,
+                PaymentProviderContract.Members.COLUMN_MEMBER_FULLNAME,
+                PaymentProviderContract.Members.COLUMN_MEMBER_JAMAATNAME
+        };
+        String sortOrder = PaymentProviderContract.Members.COLUMN_MEMBER_FULLNAME;
+        return new CursorLoader(this, uri, memberColumns, null, null, sortOrder);
     }
 
     private CursorLoader cursorLoaderMonths() {
@@ -908,8 +938,9 @@ public class MainActivity extends RuntimePermissionsActivity
             mScheduleRecyclerAdapter.changeCursor(data);
         else if(loader.getId() == LOADER_MONTHS){
             mMonthRecyclerAdapter.changeCursor(data);
+        } else if(loader.getId() == LOADER_MEMBERS){
+            mMemberRecyclerAdapter.changeCursor(data);
         }
-
     }
 
     @Override
@@ -919,6 +950,8 @@ public class MainActivity extends RuntimePermissionsActivity
         if(loader.getId() == LOADER_MONTHS){
             mMonthRecyclerAdapter.changeCursor(null);
         }
+        if(loader.getId() == LOADER_MEMBERS)
+            mMemberRecyclerAdapter.changeCursor(null);
     }
 
     @Override

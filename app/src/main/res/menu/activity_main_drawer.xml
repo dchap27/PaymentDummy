@@ -10,6 +10,10 @@
             android:id="@+id/nav_months"
             android:icon="@drawable/ic_event_note_black_24dp"
             android:title="Months"/>
+        <item
+            android:id="@+id/nav_members"
+            android:icon="@drawable/ic_baseline_view_list_24"
+            android:title="@string/nav_members_list" />
     </group>
 
     <item android:title="Communicate">
