@@ -100,6 +100,7 @@ public class MainActivity extends RuntimePermissionsActivity
     private TextView mDialogHelpText;
     private boolean mAddInvoice;
     private MemberRecyclerAdapter mMemberRecyclerAdapter;
+    private AlertDialog mDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -589,8 +590,6 @@ public class MainActivity extends RuntimePermissionsActivity
 
     }
     private void displayMembers() {
-        Toast.makeText(MainActivity.this,
-                " view members list",Toast.LENGTH_LONG).show();
         getLoaderManager().restartLoader(LOADER_MEMBERS, null, this);
         mRecyclerItems.setLayoutManager(mGridLayoutManager);
         mRecyclerItems.setAdapter(mMemberRecyclerAdapter);
@@ -670,10 +669,104 @@ public class MainActivity extends RuntimePermissionsActivity
 
         } else if (id == R.id.nav_add_new_jamaat_info){
             handleAddorUpdateJamaatInfo();
+        } else if (id == R.id.nav_add_a_member){
+            addANewMember();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
+        return true;
+    }
+
+    private void addANewMember() {
+        View dialogView = initializeAddMemberDialogView();
+        final EditText chandaNoInput = (EditText) dialogView.findViewById(R.id.input_text_chandaNo);
+        final EditText memberName = (EditText) dialogView.findViewById(R.id.input_text_memberName);
+        final EditText memberjamaat = (EditText) dialogView.findViewById(R.id.input_text_jamaatName);
+        TextView addMemberButton = (TextView) dialogView.findViewById(R.id.text_add_button);
+        TextView cancelButton = (TextView) dialogView.findViewById(R.id.text_cancel_addition);
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+        alertDialogBuilder.setCancelable(false);
+        final AlertDialog alertDialog;
+        alertDialogBuilder.setView(dialogView);
+        alertDialog = alertDialogBuilder.create();
+        alertDialog.show();
+
+        addMemberButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final EditText[] textInputs = {memberName, memberjamaat, chandaNoInput};
+                final String memberfullName = memberName.getText().toString().trim();
+                final String jamaatName = memberjamaat.getText().toString().trim().toUpperCase();
+                final String chandaNo = chandaNoInput.getText().toString().trim();
+                if(validateTextInput(textInputs))
+                    addMemberData(chandaNo, memberfullName, jamaatName);
+                alertDialog.dismiss();
+            }
+        });
+        cancelButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                alertDialog.cancel();
+            }
+        });
+    }
+
+    private void addMemberData(String chandaNo, String name, String jamaat) {
+        final ContentValues values = new ContentValues();
+        values.put(PaymentProviderContract.Members.COLUMN_MEMBER_CHANDANO, chandaNo);
+        values.put(PaymentProviderContract.Members.COLUMN_MEMBER_ID, (chandaNo) + " - " + name);
+        values.put(PaymentProviderContract.Members.COLUMN_MEMBER_FULLNAME, name);
+        values.put(PaymentProviderContract.Members.COLUMN_MEMBER_JAMAATNAME, jamaat);
+
+        AsyncTask<ContentValues, Integer, Uri> additionTask = new AsyncTask<ContentValues, Integer, Uri>() {
+
+            @Override
+            protected void onPreExecute() {
+                initializeProgressUpdate();
+                mProgressBar.setVisibility(View.VISIBLE);
+                mProgressBar.setProgress(1);
+            }
+
+            @Override
+            protected Uri doInBackground(ContentValues... contentValues) {
+                Log.d(TAG, "doInBackground - thread: " + Thread.currentThread().getId());
+                ContentValues insertValues = contentValues[0];
+                Uri uri = getContentResolver().insert(PaymentProviderContract.Members.CONTENT_URI, insertValues);
+                publishProgress(2);
+                simulateLongRunningWork();
+                publishProgress(3);
+
+                return uri;
+            }
+
+            @Override
+            protected void onProgressUpdate(Integer... values) {
+                int progressValue = values[0];
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    mProgressBar.setProgress(progressValue,true);
+                } else
+                    mProgressBar.setProgress(progressValue);
+            }
+
+            @Override
+            protected void onPostExecute(Uri uri) {
+                Log.d(TAG, "onPostExecute - thread: " + Thread.currentThread().getId());
+                mProgressBar.setVisibility(View.GONE);
+                mDialog.cancel();
+            }
+        };
+        Log.d(TAG, "call to execute - thread: " + Thread.currentThread().getId());
+        additionTask.execute(values);
+    }
+
+    private boolean validateTextInput(EditText...texts) {
+        for(EditText editText : texts){
+            if(editText.toString().isEmpty()) {
+                editText.requestFocus();
+                return false;
+            }
+        }
         return true;
     }
 
@@ -829,6 +922,12 @@ public class MainActivity extends RuntimePermissionsActivity
         }
     }
 
+    private View initializeAddMemberDialogView(){
+        LayoutInflater layoutInflater = LayoutInflater.from(MainActivity.this);
+        View addDialogView = layoutInflater.inflate(R.layout.add_member_input_layout, null);
+        return addDialogView;
+    }
+
     private void initializePopUpDialog(){
         LayoutInflater layoutInflater = LayoutInflater.from(MainActivity.this);
         mPopupDialogView = layoutInflater.inflate(R.layout.textinput_dialog, null);
@@ -915,7 +1014,8 @@ public class MainActivity extends RuntimePermissionsActivity
                 PaymentProviderContract.Members._ID,
                 PaymentProviderContract.Members.COLUMN_MEMBER_CHANDANO,
                 PaymentProviderContract.Members.COLUMN_MEMBER_FULLNAME,
-                PaymentProviderContract.Members.COLUMN_MEMBER_JAMAATNAME
+                PaymentProviderContract.Members.COLUMN_MEMBER_JAMAATNAME,
+                PaymentProviderContract.Members.COLUMN_MEMBER_ID
         };
         String sortOrder = PaymentProviderContract.Members.COLUMN_MEMBER_FULLNAME;
         return new CursorLoader(this, uri, memberColumns, null, null, sortOrder);
@@ -1209,22 +1309,25 @@ public class MainActivity extends RuntimePermissionsActivity
         });
     }
 
+    private void initializeProgressUpdate() {
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(MainActivity.this);
+        alertDialogBuilder.setCancelable(false);
+        initialiseProgressDialog(R.id.progress_bar_main_activity);
+        alertDialogBuilder.setView(mProgressView);
+        mDialog = alertDialogBuilder.create();
+        mDialog.show();
+    }
+
     private void checkScheduleStatusBeforeAddition(final long scheduleCursorID) {
         final View view = findViewById(R.id.list_schedules);
         AsyncTask<Long,Integer,Integer> task = new AsyncTask<Long, Integer, Integer>() {
 
-            private AlertDialog mDialog;
             private int mStatus;
 
             @Override
             protected void onPreExecute() {
                 super.onPreExecute();
-                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(MainActivity.this);
-                alertDialogBuilder.setCancelable(false);
-                initialiseProgressDialog(R.id.progress_bar_main_activity);
-                alertDialogBuilder.setView(mProgressView);
-                mDialog = alertDialogBuilder.create();
-                mDialog.show();
+                initializeProgressUpdate();
                 mProgressBar.setVisibility(View.VISIBLE);
                 mProgressBar.setProgress(1);
             }

@@ -18,6 +18,7 @@ public class MemberRecyclerAdapter extends RecyclerView.Adapter<MemberRecyclerAd
     private int mChandaNoPos;
     private int mMemberNamePos;
     private int mMemberIdPos;
+    private int mMemberIdComboPos;
 
     public MemberRecyclerAdapter(Context context, Cursor cursor){
         mCursor = cursor;
@@ -33,6 +34,8 @@ public class MemberRecyclerAdapter extends RecyclerView.Adapter<MemberRecyclerAd
         mChandaNoPos = mCursor.getColumnIndex(PaymentProviderContract.Members.COLUMN_MEMBER_CHANDANO);
         mMemberNamePos = mCursor.getColumnIndex(PaymentProviderContract.Members.COLUMN_MEMBER_FULLNAME);
         mMemberIdPos = mCursor.getColumnIndex(PaymentProviderContract.Members._ID);
+
+        mMemberIdComboPos = mCursor.getColumnIndex(PaymentProviderContract.Members.COLUMN_MEMBER_ID);
     }
 
     @Override
@@ -46,6 +49,7 @@ public class MemberRecyclerAdapter extends RecyclerView.Adapter<MemberRecyclerAd
         mCursor.moveToPosition(position);
         int chandaNo = mCursor.getInt(mChandaNoPos);
         String fullName = mCursor.getString(mMemberNamePos);
+        String memberIdCombo = mCursor.getString(mMemberIdComboPos);
         holder.mChandaNoText.setText(String.valueOf(chandaNo));
         holder.mMemberNameText.setText(fullName);
 

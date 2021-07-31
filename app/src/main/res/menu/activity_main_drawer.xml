@@ -26,6 +26,10 @@
                 android:id="@+id/nav_add_new_jamaat_info"
                 android:icon="@android:drawable/ic_input_add"
                 android:title="Add/update Jamaat Info" />
+            <item
+                android:id="@+id/nav_add_a_member"
+                android:icon="@drawable/ic_baseline_person_add_alt_1_24"
+                android:title="Add a Member" />
         </menu>
     </item>
 
