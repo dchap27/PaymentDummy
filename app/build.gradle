@@ -12,11 +12,11 @@ keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 // create versioning formula
 ext {
     versionMajor = 1
-    versionMinor = 1
-    versionPatch = 5
+    versionMinor = 2
+    versionPatch = 0
     screenSize = 0
     minimumSdkVersion = 18
-    versionClassifier = null
+    versionClassifier = 'opener'
     isSnapShot = true
 }
 
