@@ -18,6 +18,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
@@ -61,6 +62,7 @@ import ng.com.dayma.paymentdummy.touchhelpers.RecyclerClickAdapterListener;
 import ng.com.dayma.paymentdummy.touchhelpers.ScheduleTouchHelperCallback;
 import ng.com.dayma.paymentdummy.utils.CsvUtility;
 import ng.com.dayma.paymentdummy.utils.PreferenceKeys;
+import ng.com.dayma.paymentdummy.utils.ValidateTextInput;
 
 import static android.content.Intent.EXTRA_MIME_TYPES;
 
@@ -699,7 +701,7 @@ public class MainActivity extends RuntimePermissionsActivity
                 final String memberfullName = memberName.getText().toString().trim();
                 final String jamaatName = memberjamaat.getText().toString().trim().toUpperCase();
                 final String chandaNo = chandaNoInput.getText().toString().trim();
-                if(validateTextInput(textInputs))
+                if(ValidateTextInput.validateTextInput(textInputs))
                     addMemberData(chandaNo, memberfullName, jamaatName);
                 alertDialog.dismiss();
             }
@@ -758,16 +760,6 @@ public class MainActivity extends RuntimePermissionsActivity
         };
         Log.d(TAG, "call to execute - thread: " + Thread.currentThread().getId());
         additionTask.execute(values);
-    }
-
-    private boolean validateTextInput(EditText...texts) {
-        for(EditText editText : texts){
-            if(editText.toString().isEmpty()) {
-                editText.requestFocus();
-                return false;
-            }
-        }
-        return true;
     }
 
     private void openSettingsActivity() {
@@ -1015,7 +1007,6 @@ public class MainActivity extends RuntimePermissionsActivity
                 PaymentProviderContract.Members.COLUMN_MEMBER_CHANDANO,
                 PaymentProviderContract.Members.COLUMN_MEMBER_FULLNAME,
                 PaymentProviderContract.Members.COLUMN_MEMBER_JAMAATNAME,
-                PaymentProviderContract.Members.COLUMN_MEMBER_ID
         };
         String sortOrder = PaymentProviderContract.Members.COLUMN_MEMBER_FULLNAME;
         return new CursorLoader(this, uri, memberColumns, null, null, sortOrder);
