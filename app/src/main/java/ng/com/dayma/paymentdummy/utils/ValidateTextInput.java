@@ -1,7 +1,8 @@
 package ng.com.dayma.paymentdummy.utils;
 
-import android.support.annotation.NonNull;
 import android.widget.EditText;
+
+import androidx.annotation.NonNull;
 
 public class ValidateTextInput {
 

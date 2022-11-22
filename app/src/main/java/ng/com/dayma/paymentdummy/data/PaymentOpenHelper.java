@@ -14,7 +14,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-import ng.com.dayma.paymentdummy.MainActivity;
 import ng.com.dayma.paymentdummy.data.PaymentDatabaseContract.MemberInfoEntry;
 import ng.com.dayma.paymentdummy.data.PaymentDatabaseContract.MonthInfoEntry;
 import ng.com.dayma.paymentdummy.data.PaymentDatabaseContract.PaymentInfoEntry;
@@ -27,7 +26,7 @@ public class PaymentOpenHelper extends SQLiteOpenHelper {
     private static PaymentOpenHelper mInstance = null;
     private final Context mContext;
 
-    public PaymentOpenHelper(@Nullable MainActivity context) {
+    public PaymentOpenHelper(@Nullable Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
         this.mContext = context;
     }

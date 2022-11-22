@@ -13,10 +13,10 @@ keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 ext {
     versionMajor = 1
     versionMinor = 2
-    versionPatch = 0
+    versionPatch = 1
     screenSize = 0
     minimumSdkVersion = 18
-    versionClassifier = 'opener'
+    versionClassifier = null
     isSnapShot = true
 }
 
