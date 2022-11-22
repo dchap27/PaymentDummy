@@ -2,14 +2,14 @@ package ng.com.dayma.paymentdummy;
 
 import android.content.Context;
 import android.content.DialogInterface;
-import android.support.v7.app.AlertDialog;
+import androidx.appcompat.app.AlertDialog;
 import android.util.AttributeSet;
 import android.widget.ArrayAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class MultiSelectSpinner extends android.support.v7.widget.AppCompatSpinner implements
+public class MultiSelectSpinner extends androidx.appcompat.widget.AppCompatSpinner implements
         DialogInterface.OnMultiChoiceClickListener, DialogInterface.OnCancelListener {
 
     private List<String> items;

@@ -1,6 +1,6 @@
 package ng.com.dayma.paymentdummy.MyViewModels;
 
-import android.arch.lifecycle.ViewModel;
+import androidx.lifecycle.ViewModel;
 import android.content.Context;
 import android.database.Cursor;
 import android.os.AsyncTask;
