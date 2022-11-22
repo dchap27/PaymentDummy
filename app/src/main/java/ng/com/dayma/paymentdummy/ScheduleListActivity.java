@@ -1,7 +1,7 @@
 package ng.com.dayma.paymentdummy;
 
 import android.app.LoaderManager;
-import android.arch.lifecycle.ViewModelProviders;
+import androidx.lifecycle.ViewModelProviders;
 import android.content.CursorLoader;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -9,13 +9,13 @@ import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.view.ActionMode;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.view.ActionMode;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.appcompat.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -216,16 +216,16 @@ public class ScheduleListActivity extends AppCompatActivity implements
     }
 
     // code for ActionMode
-    private class ActionModecallbacks implements android.support.v7.view.ActionMode.Callback {
+    private class ActionModecallbacks implements androidx.appcompat.view.ActionMode.Callback {
 
         @Override
-        public boolean onCreateActionMode(android.support.v7.view.ActionMode mode, Menu menu) {
+        public boolean onCreateActionMode(androidx.appcompat.view.ActionMode mode, Menu menu) {
             mode.getMenuInflater().inflate(R.menu.contextual_menu, menu);
             return true;
         }
 
         @Override
-        public boolean onPrepareActionMode(android.support.v7.view.ActionMode mode, Menu menu) {
+        public boolean onPrepareActionMode(androidx.appcompat.view.ActionMode mode, Menu menu) {
             MenuItem edit_menu = menu.findItem(R.id.edit_schedule);
             MenuItem export_menu = menu.findItem(R.id.export_schedule);
             MenuItem invoice_menu = menu.findItem(R.id.add_invoice_menu);
@@ -241,7 +241,7 @@ public class ScheduleListActivity extends AppCompatActivity implements
         }
 
         @Override
-        public boolean onActionItemClicked(android.support.v7.view.ActionMode mode, MenuItem item) {
+        public boolean onActionItemClicked(androidx.appcompat.view.ActionMode mode, MenuItem item) {
             switch (item.getItemId()){
 
                 case R.id.delete_schedule:
@@ -258,13 +258,13 @@ public class ScheduleListActivity extends AppCompatActivity implements
         }
 
         @Override
-        public void onDestroyActionMode(android.support.v7.view.ActionMode mode) {
+        public void onDestroyActionMode(androidx.appcompat.view.ActionMode mode) {
             mMonthSchedulesAdapter.clearSelections();
             mActionMode = null;
         }
     }
 
-    private void deleteSchedule(final android.support.v7.view.ActionMode mode) {
+    private void deleteSchedule(final androidx.appcompat.view.ActionMode mode) {
         final List selectedItemPositions =
                 mMonthSchedulesAdapter.getSelectedItems();
         String displayNounMessage = " schedule";

@@ -1,6 +1,6 @@
 package ng.com.dayma.paymentdummy.MyViewModels;
 
-import android.arch.lifecycle.ViewModel;
+import androidx.lifecycle.ViewModel;
 import android.os.Bundle;
 
 public class ScheduleListViewModel extends ViewModel {

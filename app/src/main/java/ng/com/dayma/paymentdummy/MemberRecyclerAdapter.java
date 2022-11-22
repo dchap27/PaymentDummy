@@ -1,13 +1,12 @@
 package ng.com.dayma.paymentdummy;
 
+import android.app.AlertDialog;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.database.Cursor;
 import android.net.Uri;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +18,8 @@ import android.widget.Toast;
 import ng.com.dayma.paymentdummy.data.PaymentProviderContract;
 
 import static ng.com.dayma.paymentdummy.utils.ValidateTextInput.validateTextInput;
+
+import androidx.recyclerview.widget.RecyclerView;
 
 public class MemberRecyclerAdapter extends RecyclerView.Adapter<MemberRecyclerAdapter.ViewHolder> {
 

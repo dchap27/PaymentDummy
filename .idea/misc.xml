@@ -1,5 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="DesignSurface">
+    <option name="filePathToZoomLevelMap">
+      <map>
+        <entry key="..\:/Users/Dayma/StudioProjects/PaymentDummy/app/src/main/res/layout-land/content_payment.xml" value="0.1" />
+        <entry key="..\:/Users/Dayma/StudioProjects/PaymentDummy/app/src/main/res/layout-land/content_schedule.xml" value="0.1" />
+        <entry key="..\:/Users/Dayma/StudioProjects/PaymentDummy/app/src/main/res/layout/activity_main.xml" value="0.1" />
+        <entry key="..\:/Users/Dayma/StudioProjects/PaymentDummy/app/src/main/res/layout/content_main.xml" value="0.1" />
+        <entry key="..\:/Users/Dayma/StudioProjects/PaymentDummy/app/src/main/res/layout/content_payment.xml" value="0.1" />
+        <entry key="..\:/Users/Dayma/StudioProjects/PaymentDummy/app/src/main/res/layout/content_payment_list.xml" value="0.1" />
+        <entry key="..\:/Users/Dayma/StudioProjects/PaymentDummy/app/src/main/res/layout/content_schedule.xml" value="0.1" />
+        <entry key="..\:/Users/Dayma/StudioProjects/PaymentDummy/app/src/main/res/layout/content_schedule_list.xml" value="0.1" />
+        <entry key="..\:/Users/Dayma/StudioProjects/PaymentDummy/app/src/main/res/layout/item_month_list.xml" value="0.1" />
+        <entry key="..\:/Users/Dayma/StudioProjects/PaymentDummy/app/src/main/res/layout/item_payment_list.xml" value="0.1" />
+        <entry key="..\:/Users/Dayma/StudioProjects/PaymentDummy/app/src/main/res/layout/item_schedule_list.xml" value="0.1" />
+        <entry key="..\:/Users/Dayma/StudioProjects/PaymentDummy/app/src/main/res/layout/payment_summary.xml" value="0.1" />
+        <entry key="..\:/Users/Dayma/StudioProjects/PaymentDummy/app/src/main/res/layout/progress_view_dialog.xml" value="0.1" />
+        <entry key="..\:/Users/Dayma/StudioProjects/PaymentDummy/app/src/main/res/layout/textinput_dialog.xml" value="0.1" />
+      </map>
+    </option>
+  </component>
   <component name="ExternalStorageConfigurationManager" enabled="true" />
   <component name="NullableNotNullManager">
     <option name="myDefaultNullable" value="android.support.annotation.Nullable" />

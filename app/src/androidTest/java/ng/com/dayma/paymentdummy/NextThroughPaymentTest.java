@@ -1,20 +1,20 @@
 package ng.com.dayma.paymentdummy;
 
-import android.support.test.espresso.contrib.DrawerActions;
-import android.support.test.espresso.contrib.NavigationViewActions;
-import android.support.test.espresso.contrib.RecyclerViewActions;
-import android.support.test.rule.ActivityTestRule;
+import androidx.test.espresso.contrib.DrawerActions;
+import androidx.test.espresso.contrib.NavigationViewActions;
+import androidx.test.espresso.contrib.RecyclerViewActions;
+import androidx.test.rule.ActivityTestRule;
 
 import org.junit.Rule;
 import org.junit.Test;
 
 import java.util.List;
 
-import static android.support.test.espresso.Espresso.*;
-import static android.support.test.espresso.Espresso.pressBack;
-import static android.support.test.espresso.action.ViewActions.*;
-import static android.support.test.espresso.assertion.ViewAssertions.*;
-import static android.support.test.espresso.matcher.ViewMatchers.*;
+import static androidx.test.espresso.Espresso.*;
+import static androidx.test.espresso.Espresso.pressBack;
+import static androidx.test.espresso.action.ViewActions.*;
+import static androidx.test.espresso.assertion.ViewAssertions.*;
+import static androidx.test.espresso.matcher.ViewMatchers.*;
 import static org.hamcrest.Matchers.containsString;
 
 /**
