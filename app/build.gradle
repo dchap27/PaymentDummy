@@ -29,12 +29,12 @@ android {
             keyPassword keystoreProperties['keyPassword']
         }
     }
-    compileSdkVersion 28
+    compileSdkVersion 33
     buildToolsVersion "28.0.3"
     defaultConfig {
         applicationId "ng.com.dayma.paymentdummy"
         minSdkVersion minimumSdkVersion
-        targetSdkVersion 28
+        targetSdkVersion 33
         versionCode generateVersionCode()
         versionName generateVersionName()
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'

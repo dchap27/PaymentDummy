@@ -31,6 +31,7 @@
             android:name=".MainActivity"
             android:label="@string/title_activity_main_pro"
             android:theme="@style/AppTheme.NoActionBar"
+            android:exported="true"
             tools:replace="android:label">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
