@@ -156,10 +156,6 @@ public class PaymentActivity extends AppCompatActivity implements LoaderManager.
         mSpinnerChandaNo.setAdapter(mAdapterMemberIds);
 
         Log.d(TAG,"populate months into spinner");
-//        ArrayAdapter<String> adapterMonths =
-//                new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, mViewModel.monthsYear);
-//        adapterMonths.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-//        mSpinnerMonthPaid.setAdapter(adapterMonths);
         mSpinnerMonthPaid.setItems(mViewModel.monthsYear, getString(R.string.for_all), this);
 
 
@@ -735,9 +731,7 @@ public class PaymentActivity extends AppCompatActivity implements LoaderManager.
         Cursor cursor = mAdapterMemberIds.getCursor();
         cursor.moveToPosition(selectedPosition);
         int chandaNoPos = cursor.getColumnIndex(PaymentProviderContract.Members.COLUMN_MEMBER_ID);
-        int chandaNo = cursor.getInt(chandaNoPos);
-        return chandaNo;
-
+        return cursor.getInt(chandaNoPos);
     }
 
     private String getNameOfPayer(int chandaNo) {
