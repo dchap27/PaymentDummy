@@ -394,11 +394,11 @@ public class MainActivity extends RuntimePermissionsActivity
         super.onActivityResult(requestCode, resultCode, data);
         if(requestCode == SCHEDULE_FILE_RESULT && resultCode == RESULT_OK){
             Uri downloaddata = data.getData();
+            String mimeType = getContentResolver().getType(downloaddata);
             String fileName = downloaddata.getLastPathSegment();
             String mime = MimeTypeMap.getSingleton().getFileExtensionFromUrl(String.valueOf(downloaddata));
             Log.d(TAG, "selected file Uri: "+ downloaddata);
-            if(mime.toLowerCase().equals("csv")){
-                Log.d(TAG, "File extension being read, "+ mime);
+            if(mimeType.equals("text/comma-separated-values") || mimeType.equals("text/csv") || mime.toLowerCase().equals("csv") ){
                 try {
                     final InputStream csvFile = getContentResolver().openInputStream(downloaddata);
                     readDataToDatabaseFromIntent(csvFile);
@@ -1090,7 +1090,6 @@ public class MainActivity extends RuntimePermissionsActivity
         mViewModel.mJamaatName = mSharedPref.getString(PreferenceKeys.JAMAAT_NAME_PREF, "");
         if(mViewModel.mJamaatName.length() > 1){
             firstDataLoading();
-//            loadAdditionalJamaatRecords();
         }
         (mRecyclerItems.getAdapter()).notifyDataSetChanged();
         mSwipeRefreshLayout.setRefreshing(false);
@@ -1112,18 +1111,7 @@ public class MainActivity extends RuntimePermissionsActivity
         boolean isMultipleJamaat = mSharedPref.getBoolean(PreferenceKeys.KEY_ENABLE_MULTIPLE_JAMAAT, false);
         if(isFirstLoad == null) {
             Log.d(TAG, "Initial loading of jamaat info into database");
-//            if (isMultipleJamaat) {
-//                String[] jamaats = mSharedPref.getStringSet(PreferenceKeys.MULTI_SELECT_JAMAAT_PREF, null).toArray(new String[0]);
-//                for (int i = 0; i < jamaats.length; i++) {
-//                    loadJamaatInfoToDatabase(jamaats[i]);
-//                    mViewModel.loadedJamaats = new ArrayList<>();
-//                    mViewModel.loadedJamaats.add(jamaats[i]);
-//                }
-//            }
             loadJamaatInfoToDatabase(mViewModel.mJamaatName);
-//            SharedPreferences.Editor editor = mSharedPref.edit();
-//            editor.putString(PreferenceKeys.JAMAAT_INFO_FIRST_LOAD, mViewModel.mJamaatName);
-//            editor.commit();
         }
     }
 
