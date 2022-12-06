@@ -13,7 +13,7 @@ keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 ext {
     versionMajor = 1
     versionMinor = 2
-    versionPatch = 1
+    versionPatch = 2
     screenSize = 0
     minimumSdkVersion = 18
     versionClassifier = null
