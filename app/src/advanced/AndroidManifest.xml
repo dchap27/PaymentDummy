@@ -10,6 +10,7 @@
         android:roundIcon="@mipmap/ic_launcher_pro_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
+        android:requestLegacyExternalStorage="true"
         tools:replace="android:icon,android:label,android:roundIcon">
         <activity
             android:name=".ScheduleActivity"

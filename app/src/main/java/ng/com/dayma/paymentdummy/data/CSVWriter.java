@@ -25,9 +25,14 @@ package ng.com.dayma.paymentdummy.data;
  *   writeAll(), all methods related to sql
  */
 
+import java.io.BufferedOutputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.Writer;
+import java.nio.Buffer;
+import java.nio.charset.StandardCharsets;
 
 /**
  * A very simple CSV writer released under a commercial-friendly license.
@@ -38,6 +43,8 @@ import java.io.Writer;
 
 
 public class CSVWriter {
+
+    private BufferedOutputStream pwfile;
 
     private PrintWriter pw;
 
@@ -69,6 +76,20 @@ public class CSVWriter {
 
     /** Default line terminator uses platform encoding. */
     public static final String DEFAULT_LINE_END = "\n";
+
+    /**
+     * Constructs CSVWriter using a comma for the separator.
+     *
+     * @param fileOutputStream
+     *            the stream to an underlying CSV source.
+     */
+    public CSVWriter(FileOutputStream fileOutputStream){
+        pwfile = new BufferedOutputStream(fileOutputStream);
+        this.separator = DEFAULT_SEPARATOR;
+        this.quotechar = DEFAULT_QUOTE_CHARACTER;
+        this.escapechar = DEFAULT_ESCAPE_CHARACTER;
+        this.lineEnd = DEFAULT_LINE_END;
+    }
 
     /**
      * Constructs CSVWriter using a comma for the separator.
@@ -142,7 +163,15 @@ public class CSVWriter {
         }
 
         sb.append(lineEnd);
-        pw.write(sb.toString());
+        if(pwfile != null && pw == null){
+            try {
+                pwfile.write(sb.toString().getBytes());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else if(pw != null) {
+            pw.write(sb.toString());
+        }
 
     }
 
@@ -152,9 +181,8 @@ public class CSVWriter {
      * @throws IOException if bad things happen
      */
     public void flush() throws IOException {
-
-        pw.flush();
-
+        if(pw != null)
+            pw.flush();
     }
 
     /**
@@ -164,8 +192,13 @@ public class CSVWriter {
      *
      */
     public void close() throws IOException {
-        pw.flush();
-        pw.close();
+        if(pw != null) {
+            pw.flush();
+            pw.close();
+        }
+        if(pwfile != null) {
+            pwfile.close();
+        }
     }
 
 }

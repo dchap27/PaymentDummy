@@ -139,7 +139,7 @@ public class PaymentActivity extends AppCompatActivity implements LoaderManager.
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        enableStrictMode();
+//        enableStrictMode();
 
         mDbOpenHelper = new PaymentOpenHelper(this);
         mViewModel = ViewModelProviders.of(this).get(PaymentActivityViewModel.class);
@@ -201,17 +201,17 @@ public class PaymentActivity extends AppCompatActivity implements LoaderManager.
         }
     }
 
-    private void enableStrictMode() {
-        if (BuildConfig.DEBUG){
-            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
-                    .detectAll()
-                    .penaltyLog()
-                    .build();
-            StrictMode.setThreadPolicy(policy);
-
-        }
-
-    }
+//    private void enableStrictMode() {
+//        if (BuildConfig.DEBUG){
+//            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
+//                    .detectAll()
+//                    .penaltyLog()
+//                    .build();
+//            StrictMode.setThreadPolicy(policy);
+//
+//        }
+//
+//    }
 
     private void initializeMonthPaid() {
 

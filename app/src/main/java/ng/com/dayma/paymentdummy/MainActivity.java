@@ -2,6 +2,8 @@ package ng.com.dayma.paymentdummy;
 
 import android.Manifest;
 import android.app.LoaderManager;
+
+import androidx.annotation.RequiresApi;
 import androidx.lifecycle.ViewModelProviders;
 import android.content.ContentUris;
 import android.content.ContentValues;
@@ -16,23 +18,24 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import androidx.core.view.GravityCompat;
-import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
-import androidx.core.view.GravityCompat;
+
 import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.ItemTouchHelper;
+
+import android.provider.DocumentsContract;
 import android.text.InputFilter;
 import android.text.Spanned;
 import android.util.Log;
@@ -68,8 +71,6 @@ import ng.com.dayma.paymentdummy.utils.ValidateTextInput;
 
 import static android.content.Intent.EXTRA_MIME_TYPES;
 
-import com.google.android.material.navigation.NavigationView;
-
 public class MainActivity extends RuntimePermissionsActivity
         implements NavigationView.OnNavigationItemSelectedListener, LoaderManager.LoaderCallbacks<Cursor>,
         RecyclerClickAdapterListener,
@@ -81,6 +82,7 @@ public class MainActivity extends RuntimePermissionsActivity
     private static final int PERMISSION_REQUEST_READ_EXTERNAL_STORAGE = 10;
     private static final int PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE = 11;
     private static final int SCHEDULE_FILE_RESULT = 22;
+    private static final int CREATE_CSV_FILE = 23;
     public final String TAG = getClass().getSimpleName();
     private ScheduleRecyclerAdapter mScheduleRecyclerAdapter;
     private RecyclerView mRecyclerItems;
@@ -233,9 +235,10 @@ public class MainActivity extends RuntimePermissionsActivity
 
     @Override
     public void onPermissionsGranted(int requestCode) {
+        Intent intent;
         switch(requestCode){
             case PERMISSION_REQUEST_READ_EXTERNAL_STORAGE:
-                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                intent = new Intent(Intent.ACTION_GET_CONTENT);
                 intent.addCategory(intent.CATEGORY_OPENABLE);
                 intent.setType("application/csv");
                 String[] mimetypes = {"text/comma-separated-values", "text/csv"};
@@ -247,14 +250,26 @@ public class MainActivity extends RuntimePermissionsActivity
                 break;
 
             case PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE:
-                writeDataToCsV();
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    // Choose a directory using the system's file picker.
+                    intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
+                    // Specify a URI for the directory that should be opened in
+                    // the system file picker when it loads.
+                    intent.putExtra(DocumentsContract.EXTRA_INITIAL_URI, Uri.parse(Environment.DIRECTORY_DOCUMENTS));
+                    intent.addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
+
+                    startActivityForResult(intent, CREATE_CSV_FILE);
+                } else {
+                    writeDataToCsV(null);
+                }
         }
 
     }
 
-    private void writeDataToCsV() {
+    private void writeDataToCsV(final Uri uri) {
 
         AsyncTask<String, Integer, Boolean> task = new AsyncTask<String, Integer, Boolean>() {
+            private Uri filedirUri;
             private String mMonthId;
             private String mScheduleId;
             private String mFileName;
@@ -301,6 +316,7 @@ public class MainActivity extends RuntimePermissionsActivity
                     String[] monthSplit = monthId.split(" ");
                     mMonthId = monthSplit[0].trim();
                     mFileName = mScheduleId;
+                    filedirUri = uri;
                     mSuccess = true;
                     Log.d("CSVUtility", "File name reading... " + mFileName);
                 }
@@ -312,7 +328,7 @@ public class MainActivity extends RuntimePermissionsActivity
 
                 CsvUtility csvUtility = new CsvUtility(MainActivity.this);
                 Log.d(TAG, "Writing to file");
-                mSuccess = csvUtility.writeDatabaseToCSV(mFileName, mScheduleId, mMonthId);
+                mSuccess = csvUtility.writeDatabaseToCSV(mFileName, mScheduleId, mMonthId, filedirUri);
                 publishProgress(4);
                 simulateLongRunningWork();
                 if(mSuccess){
@@ -407,6 +423,23 @@ public class MainActivity extends RuntimePermissionsActivity
                 }
             }
 
+        }
+        if(requestCode == CREATE_CSV_FILE && resultCode == RESULT_OK){
+            // The result data contains a URI for the document or directory that
+            // the user selected.
+            Uri uri = null;
+            if (data != null) {
+                uri = data.getData();
+                final int takeFlags = data.getFlags()
+                        & (Intent.FLAG_GRANT_READ_URI_PERMISSION
+                        | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+                // Check for the freshest data.
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                    getContentResolver().takePersistableUriPermission(uri, takeFlags);
+                }
+                // Perform operations on the document using its URI.
+                writeDataToCsV(uri);
+            }
         }
     }
 
